@@ -155,10 +155,12 @@ function loft_dev_block_view($delta = '') {
 
       // Email output
       if (_loft_dev_reroute_email_status()) {
-        $output .= '<p>Reroute email is enabled and ready.</p>' . "\n";
+        $output .= t('<p>Reroute email is enabled and ready: %mail</p>', array(
+          '%mail' => variable_get('reroute_email_address', NULL),
+        )) . "\n";
       }
       else {
-        $output .= '<p>!!! REROUTE EMAIL IS NOT READY !!!</p>' . "\n";
+        $output .= t('<p>!!! REROUTE EMAIL IS NOT READY !!!</p>') . "\n";
       }
 
 

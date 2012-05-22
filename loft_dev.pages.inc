@@ -47,11 +47,22 @@ function loft_dev_theme_test_page() {
   $output .= _loft_dev_dummy_string(20) .'<sup>&lt;sup> '. _loft_dev_dummy_string(3) .'</sup>'. _loft_dev_dummy_string(20). "\n";
 
   $output .= '</div>'."\n";
+
+  $output .= '<pre>&lt;pre>10 print "Hello World"' . "\n" . '20 goto 10</pre>' . "\n";
+
   //ordered list
-  $output .= theme('item_list', _loft_dev_dummy_array(5),  '&lt;ol> '. _loft_dev_dummy_string(4), 'ol')."\n";
+  $output .= theme('item_list', array(
+    'items' => _loft_dev_dummy_array(5),
+    'title' => '&lt;ol> '. _loft_dev_dummy_string(4),
+    'type'  => 'ol',
+  )) . "\n";
 
   //unordered list
-  $output .= theme('item_list', _loft_dev_dummy_array(5),  '&lt;ul> '. _loft_dev_dummy_string(4), 'ul')."\n";
+  $output .= theme('item_list', array(
+    'items' => _loft_dev_dummy_array(5),
+    'title' => '&lt;ul> '. _loft_dev_dummy_string(4),
+    'type'  => 'ul',
+  )) . "\n";
 
   //p tags
   $output .= '<p>p tag: Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>'."\n";
@@ -61,12 +72,18 @@ function loft_dev_theme_test_page() {
   $output .= '<p>p tag: Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>'."\n";
 
   //table
-  $output .= theme('table', _loft_dev_dummy_array(10), _loft_dev_dummy_array(10, 10)) ."\n";
+  $output .= theme('table', array(
+    'header' => _loft_dev_dummy_array(10),
+    'rows' => _loft_dev_dummy_array(10, 10),
+  )) . "\n";
 
   //form
-  $output .= drupal_get_form('test_form_form') ."\n";
+  $output .= drupal_render(drupal_get_form('test_form_form')) ."\n";
 
-  $output .= theme('image', drupal_get_path('module', 'loft_dev') . '/image.jpg', _loft_dev_dummy_string(4), _loft_dev_dummy_string(8)) ."\n";
+  $output .= str_repeat(theme('image', array(
+    'path' => drupal_get_path('module', 'loft_dev') . '/images/monalisa.jpg',
+    //_loft_dev_dummy_string(4), _loft_dev_dummy_string(8)) ."\n";
+  )), 3);
 
 
   //pager
