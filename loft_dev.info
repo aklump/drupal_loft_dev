@@ -1,0 +1,8 @@
+; $Id: loft_dev.info 202 2011-02-28 18:54:45Z aklump $
+name = Loft Dev
+description = Used by ITLS during development of a website.
+core = 6.x
+version = "6.x-1.1"
+package = Development
+dependencies[] = devel
+dependencies[] = devel_node_access

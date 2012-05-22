@@ -1,0 +1,35 @@
+/*$Id: loft_dev.css 188 2010-10-30 16:30:49Z aklump $*/
+
+.loft-dev-closure {
+  font-size: 14px !important;
+  padding:10px !important;
+  background-color: #000000 !important;
+}
+
+.loft-dev-closure,
+.loft-dev-closure *{
+  color: #66FF66 !important;
+  font-family: "Panic Sans", monospace  !important;
+}
+.loft-dev-closure .form-submit,
+.loft-dev-closure .form-text {
+  color: #000 !important;
+}
+.loft-dev-closure tr.odd {
+  background: #000 !important;
+}
+.loft-dev-closure tr.even {
+  background: #333 !important;
+}
+.loft-dev-closure th {
+  background: #666 !important;
+  color: #000 !important;
+}
+.loft-dev-closure table {
+  width: 100% !important;
+}
+
+.loft-dev-closure a {
+  color: #fff !important;
+  text-decoration: underline !important;
+}

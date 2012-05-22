@@ -1,0 +1,181 @@
+<?php
+// $Id: loft_dev.module 200 2011-02-28 18:53:08Z aklump $ 
+
+/** 
+* @file 
+* Base module file for loft_dev
+*/
+
+/**
+ * Implementation of hook_enable()
+ */
+function loft_dev_enable() {
+
+	//make a note of who enabled it
+	global $user;
+	watchdog('loft_dev', 'loft_dev enabled by %user (uid: %uid)', array('%user' => $user->name, '%uid' => $user->uid));
+}
+
+/**
+ * Implementation of hook_disable()
+ */
+function loft_dev_disable() {
+
+	//make a note of who disabled it
+	global $user;
+	watchdog('loft_dev', 'loft_dev disabled by %user (uid: %uid)', array('%user' => $user->name, '%uid' => $user->uid));
+}
+
+/**
+ * Implementation of hook_menu()
+ */
+function loft_dev_menu() {
+  $items = array();
+  
+  $items['admin/loft-dev'] = array(
+    'title' => 'Loft Dev',
+    'page callback' => 'loft_dev_page',
+    'access arguments' => array('use loft dev tools'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['admin/loft-dev/overview'] = array(
+    'title' => 'Overview',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
+  $items['admin/loft-dev/theme'] = array(
+    'title' => 'Theme Tester',
+    'page callback' => 'loft_dev_theme_test_page',
+    'access arguments' => array('use loft dev tools'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'loft_dev.pages.inc',
+  );
+  $items['admin/loft-dev/funx'] = array(
+    'title' => 'PHP Functions',
+    'page callback' => 'loft_dev_list_functions_page',
+    'access arguments' => array('use loft dev tools'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'loft_dev.pages.inc',
+  );
+  
+  return $items;
+}
+
+/**
+ * Implementation of hook_form_alter
+ */
+function loft_dev_form_alter(&$form, $form_state, $form_id) {
+  
+  $is_new = (empty($form['old_type']['#value']));
+
+  if ($form_id == 'node_type_form' && $is_new) {
+    
+    //modify the node body so it is blank by default
+    $form['#node_type']->body_label = '';
+    $form['#node_type']->has_body = FALSE;
+    $form['submission']['body_label']['#default_value'] = '';
+    
+    //turn off comments by default
+    $form['comment']['comment']['#default_value'] = 0;
+    
+    //turn off promoted to front page default
+    unset($form['workflow']['node_options']['#default_value'][1]);
+    
+    //expand title fieldset to change the title
+    $form['submission']['#collapsed'] = 0;
+  }
+}
+
+/**
+ * Implementation of hook_perm
+ */
+function loft_dev_perm() {
+  return array(
+    'use loft dev tools',
+  );
+}
+
+/**
+ * Implementation of hook_block()
+ */
+function loft_dev_block($op = 'list', $delta = 0, $edit = array()) {
+  switch ($op) {
+  
+    //list out your blocks on block page
+    case 'list':
+      $blocks = array();
+      $blocks[0] = array(
+        'info' => t('In the Loft Development'),
+        'cache' => BLOCK_NO_CACHE,
+      );      
+      
+      //return block list for admin page
+      return $blocks;
+    
+    //render the block by the delta
+    case 'view':
+      $block = array();
+      switch ($delta) {
+        case 0:
+          $output = '';
+          
+          drupal_add_js('misc/collapse.js');
+          drupal_add_css(drupal_get_path('module', 'loft_dev') .'/loft_dev.css');
+  
+          $block['subject'] = t('In the Loft Development');
+          
+          //@todo This is ugly hackish, so refactor; there are no access restrictions...?
+          foreach (module_invoke('loft_dev', 'menu') as $href => $link) {
+            if (!empty($link['title'])) {
+              $links[$href] = array(
+                'href' => $href,
+                'title' => $link['title'],
+              );              
+            }
+          }
+          $output .= theme("links", $links) . "\n";
+          
+          if (module_exists('masquerade')) {
+            $block = module_invoke('masquerade', 'block', 'view', 0);
+            $output .= '<h3>'. $block['subject'] .'</h3>'."\n";
+            $output .= $block['content'] ."\n";    
+          }          
+          
+          //$output .= '<h3>'. $block['subject'] .'</h3>'."\n";
+          //$block = module_invoke('devel', 'block', 'view', 2);
+          //$output .= $block['content'] ."\n";
+          
+          $output .= menu_tree('devel');
+          
+          $block = module_invoke('devel_node_access', 'block', 'view', 0);
+          $output .= '<h3>'. $block['subject'] .'</h3>'."\n";
+          $output .= $block['content'] ."\n";
+          
+          $block = module_invoke('devel_node_access', 'block', 'view', 1);
+          $output .= '<h3>'. $block['subject'] .'</h3>'."\n";
+          $output .= $block['content'] ."\n";
+          
+          if (module_exists('func_search')) {
+            $block = module_invoke('func_search', 'block', 'view', 0);
+            $output .= '<h3>'. $block['subject'] .'</h3>'."\n";
+            $output .= $block['content'] ."\n";    
+          }
+          
+          $output = '<div class="loft-dev-closure">'. $output .'</div> <!-- /loft-dev-closure -->'."\n";          
+          $block['content'] = $output;
+          break;
+          
+      } //end delta
+      return $block;
+      
+  } // switch $op
+}
+
+/**
+ * Generates the overview page
+ */
+function loft_dev_page() {
+  $output = '';
+  $output .= filter_filter('process', 1, NULL, file_get_contents(dirname(__FILE__) ."/README.txt"));
+  return $output;
+}
