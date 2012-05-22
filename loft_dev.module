@@ -115,16 +115,8 @@ function loft_dev_block_view($delta = '') {
       drupal_add_js('misc/collapse.js');
       drupal_add_css(drupal_get_path('module', 'loft_dev') .'/loft_dev.css');
 
-      //@todo This is ugly hackish, so refactor; there are no access restrictions...?
-      foreach (module_invoke('loft_dev', 'menu') as $href => $link) {
-        if (!empty($link['title'])) {
-          $links[$href] = array(
-            'href' => $href,
-            'title' => $link['title'],
-          );
-        }
-      }
-      $output .= theme("links", $links) . "\n";
+      $links = module_invoke_all('loft_dev_menu');
+      $output .= theme("links", array('links' => $links)) . "\n";
 
       if (module_exists('masquerade') &&
           ($temp = module_invoke('masquerade', 'block_view', 0))) {
@@ -134,13 +126,6 @@ function loft_dev_block_view($delta = '') {
         $output .= '<h3>'. $temp['subject'] .'</h3>'."\n";
         $output .= drupal_render($temp['content']) ."\n";
       }
-
-      //$output .= '<h3>'. $temp['subject'] .'</h3>'."\n";
-      //$temp = module_invoke('devel', 'block_view', 2);
-      //if (is_string($temp['content'])) {
-      //  $temp['content'] = array('#markup' => $temp['content']);
-      //}
-      //$output .= $temp['content'] ."\n";
 
       $output .= render(menu_tree('devel'));
 
@@ -169,9 +154,7 @@ function loft_dev_block_view($delta = '') {
       }
 
       // Email output
-      if (module_exists('reroute_email') &&
-          variable_get('reroute_email_enable', NULL) &&
-          variable_get('reroute_email_address', NULL)) {
+      if (_loft_dev_reroute_email_status()) {
         $output .= '<p>Reroute email is enabled and ready.</p>' . "\n";
       }
       else {
@@ -188,4 +171,26 @@ function loft_dev_block_view($delta = '') {
       break;
   }
   return $block;
+}
+
+/**
+ * Return the current status of reroute email
+ *
+ * @return bool
+ *   TRUE: it is enabled, and all configurations a go
+ */
+function _loft_dev_reroute_email_status() {
+  $status = module_exists('reroute_email') &&
+    variable_get('reroute_email_enable', NULL) &&
+    variable_get('reroute_email_address', NULL);
+  return $status;
+}
+
+/**
+ * Implements hook_init().
+ */
+function loft_dev_init() {
+  if (!_loft_dev_reroute_email_status()) {
+    drupal_set_message(t('Reroute email is not properly enabled/configured. Fix immediately.'), 'error', FALSE);
+  }
 }

@@ -6,14 +6,13 @@ sites.
 # Creates a theme test page
 # Creates a library of all functions
 
-REQUIREMENTS:
-
 
 INSTALLATION:
 # Install and activate like other modules.
 
 CONFIGURATION:
-# Assign the block "In the Loft Dev" to the proper region.
+# Assign the block "Loft Dev Tools" to the proper region, e.g. post_footer
+# You may assign bookmark links to the dev console using hook_loft_dev_menu()
 
 CONTACT: In the Loft Studios Aaron Klump - Web Developer PO Box 29294
 Bellingham, WA 98228-1294 aim: theloft101 skype: intheloftstudios
