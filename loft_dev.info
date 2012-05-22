@@ -1,4 +1,4 @@
-name = Loft Dev
+name = Loft Dev Tools
 description = Used by ITLS during development of a website.
 package = In the Loft Studios
 core = 7.x

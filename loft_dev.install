@@ -34,6 +34,58 @@ function loft_dev_enable() {
   //change the system weight for the module, if needed
   //$weight = db_query("SELECT weight FROM {system} WHERE name = 'fieldgroup'")->fetchField();
   //db_query("UPDATE {system} SET `weight` = ". ++$weight ." WHERE name = 'loft_dev'"); //don't do alimit on this query in case there are more than one entries?
+
+  // Give all devel perms to all rids automatically
+  $all_rids = array_keys(user_roles());
+  $perms = array();
+  $modules = array('devel', 'devel_node_access');
+  foreach ($modules as $module) {
+    $perms = module_invoke($module, 'permission');
+    foreach (array_keys($perms) as $permission) {
+      foreach ($all_rids as $rid) {
+        db_delete('role_permission')
+        ->condition('rid', $rid)
+        ->condition('module', 'loft_dev')
+        ->condition('permission', $permission)
+        ->execute();
+        $query = db_select('role_permission', 'p');
+        $query
+          ->fields('p')
+          ->condition('rid', $rid)
+          ->condition('permission', $permission)
+          ->countQuery();
+        $count = $query->execute()->fetchField();
+        if ($count < 1) {
+          $data = array(
+            'rid' => $rid,
+            //'module' => $module,
+            'module' => 'loft_dev',
+            'permission' => $permission,
+          );
+          drupal_write_record('role_permission', $data);
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_disable().
+ */
+function loft_dev_disable() {
+  $all_rids = array_keys(user_roles());
+  $perms = array();
+  $modules = array('devel', 'devel_node_access');
+  foreach ($modules as $module) {
+    $perms = module_invoke($module, 'permission');
+    foreach (array_keys($perms) as $permission) {
+      db_delete('role_permission')
+      ->condition('module', 'loft_dev')
+      ->condition('permission', $permission)
+      ->condition('rid', $all_rids, 'IN')
+      ->execute();
+    }
+  }
 }
 
 /**
