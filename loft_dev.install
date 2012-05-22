@@ -1,0 +1,68 @@
+<?php
+/**
+ * @file
+ * Handles installation steps for loft_dev
+ *
+ * @ingroup func_search
+ * @{
+ */
+
+/*
+ * Implements hook_uninstall().
+ */
+function loft_dev_uninstall() {
+
+  //Clean up our entries in the variables table.
+  if ($result = db_query("SELECT name FROM {variable} WHERE `name` LIKE 'loft_dev%'")) {
+    foreach($result as $data) {
+      variable_del($data->name);
+    }
+  }
+
+  //delete blocks
+  db_query("DELETE FROM {block} WHERE `module` = 'loft_dev'");
+}
+
+/**
+ * Implements hook_enable().
+ */
+function loft_dev_enable() {
+
+  //message about module settings
+  drupal_set_message(t('You may adjust settings for Loft Dev Tools by visiting <a href="@url">@url</a>.', array('@url' => url('admin/loft-dev'))));
+
+  //change the system weight for the module, if needed
+  //$weight = db_query("SELECT weight FROM {system} WHERE name = 'fieldgroup'")->fetchField();
+  //db_query("UPDATE {system} SET `weight` = ". ++$weight ." WHERE name = 'loft_dev'"); //don't do alimit on this query in case there are more than one entries?
+}
+
+/**
+ * Implements hook_requirements().
+ *
+ * Checks installation requirements and do status reporting.
+ * http://api.drupal.org/api/function/hook_requirements
+ *
+ * @param phase 'install' or 'runtime':
+ * @return A keyed array of requirements
+ */
+//function loft_dev_requirements($phase) {
+//  $reqs = array();
+//  $t = get_t();
+//  if ($phase == 'runtime') {
+//    $reqs['loft_dev'] = array(
+//      'title' => $t('Title'),
+//      'value' => $t('Value'),
+//      'severity' => REQUIREMENT_WARNING,
+//      'description' => $t(''),
+//      );
+    //if (!_oc_server_opl_exec($stdin)) {
+    //  $reqs['oc_server']['value'] = $t('Not Found!');
+    //  $reqs['oc_server']['description'] = $t('Make sure your server path is correct.');
+    //  $reqs['oc_server']['severity'] = REQUIREMENT_ERROR;
+    //}
+
+//  }
+//  return $reqs;
+//}
+
+/** @} */ //end of group loft_dev

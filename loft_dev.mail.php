@@ -1,6 +1,4 @@
 <?php
-// $Id: loft_dev.mail.php 155 2010-06-07 14:13:14Z aklump $
-
 /**
  * @file
  * This file simply tests the server's mail function

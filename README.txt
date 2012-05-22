@@ -1,5 +1,3 @@
-/* $Id: README.txt 201 2011-02-28 18:54:18Z aklump $ */
-
 SUMMARY: This is a helper module to provide common functionality while building
 sites.
 
