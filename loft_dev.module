@@ -5,6 +5,37 @@
 */
 
 /**
+ * Implements hook_help().
+ *
+ * http://api.drupal.org/api/function/hook_help
+ *
+ * @param string $path
+ *   The router menu path, as defined in hook_menu(), for the help that is
+ *   being requested; e.g., 'admin/node' or 'user/edit'. If the router path
+ *   includes a % wildcard, then this will appear in $path; for example, node
+ *   pages would have $path equal to 'node/%' or 'node/%/view'. Your hook
+ *   implementation may also be called with special descriptors after a "#" sign.
+ * @param array $arg
+ *   An array that corresponds to the return value of the arg() function, for
+ *   modules that want to provide help that is specific to certain values of
+ *   wildcards in $path. For example, you could provide help for the path
+ *   'user/1' by looking for the path 'user/%' and $arg[1] == '1'. This array
+ *   should always be used rather than directly invoking arg(), because your
+ *   hook implementation may be called for other purposes besides building the
+ *   current page's help. Note that depending on which module is invoking
+ *   hook_help, $arg may contain only empty strings. Regardless, $arg[0] to
+ *   $arg[11] will always be set.
+ */
+function loft_dev_help($path, $arg) {
+  $output = '';
+  switch ($path) {
+    case 'loft-dev/theme':
+      $output .= 'Help area text ' . _loft_dev_dummy_string(24);
+      return $output;
+  }
+}
+
+/**
  * Implements hook_menu()
  */
 function loft_dev_menu() {
@@ -13,7 +44,7 @@ function loft_dev_menu() {
   $items['admin/loft-dev'] = array(
     'title' => 'Loft Dev',
     'page callback' => 'loft_dev_page',
-    'access arguments' => array('use loft dev tools'),
+    'access arguments' => array('use loft_dev tools'),
     'type' => MENU_NORMAL_ITEM,
     'file' => 'loft_dev.pages.inc',
   );
@@ -22,36 +53,80 @@ function loft_dev_menu() {
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => -10,
   );
+  $items['admin/loft-dev/funx'] = array(
+    'title' => 'PHP Functions',
+    'page callback' => 'loft_dev_list_functions_page',
+    'access arguments' => array('use loft_dev tools'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'loft_dev.pages.inc',
+  );
+  $items['admin/loft-dev/theme'] = array(
+    'title' => 'Default Theme Tester',
+    'page callback' => 'drupal_goto',
+    'page arguments' => array('loft-dev/theme'),
+    'access arguments' => array('use loft_dev tools'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'loft_dev.pages.inc',
+  );
   $items['admin/loft-dev/theme/admin'] = array(
     'title' => 'Admin Theme Tester',
     'page callback' => 'loft_dev_theme_test_page',
     'page arguments' => array(3),
-    'access arguments' => array('use loft dev tools'),
+    'access arguments' => array('use loft_dev tools'),
     'type' => MENU_LOCAL_TASK,
     'file' => 'loft_dev.pages.inc',
   );
-  $items['admin/loft-dev/theme/default'] = array(
-    'title' => 'Default Theme Tester',
+  $items['admin/loft-dev/theme/403'] = array(
+    'title' => '403 Theme Tester',
     'page callback' => 'drupal_goto',
-    'page arguments' => array('loft-dev/theme'),
-    'access arguments' => array('use loft dev tools'),
+    'page arguments' => array('loft-dev/theme/403'),
+    'access arguments' => array('use loft_dev tools'),
     'type' => MENU_LOCAL_TASK,
-    'file' => 'loft_dev.pages.inc',
+  );
+  $items['admin/loft-dev/theme/404'] = array(
+    'title' => '404 Theme Tester',
+    'page callback' => 'drupal_goto',
+    'page arguments' => array('loft-dev/theme/404'),
+    'access arguments' => array('use loft_dev tools'),
+    'type' => MENU_LOCAL_TASK,
+  );
+  $items['admin/loft-dev/theme/offline'] = array(
+    'title' => 'Offline Theme Tester',
+    'page callback' => 'drupal_goto',
+    'page arguments' => array('loft-dev/theme/offline'),
+    'access arguments' => array('use loft_dev tools'),
+    'type' => MENU_LOCAL_TASK,
   );
   $items['loft-dev/theme'] = array(
     'title' => 'Default Theme Tester',
     'page callback' => 'loft_dev_theme_test_page',
-    'access arguments' => array('use loft dev tools'),
+    'access arguments' => array('use loft_dev tools'),
     'type' => MENU_CALLBACK,
     'file' => 'loft_dev.pages.inc',
   );
-  $items['admin/loft-dev/funx'] = array(
-    'title' => 'PHP Functions',
-    'page callback' => 'loft_dev_list_functions_page',
-    'access arguments' => array('use loft dev tools'),
-    'type' => MENU_LOCAL_TASK,
+  $items['loft-dev/theme/403'] = array(
+    'page callback' => 'drupal_access_denied',
+    'access arguments' => array('use loft_dev tools'),
+    'type' => MENU_CALLBACK,
+  );
+  $items['loft-dev/theme/404'] = array(
+    'page callback' => 'drupal_not_found_page',
+    'access arguments' => array('use loft_dev tools'),
+    'type' => MENU_CALLBACK,
     'file' => 'loft_dev.pages.inc',
   );
+  $items['loft-dev/theme/offline'] = array(
+    'page callback' => 'drupal_site_offline',
+    'access arguments' => array('use loft_dev tools'),
+    'type' => MENU_CALLBACK,
+  );
+  $items['loft-dev/theme/teasers'] = array(
+    'page callback' => 'loft_dev_teasers_page',
+    'access arguments' => array('use loft_dev tools'),
+    'type' => MENU_CALLBACK,
+    'file' => 'loft_dev.pages.inc',
+  );
+
   return $items;
 }
 
@@ -86,7 +161,7 @@ function loft_dev_form_alter(&$form, $form_state, $form_id) {
 function loft_dev_permission() {
   return array(
     'use loft_dev tools' => array(
-      'title' => t('Use Loft Dev Tools'),
+      'title' => t('use loft_dev tools'),
       'description' => t("Use In the Loft Studios' Development Tools."),
     ),
   );
@@ -110,13 +185,22 @@ function loft_dev_block_view($delta = '') {
   switch ($delta) {
     case 0:
 
+      if (!user_access('use loft_dev tools')) {
+        return array();
+      }
+
       $output = '';
 
       drupal_add_js('misc/collapse.js');
       drupal_add_css(drupal_get_path('module', 'loft_dev') .'/loft_dev.css');
 
+      // Links from other modules
       $links = module_invoke_all('loft_dev_menu');
-      $output .= theme("links", array('links' => $links)) . "\n";
+      $output .= theme("links", array('links' => $links, 'attributes' => array(
+        'class' => array(
+          'loft-dev-auxillary-links',
+        ),
+      ),)) . "\n";
 
       if (module_exists('masquerade') &&
           ($temp = module_invoke('masquerade', 'block_view', 0))) {
@@ -163,11 +247,13 @@ function loft_dev_block_view($delta = '') {
         $output .= t('<p>!!! REROUTE EMAIL IS NOT READY !!!</p>') . "\n";
       }
 
+      // Rewind form
+      $output .= drupal_render(drupal_get_form('loft_dev_update_rewind_form'));
 
       // No more changes/additions
       $output = '<div class="loft-dev-closure">'. $output .'</div> <!-- /loft-dev-closure -->'."\n";
       $block = array(
-        'subject' =>  t('Loft Dev Tools'),
+        //'subject' =>  t('Loft Dev Tools'),
         'content' => array('#markup' => $output),
       );
       break;
@@ -196,3 +282,345 @@ function loft_dev_init() {
     drupal_set_message(t('Reroute email is not properly enabled/configured. Fix immediately.'), 'error', FALSE);
   }
 }
+
+/**
+ * Implements hook_loft_dev_menu
+ *
+ * Easily add links to the loft dev console
+ *
+ * @return array
+ * This will be passed to theme_links
+ * An array of arrays with:
+ * - title: the visible link title
+ * - href: the link to
+ *
+ * @see theme_links()
+ */
+function loft_dev_loft_dev_menu() {
+  $links = array(
+    array(
+      'title' => t('Hide Admin Stuff'),
+      'href' => '<front>',
+      'attributes' => array(
+        'onclick' => 'jQuery(\'.loft-dev-closure, #admin-menu, #toolbar, .dev-query\').remove(); jQuery(\'body.toolbar\').css(\'padding-top\', 0); return false;',
+        'class' => array(
+          'loft-dev-closure-hide',
+        ),
+      ),
+    ),
+    array(
+      'title' => t('Theme Test'),
+      'href' => 'loft-dev/theme',
+    ),
+  );
+
+  $links[] = array(
+    'title' => t('Teasers Page'),
+    'href' => 'loft-dev/theme/teasers',
+  );
+
+  // a link to a node of each type
+  foreach (loft_dev_node_suite() as $type => $node) {
+    $links[] = array(
+      'title' => $type,
+      'href' => 'node/' . $node->nid,
+    );
+  }
+  return $links;
+}
+
+/**
+ * Return an array of nids, random, one of each node type
+ */
+function loft_dev_node_suite() {
+  if (empty($_SESSION['loft_dev']['node_suite'])) {
+    $_SESSION['loft_dev']['node_suite'] = array();
+    $types = array_keys(node_type_get_types());
+    foreach ($types as $type) {
+      $query = db_select('node', 'n');
+      $nid = $query
+        ->fields('n', array('nid',))
+        ->condition('status', 1)
+        ->condition('type', $type)
+        ->orderRandom()
+        ->range(0,1)
+        ->execute()
+        ->fetchField();
+      $_SESSION['loft_dev']['node_suite'][$type] = node_load($nid);
+    }
+
+  }
+  return $_SESSION['loft_dev']['node_suite'];
+}
+
+/**
+ * Form builder for the loft_dev_update_rewind form.
+ *
+ * Generates a form to select a module to rewind it's last update hook
+ *
+ * @see loft_dev_update_rewind_form_validate()
+ * @see loft_dev_update_rewind_form_submit()
+ * @ingroup forms
+ */
+function loft_dev_update_rewind_form($form, &$form_state) {
+  $form = array();
+
+  $modules = module_list(FALSE, FALSE, TRUE);
+  $form['module'] = array(
+    '#type' => 'select',
+    '#title' => t('Replay Last Module Update'),
+    '#default_value' => !empty($_SESSION['loft_dev']['last_rewind']) ? $_SESSION['loft_dev']['last_rewind'] : '',
+    '#options' => $modules,
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Replay Update'),
+  );
+
+
+  return $form;
+}
+
+/**
+ * Form submission handler for loft_dev_update_rewind_form().
+ *
+ * @see loft_dev_update_rewind_form()
+ * @see loft_dev_update_rewind_form_validate()
+ */
+function loft_dev_update_rewind_form_submit($form, &$form_state) {
+  $_SESSION['loft_dev']['last_rewind'] = $form_state['values']['module'];
+
+  $query = db_select('system', 's');
+  $version = $query
+    ->fields('s', array('schema_version'))
+    ->condition('name', $form_state['values']['module'])
+    ->execute()->fetchField();
+  $count = db_update('system')
+    ->fields(array('schema_version' => --$version))
+    ->condition('name', $form_state['values']['module'])
+    ->execute();
+  if ($count) {
+    drupal_set_message(t('%module has been rewound to schema version %version', array(
+      '%module' => $form_state['values']['module'],
+      '%version' => $version,
+    )));
+  }
+  $form_state['redirect'] = 'update.php';
+}
+
+
+/**
+ * These UTILITY FUNCTIONS can be copied into your module's .install file and
+   used for helping with one off updates; by copying them into your .install
+   file, you will not need to have this module running on production. Be sure to
+   rename the functions to match your module if you go this route.
+ */
+
+/**
+ * Update helper function to move a block to a new region
+ *
+ * @param string $module
+ * @param string $delta
+ * @param string $new_region
+ *   Set to empty() or -1 to disable block
+ * @param array or string $themes
+ *   If empty block will be moved for all themes.
+ *   If one theme you may pass a string.
+ * @param int $new_weight
+ *   Optional, if you want to assign it a new weight.
+ */
+function loft_dev_move_block($module, $delta, $new_region, $themes = array(), $new_weight = NULL) {
+  if (empty($themes)) {
+    $themes = array_keys(list_themes(TRUE));
+  }
+  elseif (is_string($themes)) {
+    $themes = array($themes);
+  }
+
+  $fields = array(
+    'region' => empty($new_region) ? -1 : $new_region,
+    'status' => empty($new_region) ? 0 : 1,
+  );
+  if ($new_weight) {
+    $fields['weight'] = $new_weight;
+  }
+
+  db_update('block')
+  ->fields($fields)
+  ->condition('module', $module)
+  ->condition('delta', $delta)
+  ->condition('theme', $themes, 'IN')
+  ->execute();
+  cache_clear_all();
+}
+
+/**
+ * Update helper function to alter attributes of a block
+ *
+ * @param string or array $delta
+ *   string: shorthand for block module and delta
+ *   array:
+ *     - module
+ *     - delta
+ * @param string or array $body
+ *   string: The body of the block
+ *   array:
+ *     - title
+ *     - block_class: depends on block_class module
+ *     The following keys are only valid if $delta is numeric or
+       $delta['module'] == 'block':
+ *     - body
+ *     - format
+ *     - info: description
+ *
+ * @return NULL
+ *
+ * @see block_custom_block_save()
+ *
+ */
+function loft_dev_update_block($delta, $block) {
+  if (is_string($block)) {
+    $block = array('body' => $block);
+  }
+  if (is_numeric($delta)) {
+    $delta = array(
+      'module' => 'block',
+      'delta' => $delta,
+    );
+  }
+  $block = (array) $block;
+
+  if ($delta['module'] == 'block') {
+    $block += block_custom_block_get($delta['delta']);
+    $edit = array(
+      'body' => array(
+        'value' => $block['body'],
+        'format' => $block['format'],
+      ),
+      'info' => $block['info'],
+    );
+    block_custom_block_save($edit, $delta['delta']);
+  }
+
+  // Set the block's title
+  if (array_key_exists('title', $block)) {
+    db_update('block')
+    ->fields(array(
+      'title' => $block['title'],
+    ))
+    ->condition('module', $delta['block'])
+    ->condition('delta', $delta['delta']);
+  }
+
+  // block class?
+  if (module_exists('block_class') && array_key_exists('block_class', $block)) {
+    db_update('block_class')
+    ->fields('css_class', $block['block_class'])
+    ->condition('module', $delta['module'])
+    ->condition('delta', $delta['delta']);
+  }
+}
+
+/**
+ * Update helper function to reorder blocks in a region
+ *
+ * @param string $region
+ * @param array $blocks
+ *   Each element is 'module|delta'
+ *
+ * @return bool
+ */
+function loft_dev_block_order($region, $blocks, $starting_weight = -100) {
+  $weight = $starting_weight;
+  foreach ($blocks as $block) {
+    if (!($block = explode('|', $block))) {
+      return FALSE;
+    }
+    $count = db_update('block')
+      ->fields(array('weight' => $weight))
+      ->condition('module', $block[0])
+      ->condition('delta', $block[1])
+      ->execute();
+    if (!$count) {
+      return FALSE;
+    }
+    $weight += 10;
+  }
+}
+
+/**
+ * Update helper function to add menu item if it doesn't exist
+ *
+ * @param string $menu_name
+ * @param string $title
+ * @param string $href
+ * @param array $options
+ * @param array $weight
+ *
+ * @return bool
+ */
+function loft_dev_add_menu_item($menu_name, $title, $href, $options = array(), $weight = 0) {
+
+  // Make sure the menu exists
+  if (!menu_load($menu_name)) {
+    return FALSE;
+  }
+
+  // Make sure item doesn't exist
+  $query = db_select('menu_links', 'l');
+  $found = $query
+    ->condition('menu_name', $menu_name)
+    ->condition('link_path', $href)
+    ->countQuery()
+    ->execute()
+    ->fetchField();
+
+  if (!$found) {
+    $item = array(
+      'link_path' => $href,
+      'link_title' => $title,
+      'menu_name' => $menu_name,
+      'options' => $options,
+      'weight' => $weight,
+    );
+    menu_link_save($item);
+  }
+  return TRUE;
+}
+
+/**
+ * Update helper to edit a menu item
+ *
+ * BE CAREFUL with key 'options', as anything you send will not merge, but will
+   replace the stored options!!!!
+ *
+ * @param array $item
+ *   mlid is required plus one more key
+ *
+ * @return bool
+ *
+ * @see menu_link_save()
+ */
+function loft_dev_menu_link_update($item) {
+  if (empty($item['mlid']) || !($stored = menu_link_load($item['mlid']))) {
+    return FALSE;
+  }
+  $item += $stored;
+  menu_link_save($item);
+}
+
+//function _loft_dev_ga_options(&$options, $key = '') {
+//  $allowed_array_keys = array('class');
+//  $options = array_unique($options);
+//  if (is_array($options)) {
+//    foreach (array_keys($options) as $option_key) {
+//      $value = current($options);
+//      if (count($options) === 1 && !is_array($value)) {
+//        $options = $value;
+//      }
+//      else {
+//        _loft_dev_ga_options($options[$option_key], $option_key);
+//      }
+//    }
+//  }
+//}

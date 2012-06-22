@@ -37,17 +37,12 @@ function loft_dev_enable() {
 
   // Give all devel perms to all rids automatically
   $all_rids = array_keys(user_roles());
-  $perms = array();
+  $perms = $altered = array();
   $modules = array('devel', 'devel_node_access');
   foreach ($modules as $module) {
     $perms = module_invoke($module, 'permission');
     foreach (array_keys($perms) as $permission) {
       foreach ($all_rids as $rid) {
-        db_delete('role_permission')
-        ->condition('rid', $rid)
-        ->condition('module', 'loft_dev')
-        ->condition('permission', $permission)
-        ->execute();
         $query = db_select('role_permission', 'p');
         $query
           ->fields('p')
@@ -56,10 +51,10 @@ function loft_dev_enable() {
           ->countQuery();
         $count = $query->execute()->fetchField();
         if ($count < 1) {
+          $altered[$module][$permission][$rid] = $rid;
           $data = array(
             'rid' => $rid,
-            //'module' => $module,
-            'module' => 'loft_dev',
+            'module' => $module,
             'permission' => $permission,
           );
           drupal_write_record('role_permission', $data);
@@ -67,25 +62,26 @@ function loft_dev_enable() {
       }
     }
   }
+  variable_set('loft_dev_altered_perms', $altered);
 }
 
 /**
  * Implements hook_disable().
  */
 function loft_dev_disable() {
-  $all_rids = array_keys(user_roles());
-  $perms = array();
-  $modules = array('devel', 'devel_node_access');
-  foreach ($modules as $module) {
-    $perms = module_invoke($module, 'permission');
-    foreach (array_keys($perms) as $permission) {
+
+  // Find out what permissions we imposed when we enabled and remove them
+  $altered = variable_get('loft_dev_altered_perms');
+  foreach ($altered as $module => $permissions) {
+    foreach ($permissions as $permission => $rids) {
       db_delete('role_permission')
-      ->condition('module', 'loft_dev')
+      ->condition('module', $module)
       ->condition('permission', $permission)
-      ->condition('rid', $all_rids, 'IN')
+      ->condition('rid', $rids, 'IN')
       ->execute();
     }
   }
+  variable_del('loft_dev_altered_perms');
 }
 
 /**

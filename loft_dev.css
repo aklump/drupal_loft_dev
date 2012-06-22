@@ -2,6 +2,18 @@
   font-size: 14px !important;
   padding:10px !important;
   background-color: #000000 !important;
+  margin-top: 100px;
+  position: relative;
+}
+.loft-dev-auxillary-links li {
+  display: inline-block;
+  border-right: 1px solid #fff;
+  padding: 0 10px 0 0;
+  margin: 0;
+}
+.loft-dev-auxillary-links li.last {
+  border: none;
+  padding: 0;
 }
 
 .loft-dev-closure,
@@ -30,4 +42,9 @@
 .loft-dev-closure a {
   color: #fff !important;
   text-decoration: underline !important;
+}
+
+#loft-dev-update-rewind-form .form-item,
+#loft-dev-update-rewind-form label {
+  display: inline-block;
 }

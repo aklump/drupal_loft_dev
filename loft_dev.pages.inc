@@ -24,7 +24,6 @@ function loft_dev_theme_test_page() {
   drupal_set_message(_loft_dev_dummy_string(20), 'error');
   drupal_set_message(_loft_dev_dummy_string(20), 'status');
   drupal_set_message(_loft_dev_dummy_string(20), 'warning');
-  drupal_set_message(_loft_dev_dummy_string(20), 'error');
 
   $output = '';
 
@@ -52,14 +51,14 @@ function loft_dev_theme_test_page() {
 
   //ordered list
   $output .= theme('item_list', array(
-    'items' => _loft_dev_dummy_array(5),
+    'items' => _loft_dev_dummy_array(5, NULL, 20),
     'title' => '&lt;ol> '. _loft_dev_dummy_string(4),
     'type'  => 'ol',
   )) . "\n";
 
   //unordered list
   $output .= theme('item_list', array(
-    'items' => _loft_dev_dummy_array(5),
+    'items' => _loft_dev_dummy_array(5, NULL, 20),
     'title' => '&lt;ul> '. _loft_dev_dummy_string(4),
     'type'  => 'ul',
   )) . "\n";
@@ -85,10 +84,15 @@ function loft_dev_theme_test_page() {
     //_loft_dev_dummy_string(4), _loft_dev_dummy_string(8)) ."\n";
   )), 3);
 
+  // Throbber
+  $output .= '<div><div class="ajax-progress">
+    <div class="throbber"></div>
+  </div></div>' . "\n";
+
 
   //pager
   global $pager_page_array, $pager_total;
-  $pager_page_array = array(1);
+  $pager_page_array = array(empty($_GET['page']) ? 0 : $_GET['page']);
   $pager_total = array(100);
   $output .= theme('pager') ."\n";
 
@@ -102,15 +106,17 @@ function loft_dev_theme_test_page() {
  *   The number of elements in the array
  * @param $multi_dim int
  *   The length of the multi dim array
+ * @param $element_length int
+ *   How many words in each element
  */
-function _loft_dev_dummy_array($count, $multi_dim = 0) {
+function _loft_dev_dummy_array($count, $multi_dim = 0, $element_length = 1) {
   $array = array();
   for ($i = 0; $i < $count; ++$i) {
     if ($multi_dim) {
       $array[] = _loft_dev_dummy_array($multi_dim);
     }
     else {
-      $array[] = _loft_dev_dummy_string(1);
+      $array[] = _loft_dev_dummy_string($element_length);
     }
   }
   return $array;
@@ -136,6 +142,8 @@ function _loft_dev_dummy_string($length) {
  */
 function test_form_form($form_state) {
   $form = array();
+
+  $form['#attributes']['onsubmit'] = 'return false;';
 
   $form['fieldset'] = array(
     '#type' => 'fieldset',
@@ -233,4 +241,31 @@ function loft_dev_list_functions_page() {
   $output .= implode("\n", $sorted) ."\n";
   $output .= '</ol>'."\n";
   return $output;
+}
+
+/**
+ * Generate a true 404 page where the active menu item is blank
+ */
+function drupal_not_found_page() {
+  menu_set_active_item('');
+  return drupal_not_found();
+}
+
+/**
+ * Generate a page of all node type teasers
+ */
+function loft_dev_teasers_page() {
+  $build = array();
+  drupal_set_title(t('All Node Teasers Test Page'));
+  foreach (loft_dev_node_suite() as $type => $node) {
+    $build[] = array('#markup' => '<h2>' . $type . '</h2>');
+    if (!node_access('view', $node)) {
+      $build[] = array('#markup' => t('Access Denied'));
+    }
+    else {
+      $build[] = node_view($node, 'teaser');
+    }
+    $build[] = array('#markup' => '<hr />');
+  }
+  return $build;
 }
