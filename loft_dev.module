@@ -104,6 +104,27 @@ function loft_dev_menu() {
     'type' => MENU_CALLBACK,
     'file' => 'loft_dev.pages.inc',
   );
+  $items['loft-dev/theme/action1'] = array(
+    'title' => 'Action Link #1',
+    'description' => 'Some description is helpful for UX',
+    'page callback' => 'drupal_goto',
+    'access arguments' => array('use loft_dev tools'),
+    'type' => MENU_LOCAL_ACTION,
+  );
+  $items['loft-dev/theme/action2'] = array(
+    'title' => 'Action Link #2',
+    'description' => 'Some description is helpful for UX',
+    'page callback' => 'drupal_goto',
+    'access arguments' => array('use loft_dev tools'),
+    'type' => MENU_LOCAL_ACTION,
+  );
+  $items['loft-dev/theme/action3'] = array(
+    'title' => 'Action Link #3',
+    'description' => 'Some description is helpful for UX',
+    'page callback' => 'drupal_goto',
+    'access arguments' => array('use loft_dev tools'),
+    'type' => MENU_LOCAL_ACTION,
+  );
   $items['loft-dev/theme/403'] = array(
     'page callback' => 'drupal_access_denied',
     'access arguments' => array('use loft_dev tools'),
@@ -530,7 +551,7 @@ function loft_dev_update_block($delta, $block) {
  *
  * @return bool
  */
-function loft_dev_block_order($region, $blocks, $starting_weight = -100) {
+function loft_dev_block_order($region, $blocks, $starting_weight = -20) {
   $weight = $starting_weight;
   foreach ($blocks as $block) {
     if (!($block = explode('|', $block))) {
@@ -544,7 +565,7 @@ function loft_dev_block_order($region, $blocks, $starting_weight = -100) {
     if (!$count) {
       return FALSE;
     }
-    $weight += 10;
+    $weight += 1;
   }
 }
 

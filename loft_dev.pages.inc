@@ -68,27 +68,43 @@ function loft_dev_theme_test_page() {
 
   $output .= '<p>p tag: Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>'."\n";
 
+  //hr
+  $output .= '<hr />' . "\n";
+
   $output .= '<p>p tag: Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>'."\n";
 
   //table
+  $rows = _loft_dev_dummy_array(10, 10);
+
+  // Make first row links, so we theme links in table
+  foreach ($rows[0] as $cell_key => $cell) {
+    $rows[0][$cell_key] = '<a href="#" onclick="return false;">' . $cell . '</a>';
+  }
   $output .= theme('table', array(
     'header' => _loft_dev_dummy_array(10),
-    'rows' => _loft_dev_dummy_array(10, 10),
+    'rows' => $rows,
   )) . "\n";
 
-  //form
-  $output .= drupal_render(drupal_get_form('test_form_form')) ."\n";
 
-  $output .= str_repeat(theme('image', array(
-    'path' => drupal_get_path('module', 'loft_dev') . '/images/monalisa.jpg',
-    //_loft_dev_dummy_string(4), _loft_dev_dummy_string(8)) ."\n";
-  )), 3);
 
   // Throbber
   $output .= '<div><div class="ajax-progress">
     <div class="throbber"></div>
   </div></div>' . "\n";
 
+
+  //form
+  $output .= drupal_render(drupal_get_form('test_form_form')) ."\n";
+
+  //confirm form
+  $form = array();
+  $output .= '<h3>Confirm Form</h3>' . "\n";
+  $output .= drupal_render(confirm_form($form, NULL, '<front>', _loft_dev_dummy_string(26)));
+
+  $output .= str_repeat(theme('image', array(
+    'path' => drupal_get_path('module', 'loft_dev') . '/images/monalisa.jpg',
+    //_loft_dev_dummy_string(4), _loft_dev_dummy_string(8)) ."\n";
+  )), 3);
 
   //pager
   global $pager_page_array, $pager_total;
@@ -158,8 +174,16 @@ function test_form_form($form_state) {
     '#title' => _loft_dev_dummy_string(3),
     '#required' => TRUE,
     '#size' => 60,
+    '#autocomplete_path' => 'user/autocomplete',
   );
 
+  $form['fieldset']['text2'] = array(
+    '#type' => 'textfield',
+    '#description' => _loft_dev_dummy_string(10),
+    '#title' => _loft_dev_dummy_string(3),
+    '#required' => TRUE,
+    '#size' => 60,
+  );
   $form['fieldset']['checkboxes'] = array(
     '#type' => 'checkboxes',
     '#title' => _loft_dev_dummy_string(4),
