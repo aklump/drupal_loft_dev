@@ -97,9 +97,11 @@ function loft_dev_theme_test_page() {
   $output .= drupal_render(drupal_get_form('test_form_form')) ."\n";
 
   //confirm form
-  $form = array();
-  $output .= '<h3>Confirm Form</h3>' . "\n";
-  $output .= drupal_render(confirm_form($form, NULL, '<front>', _loft_dev_dummy_string(26)));
+  //@todo fix this; wasn't working on gop3 - aklump 05/08/2012 20:21:46
+  //$form = array();
+  //$output .= '<h3>Confirm Form</h3>' . "\n";
+  //$confirm = confirm_form($form, _loft_dev_dummy_string(5) . '?', '<front>', _loft_dev_dummy_string(26));
+  //$output .= drupal_render($confirm);
 
   $output .= str_repeat(theme('image', array(
     'path' => drupal_get_path('module', 'loft_dev') . '/images/monalisa.jpg',
@@ -281,7 +283,8 @@ function drupal_not_found_page() {
 function loft_dev_teasers_page() {
   $build = array();
   drupal_set_title(t('All Node Teasers Test Page'));
-  foreach (loft_dev_node_suite() as $type => $node) {
+  foreach (loft_dev_node_suite() as $type => $nid) {
+    $node = node_load($nid);
     $build[] = array('#markup' => '<h2>' . $type . '</h2>');
     if (!node_access('view', $node)) {
       $build[] = array('#markup' => t('Access Denied'));
@@ -292,4 +295,196 @@ function loft_dev_teasers_page() {
     $build[] = array('#markup' => '<hr />');
   }
   return $build;
+}
+
+/**
+ * Genereate the libraries list page
+ */
+function loft_dev_list_libraries_page() {
+  $all = loft_dev_get_libraries();
+  $rows = array();
+  foreach ($all as $module => $libraries) {
+    foreach ($libraries as $key => $data) {
+      $title = empty($data['title']) ? $key : $data['title'];
+      $link = empty($data['website']) ? $title : l($title, $data['website'], array(
+        'attributes' => array(
+          'onclick' => 'window.open(this.href); return false;',
+        ),
+      ));
+      $rows[$key] = array(
+        $link,
+        $key,
+        $module,
+      );
+    }
+  }
+  ksort($rows);
+  $build = array();
+  $build[] = array(
+    '#theme' => 'table',
+    '#rows' => $rows,
+    '#header' => array(t('Library'), t('Machine'), t('Module')),
+  );
+  return $build;
+}
+
+function loft_dev_server_vars_page() {
+  $build = array();
+
+  $output = '<h2>$_SERVER</h2>';
+  $output .= var_export($_SERVER, TRUE);
+  $output = str_replace("\n", '<br />', $output);
+  $build['server'] = array('#markup' => $output);
+
+  if (!empty($_SESSION)) {
+    $output = '<h2>$_SESSION</h2>';
+    $output .= var_export($_SESSION, TRUE);
+    $output = str_replace("\n", '<br />', $output);
+    $build['session'] = array('#markup' => $output);
+  }
+
+  // Capture last 10 user agents
+  $agents = variable_get('loft_dev_user_agents', array());
+  if (!in_array($_SERVER['HTTP_USER_AGENT'], $agents)) {
+    array_unshift($agents, $_SERVER['HTTP_USER_AGENT']);
+    $agents = array_slice($agents, 0, 10);
+    variable_set('loft_dev_user_agents', $agents);
+  }
+  $build['session_title'] = array('#markup' => '<h2>Recent Agents</h2>');
+  $build['session'] = array(
+    '#theme' => 'item_list',
+    '#items' => $agents,
+  );
+
+  return $build;
+}
+
+function loft_dev_zebra_striping_page($max = 100) {
+  drupal_add_css(drupal_get_path('module', 'loft_dev') . '/loft_dev.css');
+  $build = $items = array();
+  module_load_include('inc', 'loft_dev', 'includes/loft_dev.theme');
+  loft_dev_zebra_stripes_reset('loft_dev_zebra_striping_page');
+  for ($i = 0; $i < $max; ++$i) {
+    $classes = array();
+    loft_dev_zebra_stripes($classes, 'loft_dev_zebra_striping_page');
+    $line = ' ' . implode(' ', $classes) . ' ';
+    $line = str_replace(' alt ', ' <span class="alt">alt</span> ', $line);
+    $line = str_replace(' tri ', ' <span class="tri">tri</span> ', $line);
+    $line = str_replace(' tetra ', ' <span class="tetra">tetra</span> ', $line);
+    $line = str_replace(' alpha ', ' <span class="alpha">alpha</span> ', $line);
+    $line = str_replace(' beta ', ' <span class="beta">beta</span> ', $line);
+    $line = str_replace(' gamma ', ' <span class="gamma">gamma</span> ', $line);
+    $line = str_replace(' delta ', ' <span class="delta">delta</span> ', $line);
+    $items[] = trim($line);
+  }
+  $build[] = array(
+    '#theme' => 'item_list',
+    '#items' => $items,
+    '#type' => 'ol',
+  );
+  return $build;
+}
+
+//@@details How to do zebra striping
+
+/**
+ * Add zebra striping to an classes array based on increment
+ *
+ * @param array &$classes_array
+ *
+ * @return NULL
+ *
+ * @see drupal_static_reset('gop3_zebra')
+ */
+function loft_dev_zebra_stripes(&$classes_array, $zebra_group = 'default') {
+
+  //@todo Fine tune $column_classes as needed for your project
+
+  // You should tune this to your project's needs...
+  // If you want a four column display then you would set $column_classes =
+  // array(4); If you want to be able to apply a 2,3,4,5 column display then set
+  // $column_classes = array(2,3,4,5). And so fourth... By default we'll set
+  // this up for 3 and 4 columns.
+  $column_classes = array(3,4,5,6,7,8);
+  // end config
+
+  $word = array('zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine');
+  $increment = &drupal_static('gop3_zebra', array());
+  $classes_array = (array) $classes_array;
+
+  // For running ordinal, e.g. first, second, third...
+  $increment[$zebra_group]['running'] = empty($increment[$zebra_group]['running']) ? 1 : $increment[$zebra_group]['running'] + 1;
+
+  $increment[$zebra_group]['odd'] = empty($increment[$zebra_group]['odd']) ? 1 : !$increment[$zebra_group]['odd'];
+
+  $classes_array[] = _loft_dev_get_ordinal($increment[$zebra_group]['running']);
+  $classes_array[] = $increment[$zebra_group]['odd'] ? 'odd' : 'even';
+
+  // For every other (alt), every third (tri) and every fourth (tetra)
+  if ($increment[$zebra_group]['running'] % 2 == 0) {
+    $classes_array[] = 'alt';
+  }
+  if ($increment[$zebra_group]['running'] % 3 == 0) {
+    $classes_array[] = 'tri';
+  }
+  if ($increment[$zebra_group]['running'] % 4 == 0) {
+    $classes_array[] = 'tetra';
+  }
+  // For columns
+  foreach ($column_classes as $i) {
+    $increment[$zebra_group]['base_' . $i] = empty($increment[$zebra_group]['base_' . $i]) ? 1 : $increment[$zebra_group]['base_' . $i] + 1;
+    if ($increment[$zebra_group]['base_' . $i] > $i) {
+      $increment[$zebra_group]['base_' . $i] = 1;
+    }
+
+    $class = $word[substr($i, 0, 1)] . substr($i, 1);
+    $class .= '-cols-';
+    if ($increment[$zebra_group]['base_' . $i] == 1) {
+      $class .= 'first';
+    }
+    elseif ($i == $increment[$zebra_group]['base_' . $i]) {
+      $class .= 'last';
+    }
+    else {
+      $class .= $increment[$zebra_group]['base_' . $i];
+    }
+    $classes_array[] = $class;
+  }
+}
+
+/**
+ * Return the ordinal word of a number up to 99
+ *
+ * @param int $number
+ *
+ * @return string
+ */
+function _loft_dev_get_ordinal($number) {
+  $first_word = array('eth', 'first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth', 'tenth', 'eleventh', 'twelfth', 'thirteenth', 'fourteenth', 'fifteenth', 'sixteenth', 'seventeenth', 'eighteenth', 'nineteenth', 'twentieth');
+  $second_word =array('', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninty');
+  if($number <= 20) {
+    return $first_word[$number];
+  }
+  $first_num = substr($number, -1, 1);
+  $second_num = substr($number, -2, 1);
+  return $string = str_replace('y-eth', 'ieth', $second_word[$second_num] . '-' . $first_word[$first_num]);
+}
+
+/**
+ * Reset zebra striping
+ *
+ * @param strings...
+ *   Optional, keys of zebra groups to reset.  Leave blank to reset all
+ *
+ * @return NULL
+ */
+function loft_dev_zebra_stripes_reset() {
+  $groups = func_get_args();
+  if (empty($groups)) {
+    drupal_static_reset('gop3_zebra');
+  }
+  else {
+    $increment = &drupal_static('gop3_zebra', array());
+    $increment = array_diff_key($increment, array_flip($groups));
+  }
 }

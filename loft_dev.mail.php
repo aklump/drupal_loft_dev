@@ -3,8 +3,8 @@
  * @file
  * This file simply tests the server's mail function
  */
-$to = 'aaron@intheloftstudios.com';
-$from = 'booking@djskout.com';
+$to = 'music-williams@intheloftstudios.com';
+$from = 'music-williams@intheloftstudios.com';
 
 if (mail($to, 'testing server email', 'does the server send email?', 'from: '. $from)) {
   print 'The server has sent an email to '. $to;

@@ -48,3 +48,25 @@
 #loft-dev-update-rewind-form label {
   display: inline-block;
 }
+
+span.alt {
+  color: red;
+}
+span.tri {
+  color: green;
+}
+span.tetra {
+  color: blue;
+}
+span.alpha {
+  color: orange;
+}
+span.beta {
+  color: purple;
+}
+span.gamma {
+  color: pink;
+}
+span.delta {
+  color: grey;
+}
