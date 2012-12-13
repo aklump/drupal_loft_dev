@@ -16,7 +16,7 @@
  * This will be passed to theme_links
  * An array of arrays with:
  * - title: the visible link title
- * - href: the link to
+ * - href: the link to; this can be #
  *
  * @see theme_links()
  */

@@ -67,6 +67,13 @@ function loft_dev_menu() {
     'type' => MENU_LOCAL_TASK,
     'file' => 'loft_dev.pages.inc',
   );
+  $items['admin/loft-dev/fpo-image'] = array(
+    'title' => 'FPO Image',
+    'page callback' => 'loft_dev_fpo_image_page',
+    'access arguments' => array('use loft_dev tools'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'loft_dev.pages.inc',
+  );
   $items['admin/loft-dev/server'] = array(
     'title' => 'Server Vars',
     'page callback' => 'loft_dev_server_vars_page',
@@ -241,11 +248,15 @@ function loft_dev_block_view($delta = '') {
 
       // Links from other modules
       $links = module_invoke_all('loft_dev_menu');
-      $output .= theme("links", array('links' => $links, 'attributes' => array(
+      $links = theme("links", array('links' => $links, 'attributes' => array(
         'class' => array(
           'loft-dev-auxillary-links',
         ),
-      ),)) . "\n";
+      ),));
+      $links = str_replace('href="/%23"', 'href="#"', $links);
+      $output .= $links . "\n";
+
+      $output .= drupal_render(drupal_get_form('loft_dev_node_access_form')) . "\n";
 
       if (module_exists('masquerade') &&
           ($temp = module_invoke('masquerade', 'block_view', 0))) {
@@ -315,8 +326,8 @@ function loft_dev_block_view($delta = '') {
  */
 function _loft_dev_reroute_email_status() {
   if (module_exists('reroute_email') &&
-      variable_get('reroute_email_enable', NULL) &&
-      !variable_get('reroute_email_address', NULL)) {
+      (!variable_get('reroute_email_enable', NULL) ||
+      !variable_get('reroute_email_address', NULL))) {
     return FALSE;
   }
   return TRUE;
@@ -326,8 +337,11 @@ function _loft_dev_reroute_email_status() {
  * Implements hook_init().
  */
 function loft_dev_init() {
-  if (!_loft_dev_reroute_email_status()) {
-    drupal_set_message(t('Reroute email is not properly enabled/configured. Fix immediately.'), 'error', FALSE);
+  if (!_loft_dev_reroute_email_status() &&
+      current_path() != 'admin/config/development/reroute_email') {
+    drupal_set_message(t('Reroute email is not properly enabled/configured. <a href="@url">Fix immediately</a>.', array(
+      '@url' => url('admin/config/development/reroute_email'),
+    )), 'error', FALSE);
   }
 }
 
@@ -363,13 +377,30 @@ function loft_dev_loft_dev_menu() {
   );
 
   $links[] = array(
+    'title' => 'Functions',
+    'href' => 'admin/loft-dev/funx',
+  );
+
+  $links[] = array(
     'title' => t('Teasers Page'),
     'href' => 'loft-dev/theme/teasers',
   );
 
+  $message = '';
+  for ($i = 0; $i <= 2; $i+=.0625) {
+    $message .= round($i, 3) . "   ";
+  }
+  $links[] = array(
+    'title' => t('Font Size'),
+    'href' => '#',
+    'attributes' => array(
+      'onclick' => "alert('" . $message . "'); return false;",
+    ),
+  );
+
   $links[] = array(
     'title' => t('List Libraries'),
-    'href' => 'loft-dev/libraries',
+    'href' => 'admin/loft-dev/libraries',
   );
 
   // a link to a node of each type
@@ -818,10 +849,12 @@ function loft_dev_block_order($region, $blocks, $starting_weight = -20) {
  * @param string $href
  * @param array $options
  * @param array $weight
+ * @param bool $overwrite
+ *   Should we first delete the item and then add, thereby overwriting?
  *
  * @return bool
  */
-function loft_dev_add_menu_item($menu_name, $title, $href, $options = array(), $weight = 0) {
+function loft_dev_add_menu_item($menu_name, $title, $href, $options = array(), $weight = 0, $delete = FALSE) {
 
   // Make sure the menu exists
   if (!menu_load($menu_name)) {
@@ -830,14 +863,16 @@ function loft_dev_add_menu_item($menu_name, $title, $href, $options = array(), $
 
   // Make sure item doesn't exist
   $query = db_select('menu_links', 'l');
-  $found = $query
+  $mlid = $query
+    ->fields('l', array('mlid'))
     ->condition('menu_name', $menu_name)
     ->condition('link_path', $href)
-    ->countQuery()
     ->execute()
     ->fetchField();
-
-  if (!$found) {
+  if ($mlid && $delete) {
+    menu_link_delete($item['mlid']);
+  }
+  if ($delete || !$mlid) {
     $item = array(
       'link_path' => $href,
       'link_title' => $title,
@@ -845,6 +880,9 @@ function loft_dev_add_menu_item($menu_name, $title, $href, $options = array(), $
       'options' => $options,
       'weight' => $weight,
     );
+    if ($mlid) {
+      $item['mlid'] = $mlid;
+    }
     menu_link_save($item);
   }
   return TRUE;
@@ -902,4 +940,116 @@ function loft_dev_get_libraries() {
     ksort($libraries);
   }
   return $libraries;
+}
+
+/**
+ * Form builder for the loft_dev_node_access form.
+ *
+ * Generate the node access form
+ *
+ * @see loft_dev_node_access_form_validate()
+ * @see loft_dev_node_access_form_submit()
+ * @ingroup forms
+ */
+//D6: function loft_node_access_form($form_state) {
+function loft_dev_node_access_form($form, &$form_state) {
+  if (empty($_SESSION['loft_dev']['node_access'])) {
+    $_SESSION['loft_dev']['node_access'] = array();
+  }
+  $default = $_SESSION['loft_dev']['node_access'];
+  $has_settings = !empty($default);
+  $default += array(
+    'nids' => array(),
+    'uids' => array(),
+  );
+
+  $form['settings'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Loft Node Access Settings'),
+    '#collapsible' => TRUE,
+    '#collapsed' => $has_settings,
+  );
+  $form['settings']['nids'] = array(
+    '#type' => 'textfield',
+    '#description' => t('Comma separated list of nids'),
+    '#title' => t('NIDs'),
+    '#default_value' => implode(',',  $default['nids']),
+    '#required' => TRUE,
+  );
+  $form['settings']['uids'] = array(
+    '#type' => 'textfield',
+    '#description' => t('Comma separated list of uids or usernames'),
+    '#title' => t('Users'),
+    '#default_value' => implode(',', $default['uids']),
+    '#required' => TRUE,
+  );
+  $form['settings']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Build Table'),
+  );
+
+
+  $output = '';
+  if ($default['nids'] && $default['uids']) {
+
+    $nodes = node_load_multiple($default['nids']);
+    $accounts = array();
+    foreach ($default['uids'] as $uid) {
+      if (!is_numeric($uid)) {
+        $temp = user_load_by_name($uid);
+      }
+      else {
+        $temp = user_load($uid);
+      }
+      if ($temp) {
+        $accounts[] = $temp;
+      }
+    }
+    $accounts = array_filter($accounts);
+
+    // Build the table
+    foreach ($nodes as $node) {
+      $caption = t('nid: @nid (type: @type) title: @title', array(
+        '@nid' => $node->nid,
+        '@type' => $node->type,
+        '@title' => $node->title,
+      ));
+      $rows = array();
+      foreach ($accounts as $account) {
+        $rows[] = array(
+          theme("username", array('account' => $account)),
+          node_access('create', $node, $account) ? t('Yes') : '&ndash;',
+          node_access('view', $node, $account) ? t('Yes') : '&ndash;',
+          node_access('update', $node, $account) ? t('Yes') : '&ndash;',
+          node_access('delete', $node, $account) ? t('Yes') : '&ndash;'
+        );
+      }
+      $output .= theme("table", array(
+        'caption' => $caption,
+        'header' => array(
+          t('User'), t('Create'), t('View'), t('Edit'), t('Delete')
+        ),
+        'rows' => $rows,
+      )) . "\n";
+    }
+    if ($output) {
+      $form['table'] = array(
+        '#markup' => $output,
+      );
+    }
+  }
+
+  return $form;
+}
+
+/**
+ * Form submission handler for loft_node_access_form().
+ *
+ * @see loft_node_access_form()
+ * @see loft_node_access_form_validate()
+ */
+function loft_dev_node_access_form_submit($form, &$form_state) {
+  $form_state['values']['nids'] = explode(',', $form_state['values']['nids']);
+  $form_state['values']['uids'] = explode(',', $form_state['values']['uids']);
+  $_SESSION['loft_dev']['node_access'] = $form_state['values'];
 }

@@ -253,23 +253,6 @@ function test_form_form_submit($form, &$form_state) {
 }
 
 /**
- * Generate the available site functions page
- */
-function loft_dev_list_functions_page() {
-  $output = '';
-  $output .= '<ol>'."\n";
-  $functions = get_defined_functions();
-  $sorted = array();
-  foreach($functions['user'] as $function) {
-    $sorted[trim($function, '_')] = "<li><a href='http://api.drupal.org/api/HEAD/function/$function' target='_blank'>$function</li>";
-  }
-  ksort($sorted);
-  $output .= implode("\n", $sorted) ."\n";
-  $output .= '</ol>'."\n";
-  return $output;
-}
-
-/**
  * Generate a true 404 page where the active menu item is blank
  */
 function drupal_not_found_page() {
@@ -487,4 +470,51 @@ function loft_dev_zebra_stripes_reset() {
     $increment = &drupal_static('gop3_zebra', array());
     $increment = array_diff_key($increment, array_flip($groups));
   }
+}
+
+/**
+ * Genereate the fpo page to be used to create images
+ */
+function loft_dev_fpo_image_page() {
+  $output = '';
+  $path = url(drupal_get_path('module', 'loft_dev') . '/images/fpo-bg.png');
+  $output .= '<body style="width: 100%; height: 100%; background: url(' . $path . ') repeat"></body>' . "\n";
+  print $output;
+  drupal_exit();
+}
+
+
+/**
+ * Generate the available site functions page
+ */
+function loft_dev_list_functions_page() {
+  $output = '';
+
+  // Create a textbox for jquery to user for filtering
+  $form['filter'] = array(
+    '#attributes' => array(
+      'id' => 'loft-dev-functions-filter',
+    ),
+    '#type' => 'textfield',
+    '#description' => t('Use this box to filter the list below'),
+    '#title' => t('Filter'),
+    '#default_value' => '',
+    '#attached' => array(
+      'js' => array(
+        drupal_get_path('module', 'loft_dev') . '/loft_dev.js',
+      ),
+    ),
+  );
+  $output .= drupal_render($form) . "\n";
+
+  $output .= '<ol id="loft-dev-functions-list">'."\n";
+  $functions = get_defined_functions();
+  $sorted = array();
+  foreach($functions['user'] as $function) {
+    $sorted[trim($function, '_')] = "<li><a href='http://api.drupal.org/api/HEAD/function/$function' target='_blank'>$function</li>";
+  }
+  ksort($sorted);
+  $output .= implode("\n", $sorted) ."\n";
+  $output .= '</ol>'."\n";
+  return $output;
 }

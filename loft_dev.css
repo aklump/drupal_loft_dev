@@ -4,6 +4,7 @@
   background-color: #000000 !important;
   margin-top: 100px;
   position: relative;
+  text-align: left;
 }
 .loft-dev-auxillary-links li {
   display: inline-block;
@@ -22,7 +23,8 @@
   font-family: "Panic Sans", monospace  !important;
 }
 .loft-dev-closure .form-submit,
-.loft-dev-closure .form-text {
+.loft-dev-closure .form-text,
+.loft-dev-closure .form-select option {
   color: #000 !important;
 }
 .loft-dev-closure tr.odd {
@@ -69,4 +71,12 @@ span.gamma {
 }
 span.delta {
   color: grey;
+}
+
+#loft-dev-node-access-form th,
+#loft-dev-node-access-form td {
+  text-align: center;
+}
+#loft-dev-node-access-form {
+  margin: 20px 0;
 }
