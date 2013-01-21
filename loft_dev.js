@@ -17,7 +17,7 @@
   */
   Drupal.behaviors.loftDev = Drupal.behaviors.loftDev || {};
   Drupal.behaviors.loftDev.attach = function (context, settings) {
-    $('#loft-dev-functions-list').listSearchFilter($('#loft-dev-functions-filter'));
+    $('#loft-dev-functions-list').listSearchFilter($('#loft-dev-functions-filter'), {auto: 0});
   }
 
   /**
@@ -65,12 +65,6 @@
      */
     var filter = function(needle) {
       var $items = $list.find('li');
-
-      // Reset the list if needle is empty
-      if (!needle) {
-        $items.show();
-        return;
-      }
       $items
       .hide()
       .filter(function() {
@@ -78,13 +72,20 @@
       }).show();
     }
 
-    // Handler of the input
+    /**
+     * Handler of the input
+     */
     $input.keypress(function(e) {
       var code = (e.keyCode ? e.keyCode : e.which);
       var needle = $(this).val();
       if((settings.auto && needle.length >= settings.auto) ||
          code == settings.code) {
-        filter(needle);
+        if (needle) {
+          filter(needle);
+        }
+        else {
+          $list.find('li:hidden').show();
+        }
       }
     });
     return $(this);

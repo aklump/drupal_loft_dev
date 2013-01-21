@@ -53,9 +53,10 @@ function loft_dev_menu() {
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => -10,
   );
-  $items['admin/loft-dev/funx'] = array(
+  $items['admin/loft-dev/list/%'] = array(
     'title' => 'PHP Functions',
     'page callback' => 'loft_dev_list_functions_page',
+    'page arguments' => array(3),
     'access arguments' => array('use loft_dev tools'),
     'type' => MENU_LOCAL_TASK,
     'file' => 'loft_dev.pages.inc',
@@ -371,14 +372,21 @@ function loft_dev_loft_dev_menu() {
       ),
     ),
     array(
+      'title' => 'Functions',
+      'href' => 'admin/loft-dev/list/functions',
+    ),
+    array(
+      'title' => 'Constants',
+      'href' => 'admin/loft-dev/list/constants',
+    ),
+    array(
+      'title' => 'Classes',
+      'href' => 'admin/loft-dev/list/classes',
+    ),
+    array(
       'title' => t('Theme Test'),
       'href' => 'loft-dev/theme',
     ),
-  );
-
-  $links[] = array(
-    'title' => 'Functions',
-    'href' => 'admin/loft-dev/funx',
   );
 
   $links[] = array(

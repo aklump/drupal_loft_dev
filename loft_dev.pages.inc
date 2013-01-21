@@ -487,8 +487,21 @@ function loft_dev_fpo_image_page() {
 /**
  * Generate the available site functions page
  */
-function loft_dev_list_functions_page() {
+function loft_dev_list_functions_page($op) {
   $output = '';
+
+  $includes = module_invoke_all('loft_dev_function_includes');
+  foreach ($includes as $array) {
+    $dir = DRUPAL_ROOT . '/' . $array['file path'] . '/';
+    if (!is_array($array['file'])) {
+      $array['file'] = array($array['file']);
+    }
+    foreach ($array['file'] as $file) {
+      if (is_file($dir . $file)) {
+        require_once $dir . $file;
+      }
+    }
+  }
 
   // Create a textbox for jquery to user for filtering
   $form['filter'] = array(
@@ -508,13 +521,28 @@ function loft_dev_list_functions_page() {
   $output .= drupal_render($form) . "\n";
 
   $output .= '<ol id="loft-dev-functions-list">'."\n";
-  $functions = get_defined_functions();
-  $sorted = array();
-  foreach($functions['user'] as $function) {
-    $sorted[trim($function, '_')] = "<li><a href='http://api.drupal.org/api/HEAD/function/$function' target='_blank'>$function</li>";
+
+  $list = array();
+
+  switch ($op) {
+    case 'constants':
+      $list = array_keys(get_defined_constants());
+      break;
+    case 'classes':
+      $list = get_declared_classes();
+      break;
+    case 'functions':
+      $functions = get_defined_functions();
+      $list = array();
+      foreach($functions['user'] as $function) {
+        $list[trim($function, '_')] = "<a href='http://api.drupal.org/api/HEAD/function/$function' target='_blank'>$function</a>";
+      }
+      ksort($list);
+      break;
   }
-  ksort($sorted);
-  $output .= implode("\n", $sorted) ."\n";
+
+  $output .= '<li>' .  implode("</li>\n<li>", $list) ."</li>\n";
   $output .= '</ol>'."\n";
+
   return $output;
 }

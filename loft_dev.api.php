@@ -29,4 +29,28 @@ function hook_loft_dev_menu() {
   );
 }
 
+/**
+ * Implements hook_loft_dev_function_includes().
+ *
+ * If you need to manually add files to the function lookup pages use this.
+ *
+ * @return array
+ * - An array of arrays each with:
+ *   - file path: the path to the file or files
+ *   - file: string/array
+ *     If you need to load more than one file, include an array of files all
+       within file path
+ */
+function hook_loft_dev_function_includes() {
+  return array(
+    array(
+      'file path' => drupal_get_path('module', 'koiros') . '/includes',
+      'file' => array(
+        'koiros.trade.inc',
+        'koiros.theme.inc',
+      ),
+    )
+  );
+}
+
 /** @} */ //end of group hooks

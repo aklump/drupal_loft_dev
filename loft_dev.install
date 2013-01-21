@@ -63,6 +63,14 @@ function loft_dev_enable() {
     }
   }
   variable_set('loft_dev_altered_perms', $altered);
+
+  // Place the loft block in the footer-ish most region
+  // Discover the footer-est most region
+  global $theme, $user, $custom_theme, $theme_key;
+  $regions = system_region_list($theme_key);
+  $preferred = array('post_footer', 'footer_last', 'footer', 'content_last', 'content');
+  $region = key(array_intersect_key(array_flip($preferred), $regions));
+  loft_dev_move_block('loft_dev', 0, $region);
 }
 
 /**
