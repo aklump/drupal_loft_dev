@@ -526,7 +526,10 @@ function loft_dev_list_functions_page($op) {
 
   switch ($op) {
     case 'constants':
-      $list = array_keys(get_defined_constants());
+      $list = array();
+      foreach (get_defined_constants() as $key => $value) {
+        $list[] = "$key = $value";
+      }
       break;
     case 'classes':
       $list = get_declared_classes();
@@ -535,9 +538,10 @@ function loft_dev_list_functions_page($op) {
       $functions = get_defined_functions();
       $list = array();
       foreach($functions['user'] as $function) {
-        $list[trim($function, '_')] = "<a href='http://api.drupal.org/api/HEAD/function/$function' target='_blank'>$function</a>";
+        $list[] = "<a href='http://api.drupal.org/api/HEAD/function/$function' target='_blank'>$function</a>";
+        //$list[trim($function, '_')] = "<a href='http://api.drupal.org/api/HEAD/function/$function' target='_blank'>$function</a>";
       }
-      ksort($list);
+      uasort($list, '_loft_dev_func_sort');
       break;
   }
 
@@ -545,4 +549,20 @@ function loft_dev_list_functions_page($op) {
   $output .= '</ol>'."\n";
 
   return $output;
+}
+
+/**
+ * Sorting function for functions
+ *
+ * @see loft_dev_list_functions_page()
+ */
+function _loft_dev_func_sort($a, $b) {
+  $a = strip_tags($a);
+  $a = trim($a, '_');
+  $b = strip_tags($b);
+  $b = trim($b, '_');
+  if ($a == $b) {
+    return 0;
+  }
+  return $a < $b ? -1 : 1;
 }

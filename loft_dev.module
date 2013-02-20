@@ -869,6 +869,10 @@ function loft_dev_add_menu_item($menu_name, $title, $href, $options = array(), $
     return FALSE;
   }
 
+  if (empty($options) || !is_array($options)) {
+    $options = array();
+  }
+
   // Make sure item doesn't exist
   $query = db_select('menu_links', 'l');
   $mlid = $query
@@ -878,7 +882,7 @@ function loft_dev_add_menu_item($menu_name, $title, $href, $options = array(), $
     ->execute()
     ->fetchField();
   if ($mlid && $delete) {
-    menu_link_delete($item['mlid']);
+    menu_link_delete($mlid);
   }
   if ($delete || !$mlid) {
     $item = array(
@@ -900,10 +904,18 @@ function loft_dev_add_menu_item($menu_name, $title, $href, $options = array(), $
  * Update helper to edit a menu item
  *
  * BE CAREFUL with key 'options', as anything you send will not merge, but will
-   replace the stored options!!!!
+   replace the stored options!!!! Refer to the menu_links table for more keys
+   for $item
  *
  * @param array $item
  *   mlid is required plus one more key
+ *   mlid
+ *   plid
+ *   link_path
+ *   link_title
+ *   options
+ *   weight
+ *
  *
  * @return bool
  *

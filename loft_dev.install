@@ -64,11 +64,16 @@ function loft_dev_enable() {
   }
   variable_set('loft_dev_altered_perms', $altered);
 
-  // Place the loft block in the footer-ish most region
+  /**
+   * Place the loft block in the footer-ish most region
+   */
   // Discover the footer-est most region
+  //@todo this needs to grab all themes not just active, because the regions are
+  //different for each theme and it needs to loop and assign for each; OR, maybe
+  //page_bottom is the best place anyway
   global $theme, $user, $custom_theme, $theme_key;
   $regions = system_region_list($theme_key);
-  $preferred = array('post_footer', 'footer_last', 'footer', 'content_last', 'content');
+  $preferred = array('post_footer', 'footer_last', 'footer', 'content_last', 'page_bottom', 'content');
   $region = key(array_intersect_key(array_flip($preferred), $regions));
   loft_dev_move_block('loft_dev', 0, $region);
 }
@@ -77,7 +82,6 @@ function loft_dev_enable() {
  * Implements hook_disable().
  */
 function loft_dev_disable() {
-
   // Find out what permissions we imposed when we enabled and remove them
   $altered = variable_get('loft_dev_altered_perms');
   foreach ($altered as $module => $permissions) {
@@ -91,34 +95,5 @@ function loft_dev_disable() {
   }
   variable_del('loft_dev_altered_perms');
 }
-
-/**
- * Implements hook_requirements().
- *
- * Checks installation requirements and do status reporting.
- * http://api.drupal.org/api/function/hook_requirements
- *
- * @param phase 'install' or 'runtime':
- * @return A keyed array of requirements
- */
-//function loft_dev_requirements($phase) {
-//  $reqs = array();
-//  $t = get_t();
-//  if ($phase == 'runtime') {
-//    $reqs['loft_dev'] = array(
-//      'title' => $t('Title'),
-//      'value' => $t('Value'),
-//      'severity' => REQUIREMENT_WARNING,
-//      'description' => $t(''),
-//      );
-    //if (!_oc_server_opl_exec($stdin)) {
-    //  $reqs['oc_server']['value'] = $t('Not Found!');
-    //  $reqs['oc_server']['description'] = $t('Make sure your server path is correct.');
-    //  $reqs['oc_server']['severity'] = REQUIREMENT_ERROR;
-    //}
-
-//  }
-//  return $reqs;
-//}
 
 /** @} */ //end of group loft_dev

@@ -5,6 +5,7 @@ core = 7.x
 version = 7.x-2.1
 
 package = Development
+dependencies[] = simpletest
 dependencies[] = devel
 dependencies[] = devel_node_access
 dependencies[] = reroute_email
