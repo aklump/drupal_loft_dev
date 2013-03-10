@@ -566,3 +566,19 @@ function _loft_dev_func_sort($a, $b) {
   }
   return $a < $b ? -1 : 1;
 }
+
+/**
+ * Render the REM font sizing page
+ */
+function loft_dev_rem_page() {
+  $sizes = '';
+  for ($i = 0; $i <= 2; $i+=.0625) {
+    $sizes[] = round($i, 3);
+  }
+  drupal_add_http_header('Content-Type', 'text/html; charset=utf-8');
+  $build = array(
+    '#markup' => implode('<br />', $sizes),
+  );
+  print drupal_render($build);
+  exit;
+}

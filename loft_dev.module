@@ -75,6 +75,13 @@ function loft_dev_menu() {
     'type' => MENU_LOCAL_TASK,
     'file' => 'loft_dev.pages.inc',
   );
+  $items['admin/loft-dev/rem'] = array(
+    'title' => 'REM Font Sizing',
+    'page callback' => 'loft_dev_rem_page',
+    'access arguments' => array('use loft_dev tools'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'loft_dev.pages.inc',
+  );
   $items['admin/loft-dev/server'] = array(
     'title' => 'Server Vars',
     'page callback' => 'loft_dev_server_vars_page',
@@ -365,7 +372,7 @@ function loft_dev_loft_dev_menu() {
       'title' => t('Hide Admin Stuff'),
       'href' => '<front>',
       'attributes' => array(
-        'onclick' => 'jQuery(\'.loft-dev-closure, #admin-menu, #toolbar, .dev-query\').remove(); jQuery(\'body.toolbar\').css(\'padding-top\', 0); return false;',
+        'onclick' => 'jQuery(\'.loft-dev-closure, #admin-menu, #toolbar, .dev-query, ul.tabs.primary\').remove(); jQuery(\'body.toolbar\').css(\'padding-top\', 0); return false;',
         'class' => array(
           'loft-dev-closure-hide',
         ),
@@ -394,15 +401,12 @@ function loft_dev_loft_dev_menu() {
     'href' => 'loft-dev/theme/teasers',
   );
 
-  $message = '';
-  for ($i = 0; $i <= 2; $i+=.0625) {
-    $message .= round($i, 3) . "   ";
-  }
+
   $links[] = array(
     'title' => t('Font Size'),
-    'href' => '#',
+    'href' => 'admin/loft-dev/rem',
     'attributes' => array(
-      'onclick' => "alert('" . $message . "'); return false;",
+      'onclick' => 'window.open(this.href, "REM Sizing", "status=0,toolbar=0,location=0,menubar=0,directories=0,resizable=1,scrollbars=0,height=650,width=120"); return false;',
     ),
   );
 
