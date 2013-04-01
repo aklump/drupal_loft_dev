@@ -372,7 +372,7 @@ function loft_dev_loft_dev_menu() {
       'title' => t('Hide Admin Stuff'),
       'href' => '<front>',
       'attributes' => array(
-        'onclick' => 'jQuery(\'.loft-dev-closure, #admin-menu, #toolbar, .dev-query, ul.tabs.primary\').remove(); jQuery(\'body.toolbar\').css(\'padding-top\', 0); return false;',
+        'onclick' => 'jQuery(\'.loft-deploy, .loft-dev-closure, #admin-menu, #toolbar, .dev-query, ul.tabs.primary\').remove(); jQuery(\'body.toolbar\').css(\'padding-top\', 0); return false;',
         'class' => array(
           'loft-dev-closure-hide',
         ),
@@ -606,90 +606,10 @@ function loft_dev_export_block_regions($theme = NULL, $themes = array()) {
 }
 
 /**
- * Update helper function to alter attributes of a block
- *
- * @param string $delta
- * @param string or array $block
- *   string: The body of the block
- *   array:
- *     - title
- *     - visibility
- *     - pages
- *     - custom
- *     - theme
- *     - status
- *     - weight
- *     - cache
- *     - block_class: depends on block_class module
- *     The following keys are only valid if $module == 'block'
- *     - body
- *     - format
- *     - info: description
- *
- * @param string $module
- *   Defaults to 'block'
- *
- * @return NULL
- *
- * @see block_custom_block_save()
- *
+ * @see loft_db_update_block().
  */
 function loft_dev_update_block($delta, $block, $module = 'block') {
-  if (is_string($block)) {
-    $block = array('body' => $block);
-  }
-  $block = (array) $block;
-
-  if ($module == 'block' &&
-      ($stored = block_custom_block_get($delta))) {
-    $block += $stored;
-    $edit = array(
-      'body' => array(
-        'value' => $block['body'],
-        'format' => $block['format'],
-      ),
-      'info' => $block['info'],
-    );
-    block_custom_block_save($edit, $delta);
-  }
-
-  // Set the block's title and other block table key/values
-  $block_table_keys = array(
-    'title',
-    'visibility',
-    'pages',
-    'custom',
-    'title',
-    'theme',
-    'status',
-    'weight',
-    'cache'
-  );
-  if ($additional = array_intersect(array_keys($block), $block_table_keys)) {
-    $additional_fields = array();
-    foreach ($additional as $key) {
-      $additional_fields[$key] = $block[$key];
-    }
-    $update = db_update('block')
-    ->fields($additional_fields)
-    ->condition('module', $module)
-    ->condition('delta', $delta)
-    ->execute();
-  }
-
-  // block class?
-  if (module_exists('block_class') && array_key_exists('block_class', $block)) {
-    db_delete('block_class')
-    ->condition('module', $module)
-    ->condition('delta', $delta)
-    ->execute();
-    db_insert('block_class')
-    ->fields(array(
-      'module' => $module,
-      'delta' => $delta,
-      'css_class' => $block['block_class']))
-    ->execute();
-  }
+  return loft_updb_update_block($delta, $block, $module);
 }
 
 /**
@@ -854,83 +774,17 @@ function loft_dev_block_order($region, $blocks, $starting_weight = -20) {
 }
 
 /**
- * Update helper function to add menu item if it doesn't exist
- *
- * @param string $menu_name
- * @param string $title
- * @param string $href
- * @param array $options
- * @param array $weight
- * @param bool $overwrite
- *   Should we first delete the item and then add, thereby overwriting?
- *
- * @return bool
+ * @see loft_updb_add_menu_item()
  */
 function loft_dev_add_menu_item($menu_name, $title, $href, $options = array(), $weight = 0, $delete = FALSE) {
-
-  // Make sure the menu exists
-  if (!menu_load($menu_name)) {
-    return FALSE;
-  }
-
-  if (empty($options) || !is_array($options)) {
-    $options = array();
-  }
-
-  // Make sure item doesn't exist
-  $query = db_select('menu_links', 'l');
-  $mlid = $query
-    ->fields('l', array('mlid'))
-    ->condition('menu_name', $menu_name)
-    ->condition('link_path', $href)
-    ->execute()
-    ->fetchField();
-  if ($mlid && $delete) {
-    menu_link_delete($mlid);
-  }
-  if ($delete || !$mlid) {
-    $item = array(
-      'link_path' => $href,
-      'link_title' => $title,
-      'menu_name' => $menu_name,
-      'options' => $options,
-      'weight' => $weight,
-    );
-    if ($mlid) {
-      $item['mlid'] = $mlid;
-    }
-    menu_link_save($item);
-  }
-  return TRUE;
+  return loft_updb_add_menu_item($menu_name, $title, $href, $options, $weight, $delete);
 }
 
 /**
- * Update helper to edit a menu item
- *
- * BE CAREFUL with key 'options', as anything you send will not merge, but will
-   replace the stored options!!!! Refer to the menu_links table for more keys
-   for $item
- *
- * @param array $item
- *   mlid is required plus one more key
- *   mlid
- *   plid
- *   link_path
- *   link_title
- *   options
- *   weight
- *
- *
- * @return bool
- *
- * @see menu_link_save()
+ * @see loft_updb_menu_link_update();
  */
 function loft_dev_menu_link_update($item) {
-  if (empty($item['mlid']) || !($stored = menu_link_load($item['mlid']))) {
-    return FALSE;
-  }
-  $item += $stored;
-  menu_link_save($item);
+  return loft_updb_menu_link_update($item);
 }
 
 //function _loft_dev_ga_options(&$options, $key = '') {

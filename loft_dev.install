@@ -40,24 +40,25 @@ function loft_dev_enable() {
   $perms = $altered = array();
   $modules = array('devel', 'devel_node_access');
   foreach ($modules as $module) {
-    $perms = module_invoke($module, 'permission');
-    foreach (array_keys($perms) as $permission) {
-      foreach ($all_rids as $rid) {
-        $query = db_select('role_permission', 'p');
-        $query
-          ->fields('p')
-          ->condition('rid', $rid)
-          ->condition('permission', $permission)
-          ->countQuery();
-        $count = $query->execute()->fetchField();
-        if ($count < 1) {
-          $altered[$module][$permission][$rid] = $rid;
-          $data = array(
-            'rid' => $rid,
-            'module' => $module,
-            'permission' => $permission,
-          );
-          drupal_write_record('role_permission', $data);
+    if ($perms = module_invoke($module, 'permission')) {
+      foreach (array_keys($perms) as $permission) {
+        foreach ($all_rids as $rid) {
+          $query = db_select('role_permission', 'p');
+          $query
+            ->fields('p')
+            ->condition('rid', $rid)
+            ->condition('permission', $permission)
+            ->countQuery();
+          $count = $query->execute()->fetchField();
+          if ($count < 1) {
+            $altered[$module][$permission][$rid] = $rid;
+            $data = array(
+              'rid' => $rid,
+              'module' => $module,
+              'permission' => $permission,
+            );
+            drupal_write_record('role_permission', $data);
+          }
         }
       }
     }
@@ -76,6 +77,17 @@ function loft_dev_enable() {
   $preferred = array('post_footer', 'footer_last', 'footer', 'content_last', 'page_bottom', 'content');
   $region = key(array_intersect_key(array_flip($preferred), $regions));
   loft_dev_move_block('loft_dev', 0, $region);
+
+  // Turn on all modules indicated by hook_loft_dev_module_dependencies()
+  if ($modules = module_invoke_all('loft_dev_module_dependencies')) {
+    module_enable($modules);
+    drupal_set_message(t('Enabled these dependent modules: %list', array(
+      '%list' => implode(', ', $modules),
+    )));
+  }
+
+  // Enable reroute email
+  variable_set('reroute_email_enable',  1);
 }
 
 /**

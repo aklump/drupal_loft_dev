@@ -5,7 +5,11 @@ core = 7.x
 version = 7.x-2.1
 
 package = Development
+dependencies[] = loft_updb
 dependencies[] = simpletest
-dependencies[] = devel
-dependencies[] = devel_node_access
+;dependencies[] = devel
+;dependencies[] = devel_node_access
 dependencies[] = reroute_email
+dependencies[] = schema
+dependencies[] = coder
+dependencies[] = coder_review

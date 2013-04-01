@@ -40,16 +40,36 @@ function hook_loft_dev_menu() {
  *   - file: string/array
  *     If you need to load more than one file, include an array of files all
        within file path
+       If you want to use a regex mask and scan teh file_path then use: #mask
+       @code
+         array('#mask' => '/*\.inc$/')
+       @endcode
  */
+
 function hook_loft_dev_function_includes() {
   return array(
     array(
       'file path' => drupal_get_path('module', 'koiros') . '/includes',
       'file' => array(
-        'koiros.trade.inc',
-        'koiros.theme.inc',
+        '#mask' => '/\.inc$/',
       ),
     )
+  );
+}
+
+/**
+ * Implements hook_loft_dev_module_dependencies().
+ *
+ * Make sure all dependent modules get turned on when loft_dev is turned on. Use
+   this to indicate a suite of development modules that should be enabled when
+   you enable loft_dev. Add it to the core custom module of a site.
+ *
+ * @return array
+ *   An array of module names that should be enabled when loft_dev is enabled
+ */
+function hook_loft_dev_module_dependencies() {
+  return array(
+    'ova_dev'
   );
 }
 

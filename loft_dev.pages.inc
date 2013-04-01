@@ -490,15 +490,48 @@ function loft_dev_fpo_image_page() {
 function loft_dev_list_functions_page($op) {
   $output = '';
 
+  /**
+   * Load Explicit files
+   */
   $includes = module_invoke_all('loft_dev_function_includes');
   foreach ($includes as $array) {
     $dir = DRUPAL_ROOT . '/' . $array['file path'] . '/';
     if (!is_array($array['file'])) {
       $array['file'] = array($array['file']);
     }
-    foreach ($array['file'] as $file) {
+    foreach (element_children($array['file']) as $file) {
       if (is_file($dir . $file)) {
         require_once $dir . $file;
+      }
+    }
+    if (!empty($array['file']['#mask']) &&
+        ($files = file_scan_directory($dir, $array['file']['#mask']))) {
+      foreach ($files as $file) {
+        $file = drupal_realpath($file->uri);
+        require_once $file;
+      }
+    }
+  }
+
+  /**
+   * Auto load all .inc files for all active modules
+   */
+  $result = db_select('system', 's')
+    ->fields('s', array('filename'))
+    ->condition('status', '1')
+
+    //@todo figure out why these cause trouble; has to do with classes
+    ->condition('name', array('backup_migrate', 'date', 'metatag', 'print', 'prod_check', 'email', 'fb_social', 'imageapi', 'mailchimp', 'coder'), 'NOT IN')
+    ->execute()->fetchCol();
+  foreach ($result as $filename) {
+    $dir = drupal_dirname($filename);
+    $includes = file_scan_directory($dir, '/\.inc$/', array(
+      'recurse' => TRUE,
+    ));
+    foreach ($includes as $file) {
+      $file = drupal_realpath($file->uri);
+      if (preg_match('/^<\?php/s', file_get_contents($file))) {
+        require_once $file;
       }
     }
   }
