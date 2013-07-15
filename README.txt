@@ -11,6 +11,10 @@ INSTALLATION:
 # Install and activate like other modules.
 
 CONFIGURATION:
+# Add the following to settings.php and you will bypass all user perms for displaying the loft_tools
+
+    $conf['loft_dev_free_access'] = TRUE;
+
 # Assign the block "Loft Dev Tools" to the proper region, e.g. post_footer
 # You may assign bookmark links to the dev console using hook_loft_dev_menu()
 

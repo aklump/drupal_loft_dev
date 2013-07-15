@@ -311,6 +311,56 @@ function loft_dev_list_libraries_page() {
   return $build;
 }
 
+/**
+ * Genereate the libraries list page
+ */
+function loft_dev_list_fapi_elements_page() {
+  $info_hook_modules = module_implements('element_info', TRUE);
+  $elements = array();
+  foreach ($info_hook_modules as $module) {
+    $elements += module_invoke($module, 'element_info');
+  }
+  $items = array();
+  foreach ($elements as $name => $data) {
+    $item = '';
+    $item .= '<div class="element-name"><a href="#" onclick="return false;">' . $name . '</a></div>';
+    $item .= '<div class="element-details"><pre>' . var_export($data, TRUE) . '</pre></div>';
+    $items[$name] = $item;
+  }
+  ksort($items);
+
+  $build = array();
+
+  // Create a textbox for jquery to user for filtering
+  $build['filter'] = array(
+    '#attributes' => array(
+      'id' => 'loft-dev-elements-filter',
+    ),
+    '#type' => 'textfield',
+    '#description' => t('Use this box to filter the list below'),
+    '#title' => t('Filter'),
+    '#default_value' => '',
+    '#attached' => array(
+      'js' => array(
+        drupal_get_path('module', 'loft_dev') . '/loft_dev.js',
+      ),
+    ),
+  );
+
+  $build[] = array(
+    '#theme' => 'item_list',
+    '#items' => $items,
+    '#attributes' => array(
+      'id' => 'loft-dev-elements-list',
+    ),
+  );
+
+  drupal_add_css(drupal_get_path('module', 'loft_dev') . '/loft_dev.css');
+  drupal_add_js(drupal_get_path('module', 'loft_dev') . '/loft_dev.js');
+
+  return $build;
+}
+
 function loft_dev_server_vars_page() {
   $build = array();
 
@@ -488,6 +538,9 @@ function loft_dev_fpo_image_page() {
  * Generate the available site functions page
  */
 function loft_dev_list_functions_page($op) {
+
+  ini_set('memory_limit','192M');
+
   $output = '';
 
   /**
@@ -521,8 +574,15 @@ function loft_dev_list_functions_page($op) {
     ->condition('status', '1')
 
     //@todo figure out why these cause trouble; has to do with classes
-    ->condition('name', array('backup_migrate', 'date', 'metatag', 'print', 'prod_check', 'email', 'fb_social', 'imageapi', 'mailchimp', 'coder'), 'NOT IN')
+    ->condition('name', array('backup_migrate', 'date', 'metatag', 'print', 'prod_check', 'email', 'fb_social', 'imageapi', 'mailchimp', 'coder', 'comment_notify', 'link', 'commerce_product'), 'NOT IN')
     ->execute()->fetchCol();
+
+  $skipped_files = array(
+    'filters.backup_restore.inc',
+    'filters.compression.inc',
+    'commerce_product.translation_handler.inc',
+    'rules_i18n.i18n.inc',
+  );
   foreach ($result as $filename) {
     $dir = drupal_dirname($filename);
     $includes = file_scan_directory($dir, '/\.inc$/', array(
@@ -530,7 +590,9 @@ function loft_dev_list_functions_page($op) {
     ));
     foreach ($includes as $file) {
       $file = drupal_realpath($file->uri);
-      if (preg_match('/^<\?php/s', file_get_contents($file))) {
+      $info = pathinfo($file);
+      if (!in_array($info['basename'], $skipped_files)
+          && preg_match('/^<\?php/s', file_get_contents($file))) {
         require_once $file;
       }
     }

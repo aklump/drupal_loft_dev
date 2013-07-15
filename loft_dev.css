@@ -80,3 +80,10 @@ span.delta {
 #loft-dev-node-access-form {
   margin: 20px 0;
 }
+
+/**
+ * drupal elements
+ */
+li .element-details {
+  display: none;
+}

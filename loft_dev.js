@@ -18,6 +18,13 @@
   Drupal.behaviors.loftDev = Drupal.behaviors.loftDev || {};
   Drupal.behaviors.loftDev.attach = function (context, settings) {
     $('#loft-dev-functions-list').listSearchFilter($('#loft-dev-functions-filter'), {auto: 0});
+
+    $('#loft-dev-elements-list').listSearchFilter($('#loft-dev-elements-filter'), {auto: 0});
+    $('li .element-name a').click(function(){
+      $(this).parents('li').find('.element-details').slideToggle();
+      return false;
+    });
+
   }
 
   /**

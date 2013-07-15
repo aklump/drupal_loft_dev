@@ -65,26 +65,26 @@ function loft_dev_enable() {
   }
   variable_set('loft_dev_altered_perms', $altered);
 
-  /**
-   * Place the loft block in the footer-ish most region
-   */
-  // Discover the footer-est most region
-  //@todo this needs to grab all themes not just active, because the regions are
-  //different for each theme and it needs to loop and assign for each; OR, maybe
-  //page_bottom is the best place anyway
-  global $theme, $user, $custom_theme, $theme_key;
-  $regions = system_region_list($theme_key);
-  $preferred = array('post_footer', 'footer_last', 'footer', 'content_last', 'page_bottom', 'content');
-  $region = key(array_intersect_key(array_flip($preferred), $regions));
-  loft_dev_move_block('loft_dev', 0, $region);
-
-  // Turn on all modules indicated by hook_loft_dev_module_dependencies()
-  if ($modules = module_invoke_all('loft_dev_module_dependencies')) {
-    module_enable($modules);
-    drupal_set_message(t('Enabled these dependent modules: %list', array(
-      '%list' => implode(', ', $modules),
-    )));
-  }
+  ///**
+  // * Place the loft block in the footer-ish most region
+  // */
+  //// Discover the footer-est most region
+  ////@todo this needs to grab all themes not just active, because the regions are
+  ////different for each theme and it needs to loop and assign for each; OR, maybe
+  ////page_bottom is the best place anyway
+  //global $theme, $user, $custom_theme, $theme_key;
+  //$regions = system_region_list($theme_key);
+  //$preferred = array('post_footer', 'footer_last', 'footer', 'content_last', 'page_bottom', 'content');
+  //$region = key(array_intersect_key(array_flip($preferred), $regions));
+  //loft_dev_move_block('loft_dev', 0, $region);
+  //
+  //// Turn on all modules indicated by hook_loft_dev_module_dependencies()
+  //if ($modules = module_invoke_all('loft_dev_module_dependencies')) {
+  //  module_enable($modules);
+  //  drupal_set_message(t('Enabled these dependent modules: %list', array(
+  //    '%list' => implode(', ', $modules),
+  //  )));
+  //}
 
   // Enable reroute email
   variable_set('reroute_email_enable',  1);

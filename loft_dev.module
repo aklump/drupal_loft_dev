@@ -53,14 +53,6 @@ function loft_dev_menu() {
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => -10,
   );
-  $items['admin/loft-dev/list/%'] = array(
-    'title' => 'PHP Functions',
-    'page callback' => 'loft_dev_list_functions_page',
-    'page arguments' => array(3),
-    'access arguments' => array('use loft_dev tools'),
-    'type' => MENU_LOCAL_TASK,
-    'file' => 'loft_dev.pages.inc',
-  );
   $items['admin/loft-dev/zebra'] = array(
     'title' => 'Zebra Striping',
     'page callback' => 'loft_dev_zebra_striping_page',
@@ -90,9 +82,46 @@ function loft_dev_menu() {
     'type' => MENU_LOCAL_TASK,
     'file' => 'loft_dev.pages.inc',
   );
-  $items['admin/loft-dev/libraries'] = array(
-    'title' => 'Libraries',
+
+  $items['admin/loft-dev/list'] = array(
+    'title' => 'Functions Lists',
+    'page callback' => 'loft_dev_list_functions_page',
+    'page arguments' => array('functions'),
+    'access arguments' => array('use loft_dev tools'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'loft_dev.pages.inc',
+  );
+  $items['admin/loft-dev/list/functions'] = array(
+    'title' => 'PHP Functions',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
+  $items['admin/loft-dev/list/constants'] = array(
+    'title' => 'PHP Constants',
+    'page callback' => 'loft_dev_list_functions_page',
+    'page arguments' => array(3),
+    'access arguments' => array('use loft_dev tools'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'loft_dev.pages.inc',
+  );
+  $items['admin/loft-dev/list/classes'] = array(
+    'title' => 'PHP Classes',
+    'page callback' => 'loft_dev_list_functions_page',
+    'page arguments' => array(3),
+    'access arguments' => array('use loft_dev tools'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'loft_dev.pages.inc',
+  );
+  $items['admin/loft-dev/list/libraries'] = array(
+    'title' => 'Drupal Libraries',
     'page callback' => 'loft_dev_list_libraries_page',
+    'access arguments' => array('use loft_dev tools'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'loft_dev.pages.inc',
+  );
+  $items['admin/loft-dev/list/fapi'] = array(
+    'title' => 'FAPI Elements',
+    'page callback' => 'loft_dev_list_fapi_elements_page',
     'access arguments' => array('use loft_dev tools'),
     'type' => MENU_LOCAL_TASK,
     'file' => 'loft_dev.pages.inc',
@@ -228,6 +257,16 @@ function loft_dev_permission() {
 }
 
 /**
+ * Implements hook_preprocess_html().
+ */
+function loft_dev_preprocess_html(&$vars) {
+
+  // Append the loft dev tools to page_bottom
+  $tools = module_invoke('loft_dev', 'block_view', 0);
+  $vars['page']['page_bottom']['loft_dev_block'] = $tools;
+}
+
+/**
  * Implements hook_block_info().
  */
 function loft_dev_block_info() {
@@ -245,7 +284,7 @@ function loft_dev_block_view($delta = '') {
   switch ($delta) {
     case 0:
 
-      if (!user_access('use loft_dev tools')) {
+      if (!user_access('use loft_dev tools') && !variable_get('loft_dev_free_access', FALSE)) {
         return array();
       }
 
@@ -609,6 +648,10 @@ function loft_dev_export_block_regions($theme = NULL, $themes = array()) {
  * @see loft_db_update_block().
  */
 function loft_dev_update_block($delta, $block, $module = 'block') {
+  if (!module_exists('loft_updb')) {
+    watchdog('loft_dev', 'Missing module loft_updb', array(), WATCHDOG_ERROR);
+    return;
+  }
   return loft_updb_update_block($delta, $block, $module);
 }
 
@@ -771,20 +814,6 @@ function loft_dev_block_order($region, $blocks, $starting_weight = -20) {
     }
     $weight += 1;
   }
-}
-
-/**
- * @see loft_updb_add_menu_item()
- */
-function loft_dev_add_menu_item($menu_name, $title, $href, $options = array(), $weight = 0, $delete = FALSE) {
-  return loft_updb_add_menu_item($menu_name, $title, $href, $options, $weight, $delete);
-}
-
-/**
- * @see loft_updb_menu_link_update();
- */
-function loft_dev_menu_link_update($item) {
-  return loft_updb_menu_link_update($item);
 }
 
 //function _loft_dev_ga_options(&$options, $key = '') {
