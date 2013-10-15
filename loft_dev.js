@@ -17,15 +17,20 @@
   */
   Drupal.behaviors.loftDev = Drupal.behaviors.loftDev || {};
   Drupal.behaviors.loftDev.attach = function (context, settings) {
-    $('#loft-dev-functions-list').listSearchFilter($('#loft-dev-functions-filter'), {auto: 0});
+    if ($('#loft-dev-functions-list').length) {
+      $('#loft-dev-functions-list').listSearchFilter($('#loft-dev-functions-filter'), {auto: 0});
+    }
 
-    $('#loft-dev-elements-list').listSearchFilter($('#loft-dev-elements-filter'), {auto: 0});
+    if ($('#loft-dev-elements-list')) {
+      $('#loft-dev-elements-list').listSearchFilter($('#loft-dev-elements-filter'), {auto: 0});
+    }
+
     $('li .element-name a').click(function(){
       $(this).parents('li').find('.element-details').slideToggle();
       return false;
     });
 
-  }
+  };
 
   /**
   * @} End of "defgroup loft_dev".
@@ -61,7 +66,7 @@
  */
 (function($) {
   $.fn.listSearchFilter = function($input, options) {
-    $list = $(this);
+    var $list = $(this);
     var settings = $.extend({
       'code'    : 13,
       'auto'    : 6
@@ -77,7 +82,7 @@
       .filter(function() {
         return $(this).text().indexOf(needle) !== -1;
       }).show();
-    }
+    };
 
     /**
      * Handler of the input
@@ -86,7 +91,7 @@
       var code = (e.keyCode ? e.keyCode : e.which);
       var needle = $(this).val();
       if((settings.auto && needle.length >= settings.auto) ||
-         code == settings.code) {
+         code === settings.code) {
         if (needle) {
           filter(needle);
         }

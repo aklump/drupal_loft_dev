@@ -48,6 +48,15 @@ function loft_dev_menu() {
     'type' => MENU_NORMAL_ITEM,
     'file' => 'loft_dev.pages.inc',
   );
+  $items['admin/loft-dev/parse-time'] = array(
+    'title' => 'Pull Timestamps',
+    'description' => 'Parse English Time from a string and convert to Unix',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('loft_dev_parse_time_form'),
+    'access arguments' => array('use loft_dev tools'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'loft_dev.pages.inc',
+  );
   $items['admin/loft-dev/overview'] = array(
     'title' => 'Overview',
     'type' => MENU_DEFAULT_LOCAL_TASK,

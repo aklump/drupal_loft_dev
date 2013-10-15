@@ -66,6 +66,8 @@ function loft_dev_theme_test_page() {
   //p tags
   $output .= '<p>p tag: Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>'."\n";
 
+  $output .= '<blockquote>blockquote tag: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla at massa sed nulla consectetur malesuada.</blockquote>' . "\n";
+
   $output .= '<p>p tag: Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>'."\n";
 
   //hr
@@ -322,9 +324,21 @@ function loft_dev_list_fapi_elements_page() {
   }
   $items = array();
   foreach ($elements as $name => $data) {
+    if ($name === 'machine_name') {
+      continue;
+    }
+
+    if (isset($data['#theme_wrappers'])
+        && in_array('form_element', (array) $data['#theme_wrappers'])) {
+      $name = $name . ' (fapi)';
+    }
     $item = '';
     $item .= '<div class="element-name"><a href="#" onclick="return false;">' . $name . '</a></div>';
-    $item .= '<div class="element-details"><pre>' . var_export($data, TRUE) . '</pre></div>';
+
+    $details = var_export($data, TRUE);
+    $details = str_replace('<', '&lt;', $details);
+    $details = preg_replace('/=>\s+array/', '=> array', $details);
+    $item .= '<div class="element-details"><pre>' . $details . '</pre></div>';
     $items[$name] = $item;
   }
   ksort($items);
@@ -676,4 +690,123 @@ function loft_dev_rem_page() {
   );
   print drupal_render($build);
   exit;
+}
+
+/**
+ * Form builder for the loft_dev_parse_time_form form.
+ *
+ * Accept a string and parse the english time into unix
+ *
+ * @param array $form
+ * @param array &$form_state
+ *
+ * @see loft_dev_parse_time_form_validate()
+ * @see loft_dev_parse_time_form_submit()
+ * @ingroup forms
+ */
+function loft_dev_parse_time_form($form, &$form_state) {
+
+  if (!empty($form_state['storage']['output'])) {
+    //$form['output'] = array(
+    //  '#type' => 'textarea',
+    //  '#title' => t('Output'),
+    //  '#default_value' => $form_state['storage']['output'],
+    //  '#rows' => 20,
+    //);
+    $form['output'] = array(
+      '#markup' => '<textarea>' . $form_state['storage']['output'] . '</textarea>',
+    );
+  }
+
+  $form['input'] = array(
+    '#type' => 'textarea',
+    '#description' => t('Paste a string containing english time here'),
+    '#title' => t('Input String'),
+    '#default_value' => '',
+    '#required' => TRUE,
+    '#rows' => 20,
+  );
+
+  $form['time_out'] = array(
+    '#type' => 'select',
+    '#title' => t('Time Output Format'),
+    '#default_value' => 'unix',
+    '#options' => array(
+      'unix' => 'Unix Timestamp',
+    ),
+  );
+
+  $form['append_to_line'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Append to the end of the line'),
+    '#default_value' => variable_get('loft_dev_parse_time:append_to_line', TRUE),
+  );
+
+  //http://api.drupal.org/api/drupal/includes%21common.inc/function/drupal_process_states/7
+  $form['append_options'] = array(
+    '#type' => 'container',
+    '#states' => array(
+      'visible' => array(
+        ':input[name=append_to_line]' => array('value' => 1),
+      ),
+    ),
+  );
+
+  //@todo fix; not hiding
+  $form['append_options']['append_prefix'] = array(
+    '#type' => 'textfield',
+    '#description' => t('When appending the output time, place this string between the line and the output.'),
+    '#title' => t('Append Prefix'),
+    '#default_value' => variable_get('loft_dev_parse_time:append_prefix', '|'),
+    '#size' => 10,
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Parse Now'),
+  );
+
+  return $form;
+}
+
+/**
+ * Form submission handler for loft_dev_parse_time_form().
+ *
+ * @see loft_dev_parse_time_form()
+ * @see loft_dev_parse_time_form_validate()
+ */
+function loft_dev_parse_time_form_submit($form, &$form_state) {
+  $output = array();
+  $eol = "\n";
+  $tok = strtok($form_state['values']['input'], $eol);
+  while ($tok != FALSE) {
+    if ($time = _loft_dev_pull_time_string($tok)) {
+      if ($form_state['values']['append_to_line']) {
+        $output[] = rtrim($tok) . $form_state['values']['append_prefix'] . $time;
+      }
+      else {
+        $output[] = $time;
+      }
+    }
+    else {
+      drupal_set_message(t('No date found in: @line', array(
+        '@line' => $tok,
+      )), 'warning', FALSE);
+      $output[] = $tok;
+    }
+    $tok = strtok($eol);
+  }
+  $form_state['rebuild'] = TRUE;
+  $form_state['storage']['output'] = implode($eol, $output);
+
+  variable_set('loft_dev_parse_time:append_prefix', $form_state['values']['append_prefix']);
+  variable_set('loft_dev_parse_time:append_to_line', $form_state['values']['append_to_line']);
+}
+
+function _loft_dev_pull_time_string($string) {
+  if (preg_match('/((?:(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)|(january|february|march|april|may|june|july|august|september|october|november|december))\s+[\sa-z0-9,]+)/i', $string, $matches)) {
+    return strtotime($matches[1]);
+  }
+
+  return FALSE;
 }
