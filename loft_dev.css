@@ -1,49 +1,42 @@
-.loft-dev-closure {
-  font-size: 14px !important;
-  padding:10px !important;
-  background-color: #000000 !important;
+#loft-dev-tools {
+  font-size: 14px;
+  padding:10px;
+  background-color: #000000;
   margin-top: 100px;
   position: relative;
   text-align: left;
 }
-.loft-dev-auxillary-links li {
-  display: inline-block;
-  border-right: 1px solid #fff;
-  padding: 0 10px 0 0;
-  margin: 0;
+
+#loft-dev-tools {
+  color: #66FF66;
+  font-family: "Panic Sans", monospace;
 }
-.loft-dev-auxillary-links li.last {
-  border: none;
-  padding: 0;
+#loft-dev-tools .form-submit,
+#loft-dev-tools .form-text,
+#loft-dev-tools .form-select option {
+  color: #000;
+}
+#loft-dev-tools tr.odd {
+  background: #000;
+}
+#loft-dev-tools tr.even {
+  background: #333;
+}
+#loft-dev-tools th {
+  background: #666;
+  color: #000;
+}
+#loft-dev-tools table {
+  width: 100%;
 }
 
-.loft-dev-closure,
-.loft-dev-closure *{
-  color: #66FF66 !important;
-  font-family: "Panic Sans", monospace  !important;
+#loft-dev-tools a {
+  color: #fff;
+  text-decoration: none;
 }
-.loft-dev-closure .form-submit,
-.loft-dev-closure .form-text,
-.loft-dev-closure .form-select option {
-  color: #000 !important;
-}
-.loft-dev-closure tr.odd {
-  background: #000 !important;
-}
-.loft-dev-closure tr.even {
-  background: #333 !important;
-}
-.loft-dev-closure th {
-  background: #666 !important;
-  color: #000 !important;
-}
-.loft-dev-closure table {
-  width: 100% !important;
-}
-
-.loft-dev-closure a {
-  color: #fff !important;
-  text-decoration: underline !important;
+#loft-dev-tools a:hover {
+  color: #fff;
+  text-decoration: underline;
 }
 
 #loft-dev-update-rewind-form .form-item,

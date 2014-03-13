@@ -10,13 +10,28 @@
 
   Drupal.loftDev = Drupal.loftDev || {};
 
-
+  /**
+   * A function to quickly clean up the view for layout checks.
+   */
+  function hideAdminStuff() {
+    // List of classes that are "admin stuff"--to hide.
+    $(".contextual-links-trigger, .contextual-links-wrapper, .block-masquerade, .loft-deploy, .loft-dev-closure, #admin-menu, #toolbar, .dev-query, ul.tabs.primary")
+    .remove();
+    $("body.toolbar")
+    .css("padding-top", 0);
+  }
 
   /**
   * Core behavior for loft_dev.
   */
   Drupal.behaviors.loftDev = Drupal.behaviors.loftDev || {};
   Drupal.behaviors.loftDev.attach = function (context, settings) {
+    $('.loft-dev-hide-admin-trigger').click(function () {
+      hideAdminStuff();
+
+      return false;
+    });
+
     if ($('#loft-dev-functions-list').length) {
       $('#loft-dev-functions-list').listSearchFilter($('#loft-dev-functions-filter'), {auto: 0});
     }

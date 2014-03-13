@@ -1,0 +1,6 @@
+*
+!.gitignore
+!core-config.sh
+!source
+!source/*
+source/.*
