@@ -172,6 +172,7 @@ function loft_dev_menu() {
     'access callback' => '_loft_dev_access',
     'type' => MENU_LOCAL_TASK,
   );
+
   $items['loft-dev/theme'] = array(
     'title' => 'Default Theme Tester',
     'page callback' => 'loft_dev_theme_test_page',
@@ -217,6 +218,13 @@ function loft_dev_menu() {
     'page callback' => 'drupal_site_offline',
     'access callback' => '_loft_dev_access',
     'type' => MENU_CALLBACK,
+  );
+  $items['loft-dev/theme/playground'] = array(
+    'title' => 'Loft Dev Theme Playground',
+    'page callback' => 'loft_dev_playground_page',
+    'access callback' => '_loft_dev_access',
+    'type' => MENU_CALLBACK,
+    'file' => 'loft_dev.pages.inc',
   );
   $items['loft-dev/theme/teasers'] = array(
     'page callback' => 'loft_dev_teasers_page',
@@ -279,11 +287,25 @@ function _loft_dev_access() {
  * Implements hook_preprocess_html().
  */
 function loft_dev_preprocess_html(&$vars) {
+  global $_loft_dev_embedded_page_;
+  if ($_loft_dev_embedded_page_ === TRUE) {
+    $vars['theme_hook_suggestion'] = 'html__loft_dev_playground';
+  }  
 
   // Append the loft dev tools to page_bottom
   $build    = array();
   $build['loft_dev']['block'] = module_invoke('loft_dev', 'block_view', 0);
   $vars['page']['page_bottom']['loft_dev_block'] = $build;
+}
+
+/**
+ * Implements hook_preprocess_page().
+ */
+function loft_dev_preprocess_page(&$vars) {
+  global $_loft_dev_embedded_page_;
+  if ($_loft_dev_embedded_page_ === TRUE) {
+    $vars['theme_hook_suggestion'] = 'page__loft_dev_playground';
+  }
 }
 
 /**
@@ -339,6 +361,11 @@ function loft_dev_block_view($delta = '') {
       $links['maintenance'] = array(
         'title'       => 'Offline', 
         'href'        => 'loft-dev/theme/offline', 
+        'attributes'  => array(), 
+      );
+      $links['playground'] = array(
+        'title'       => 'Theme Playground', 
+        'href'        => 'loft-dev/theme/playground', 
         'attributes'  => array(), 
       );
       $links['teasers'] = array(
@@ -1066,3 +1093,4 @@ function loft_dev_node_access_form_submit($form, &$form_state) {
   $form_state['values']['uids'] = explode(',', $form_state['values']['uids']);
   $_SESSION['loft_dev']['node_access'] = $form_state['values'];
 }
+

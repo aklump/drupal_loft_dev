@@ -4,6 +4,59 @@
  * Pages for loft_dev
  */
 
+function loft_dev_playground_page() {
+  global $theme, $_loft_dev_embedded_page_;
+  $_loft_dev_embedded_page_ = TRUE;
+  $args = array(
+    '%theme' => $theme,
+    '%path' => path_to_theme(),
+    '!list' => array(
+      '#theme' => 'item_list', 
+      '#items' => array(
+        '<em>html--loft-dev-playground.tpl.php</em>',
+        '<em>page--loft-dev-playground.tpl.php</em>',
+      ), 
+    ),
+  );
+  $args['!list'] = drupal_render($args['!list']);
+
+  $build    = array();
+  $build['goal'] = array(
+    '#markup' => t('<h2>Goal: To provide a canvas where you can play with html and css inside your current theme, free from the distraction of the CMS.</h2>'), 
+  );;
+
+  $build['content'] = array(
+    '#theme' => 'item_list',
+    '#type' => 'ol',
+    '#items' => array(
+      t('Make sure your theme implements <em>page.tpl.php</em>.'),
+      t('Create this file <em>%path/tpl/page--loft-dev-playground.tpl.php</em>.  Treat this like a vanilla html page and just add html markup to see how the theme affects it.', $args),
+      t('Create this file <em>%path/css/loft_dev_playground.css</em>. You may isolate css in this file as it will be autoloaded on this page only.  This file will come after all your theme css', $args),
+      t("The above applies to all of these template suggestions: !list", $args),
+    ), 
+  );
+
+  $css_js = array();
+  $css_js['#attached']['css'][] =  array(
+    'type' => 'file', 
+    'data' => $args['%path'] . '/css/loft_dev_playground.css',
+    'group' => CSS_THEME,
+    'weight' => 1000,
+  );
+  $css_js['#attached']['js'][] =  array(
+    'type' => 'file', 
+    'data' => drupal_get_path('module', 'loft_dev') . '/loft_dev.js',
+  );
+  $css_js['#attached']['js'][] = array(
+    'type' => 'file', 
+    'group' => JS_THEME,
+    'data' => drupal_get_path('module', 'loft_dev') . '/js/playground.js',
+  );
+  drupal_render($css_js);
+
+  return $build;
+}
+
 /**
  * Generates the overview page
  */

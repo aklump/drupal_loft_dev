@@ -13,7 +13,7 @@
   /**
    * A function to quickly clean up the view for layout checks.
    */
-  function hideAdminStuff() {
+  Drupal.loftDev.hideAdminStuff = function() {
     // List of classes that are "admin stuff"--to hide.
     $(".contextual-links-trigger, .contextual-links-wrapper, .block-masquerade, .loft-deploy, .loft-dev-closure, #admin-menu, #toolbar, .dev-query, ul.tabs.primary")
     .remove();
@@ -27,7 +27,7 @@
   Drupal.behaviors.loftDev = Drupal.behaviors.loftDev || {};
   Drupal.behaviors.loftDev.attach = function (context, settings) {
     $('.loft-dev-hide-admin-trigger').click(function () {
-      hideAdminStuff();
+      Drupal.loftDev.hideAdminStuff();
 
       return false;
     });
