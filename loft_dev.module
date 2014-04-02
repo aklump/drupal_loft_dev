@@ -3,6 +3,12 @@
 * @file
 * Base module file for loft_dev
 */
+/**
+ * The default interval for ld export
+ *
+ * 0 = disabled
+ */
+define('LOFT_DEV_LOFT_DEPLOY_EXPORT_PERIOD_MIN', 5);
 
 /**
  * Implements hook_help().
@@ -36,6 +42,48 @@ function loft_dev_help($path, $arg) {
 }
 
 /**
+ * Include (or return include path to) a loft_dev include file(s)
+ *
+ * @code
+ *   'file' => loft_dev_include('pages', 2),
+ * @endcode
+ *
+ * @param... string
+ *   Any number of include file keys to include
+ *   For includes/loft_dev.example.inc, set this to: example
+ * @param int $action
+ *   The final argument, if numeric is one of.  If omitted 1 is the default.
+ *   1: include the module(s)
+ *   2: return the path relative to the module, e.g., hook_menu()
+ *   3: return the complete Drupal path per drupal_get_path()
+ *
+ * @return string
+ *   The path to the FIRST include file requested, but only if $return is set to TRUE
+ */
+function loft_dev_include() {
+  $includes = func_get_args();
+  if (is_numeric(end($includes))) {
+    $action = array_pop($includes);
+  }
+  else {
+    $action = 1;
+  }
+  if ($action > 1) {
+    $module = 'includes/loft_dev.' .  reset($includes) . '.inc';
+    switch ($action) {
+      case 3:
+        $module = drupal_get_path('module', 'loft_dev') . '/' . $module;
+        break;
+    }
+    return $module;
+  }
+  reset($includes);
+  foreach ($includes as $include_name) {
+    module_load_include('inc', 'loft_dev', 'includes/loft_dev.' . $include_name);
+  }
+}
+
+/**
  * Implements hook_menu()
  */
 function loft_dev_menu() {
@@ -46,7 +94,7 @@ function loft_dev_menu() {
     'page callback' => 'loft_dev_page',
     'access callback' => '_loft_dev_access',
     'type' => MENU_NORMAL_ITEM,
-    'file' => 'loft_dev.pages.inc',
+    'file' => loft_dev_include('pages', 2),
   );
   $items['admin/loft-dev/parse-time'] = array(
     'title' => 'Pull Timestamps',
@@ -55,7 +103,7 @@ function loft_dev_menu() {
     'page arguments' => array('loft_dev_parse_time_form'),
     'access callback' => '_loft_dev_access',
     'type' => MENU_NORMAL_ITEM,
-    'file' => 'loft_dev.pages.inc',
+    'file' => loft_dev_include('pages', 2),
   );
   $items['admin/loft-dev/overview'] = array(
     'title' => 'Overview',
@@ -67,21 +115,21 @@ function loft_dev_menu() {
     'page callback' => 'loft_dev_zebra_striping_page',
     'access callback' => '_loft_dev_access',
     'type' => MENU_LOCAL_TASK,
-    'file' => 'loft_dev.pages.inc',
+    'file' => loft_dev_include('pages', 2),
   );
   $items['admin/loft-dev/fpo-image'] = array(
     'title' => 'FPO Image',
     'page callback' => 'loft_dev_fpo_image_page',
     'access callback' => '_loft_dev_access',
     'type' => MENU_LOCAL_TASK,
-    'file' => 'loft_dev.pages.inc',
+    'file' => loft_dev_include('pages', 2),
   );
   $items['admin/loft-dev/rem'] = array(
     'title' => 'REM Font Sizing',
     'page callback' => 'loft_dev_rem_page',
     'access callback' => '_loft_dev_access',
     'type' => MENU_LOCAL_TASK,
-    'file' => 'loft_dev.pages.inc',
+    'file' => loft_dev_include('pages', 2),
   );
   $items['admin/loft-dev/server'] = array(
     'title' => 'Server Vars',
@@ -89,7 +137,7 @@ function loft_dev_menu() {
     'access callback' => TRUE,
     'access callback' => '_loft_dev_access',
     'type' => MENU_LOCAL_TASK,
-    'file' => 'loft_dev.pages.inc',
+    'file' => loft_dev_include('pages', 2),
   );
 
   $items['admin/loft-dev/list'] = array(
@@ -98,7 +146,7 @@ function loft_dev_menu() {
     'page arguments' => array('functions'),
     'access callback' => '_loft_dev_access',
     'type' => MENU_NORMAL_ITEM,
-    'file' => 'loft_dev.pages.inc',
+    'file' => loft_dev_include('pages', 2),
   );
   $items['admin/loft-dev/list/functions'] = array(
     'title' => 'PHP Functions',
@@ -111,7 +159,7 @@ function loft_dev_menu() {
     'page arguments' => array(3),
     'access callback' => '_loft_dev_access',
     'type' => MENU_LOCAL_TASK,
-    'file' => 'loft_dev.pages.inc',
+    'file' => loft_dev_include('pages', 2),
   );
   $items['admin/loft-dev/list/classes'] = array(
     'title' => 'PHP Classes',
@@ -119,21 +167,21 @@ function loft_dev_menu() {
     'page arguments' => array(3),
     'access callback' => '_loft_dev_access',
     'type' => MENU_LOCAL_TASK,
-    'file' => 'loft_dev.pages.inc',
+    'file' => loft_dev_include('pages', 2),
   );
   $items['admin/loft-dev/list/libraries'] = array(
     'title' => 'Drupal Libraries',
     'page callback' => 'loft_dev_list_libraries_page',
     'access callback' => '_loft_dev_access',
     'type' => MENU_LOCAL_TASK,
-    'file' => 'loft_dev.pages.inc',
+    'file' => loft_dev_include('pages', 2),
   );
   $items['admin/loft-dev/list/fapi'] = array(
     'title' => 'FAPI Elements',
     'page callback' => 'loft_dev_list_fapi_elements_page',
     'access callback' => '_loft_dev_access',
     'type' => MENU_LOCAL_TASK,
-    'file' => 'loft_dev.pages.inc',
+    'file' => loft_dev_include('pages', 2),
   );
   $items['admin/loft-dev/theme'] = array(
     'title' => 'Default Theme Tester',
@@ -141,7 +189,7 @@ function loft_dev_menu() {
     'page arguments' => array('loft-dev/theme'),
     'access callback' => '_loft_dev_access',
     'type' => MENU_LOCAL_TASK,
-    'file' => 'loft_dev.pages.inc',
+    'file' => loft_dev_include('pages', 2),
   );
   $items['admin/loft-dev/theme/admin'] = array(
     'title' => 'Admin Theme Tester',
@@ -149,7 +197,7 @@ function loft_dev_menu() {
     'page arguments' => array(3),
     'access callback' => '_loft_dev_access',
     'type' => MENU_LOCAL_TASK,
-    'file' => 'loft_dev.pages.inc',
+    'file' => loft_dev_include('pages', 2),
   );
   $items['admin/loft-dev/theme/403'] = array(
     'title' => '403 Theme Tester',
@@ -178,7 +226,7 @@ function loft_dev_menu() {
     'page callback' => 'loft_dev_theme_test_page',
     'access callback' => '_loft_dev_access',
     'type' => MENU_CALLBACK,
-    'file' => 'loft_dev.pages.inc',
+    'file' => loft_dev_include('pages', 2),
   );
   $items['loft-dev/theme/action1'] = array(
     'title' => 'Action Link #1',
@@ -212,7 +260,7 @@ function loft_dev_menu() {
     'page callback' => 'drupal_not_found_page',
     'access callback' => '_loft_dev_access',
     'type' => MENU_CALLBACK,
-    'file' => 'loft_dev.pages.inc',
+    'file' => loft_dev_include('pages', 2),
   );
   $items['loft-dev/theme/offline'] = array(
     'page callback' => 'drupal_site_offline',
@@ -224,13 +272,13 @@ function loft_dev_menu() {
     'page callback' => 'loft_dev_playground_page',
     'access callback' => '_loft_dev_access',
     'type' => MENU_CALLBACK,
-    'file' => 'loft_dev.pages.inc',
+    'file' => loft_dev_include('pages', 2),
   );
   $items['loft-dev/theme/teasers'] = array(
     'page callback' => 'loft_dev_teasers_page',
     'access callback' => '_loft_dev_access',
     'type' => MENU_CALLBACK,
-    'file' => 'loft_dev.pages.inc',
+    'file' => loft_dev_include('pages', 2),
   );
 
   return $items;
@@ -333,11 +381,11 @@ function loft_dev_block_view($delta = '') {
 
       $build    = array();
       $build['#attached']['js'][] =  array(
-        'type' => 'file|inline|external|setting', 
+        'type' => 'file', 
         'data' => 'misc/collapse.js',
       );
       $build['#attached']['css'][] =  array(
-        'type' => 'file|inline|external', 
+        'type' => 'file', 
         'data' => drupal_get_path('module', 'loft_dev') . '/loft_dev.css',
       );
 
@@ -481,6 +529,18 @@ function loft_dev_block_view($delta = '') {
         $output .= t('<p>!!! REROUTE EMAIL IS NOT READY !!!</p>') . "\n";
       }
 
+      if (($path = variable_get('loft_dev_loft_deploy_export_path', ''))
+        && ($last = variable_get('loft_dev_loft_deploy_export_last', 0))) {
+        $date = new \DateTime();
+        $date
+          ->setTimestamp($last)
+          ->setTimezone(new \DateTimeZone('America/Los_Angeles'));
+        $output .= t('Database last backed at %time to %path', array(
+          '%time' => $date->format('r'),
+          '%path' => $path,
+        ));
+      }
+
       // Rewind form
       $output .= drupal_render(drupal_get_form('loft_dev_update_rewind_form'));
 
@@ -527,6 +587,56 @@ function loft_dev_init() {
       '@url' => url('admin/config/development/reroute_email'),
     )), 'error', FALSE);
   }
+
+  $admin_stuff = module_invoke_all('loft_dev_admin_stuff');
+  $build['#attached']['js'][] =  array(
+    'type' => 'setting', 
+    'data' => array(
+      'loftDev' => array('adminStuff' => implode(', ', $admin_stuff['selectors'])),
+    ),
+  );
+  $build['#attached']['js'][] =  array(
+    'type' => 'file', 
+    'data' => drupal_get_path('module', 'loft_dev') . '/loft_dev.js',
+  );
+  $build['#attached']['library'][] =  array('system', 'cookie');
+  drupal_render($build);
+
+
+  if (variable_get('loft_dev_loft_deploy_export_period_mins', LOFT_DEV_LOFT_DEPLOY_EXPORT_PERIOD_MIN)) {
+    $now = new \DateTime('now', new \DateTimeZone('America/Los_Angeles'));
+    $now = $now->format('U');    
+    $threshold = variable_get('loft_dev_loft_deploy_export_last', 0) + (variable_get('loft_dev_loft_deploy_export_period_mins', LOFT_DEV_LOFT_DEPLOY_EXPORT_PERIOD_MIN) * 60);
+    if ($now >= $threshold) {
+      loft_dev_include('pages');
+      if (loft_dev_loft_deploy_export('loft_dev_auto')) {
+        variable_set('loft_dev_loft_deploy_export_last', $now);
+      }
+      else {
+        drupal_set_message(t("ld export failed; investigate immediately."), 'error');
+      }
+    }
+  }
+}
+
+
+/**
+ * Implements hook_loft_dev_admin_stuff().
+ */
+function loft_dev_loft_dev_admin_stuff() {
+  return array(
+    'selectors' => array(
+      ".contextual-links-trigger",
+      ".contextual-links-wrapper",
+      ".block-masquerade",
+      ".loft-deploy",
+      ".loft-dev-closure",
+      "#admin-menu",
+      "#toolbar",
+      ".dev-query",
+      "ul.tabs.primary",
+    ),
+  );
 }
 
 /**
@@ -570,7 +680,7 @@ function loft_dev_loft_dev_menu() {
 
   $links[] = array(
     'title' => t('List Libraries'),
-    'href' => 'admin/loft-dev/libraries',
+    'href' => 'admin/loft-dev/list/libraries',
   );
 
   return $links;

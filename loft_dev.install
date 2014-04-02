@@ -88,6 +88,12 @@ function loft_dev_enable() {
 
   // Enable reroute email
   variable_set('reroute_email_enable',  1);
+
+  // Change the system weight for the module (in relation to another)...
+  db_update('system')
+    ->fields(array('weight' => 100))
+    ->condition('name', 'reroute_email')
+    ->execute();
 }
 
 /**

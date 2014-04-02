@@ -15,19 +15,50 @@
    */
   Drupal.loftDev.hideAdminStuff = function() {
     // List of classes that are "admin stuff"--to hide.
-    $(".contextual-links-trigger, .contextual-links-wrapper, .block-masquerade, .loft-deploy, .loft-dev-closure, #admin-menu, #toolbar, .dev-query, ul.tabs.primary")
-    .remove();
-    $("body.toolbar")
-    .css("padding-top", 0);
-  }
+    $(Drupal.settings.loftDev.adminStuff).hide();
+    $("body.toolbar").css("padding-top", 0);
+  };
+
+  /**
+   * Delete cookie and relad
+   *
+   * @return {[type]} [description]
+   */
+  Drupal.loftDev.showAdminStuff = function() {
+    $(Drupal.settings.loftDev.adminStuff).show();
+    $.cookie('loft_dev_admin_stuff', 'visible');
+  };
 
   /**
   * Core behavior for loft_dev.
   */
   Drupal.behaviors.loftDev = Drupal.behaviors.loftDev || {};
   Drupal.behaviors.loftDev.attach = function (context, settings) {
-    $('.loft-dev-hide-admin-trigger').click(function () {
+
+    if ($.cookie('loft_dev_admin_stuff') === 'hidden') {
       Drupal.loftDev.hideAdminStuff();
+      $('body')
+      .once('loft_dev')
+      .append('<a class="loft-dev-show-admin-stuff" onclick="Drupal.loftDev.showAdminStuff(); return false;">[+]</a>');
+    }
+    
+    // Duration of the adminStuff cookie in mins
+    var duration = 10;
+
+    $('.loft-dev-hide-admin-trigger')
+    .once('loft-dev')
+    .click(function (e) {
+      Drupal.loftDev.hideAdminStuff();
+
+      // Was the meta key held down? Set cookie?
+      if (e.metaKey) {
+        console.log('metaKey');
+        var expiry = new Date();
+        var time = expiry.getTime();
+        time += duration * 60 * 1000;
+        expiry.setTime(time);        
+        $.cookie('loft_dev_admin_stuff', "hidden", {"expires": expiry});
+      };   
 
       return false;
     });

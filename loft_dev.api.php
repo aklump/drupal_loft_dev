@@ -8,6 +8,21 @@
  */
 
 /**
+ * Implements hook_loft_dev_admin_stuff().
+ *
+ * Allow modules to add jquery selectors to what is considered admin stuff.
+ * Such that they can affect the Hide Admin Stuff button. 
+ */
+function hook_loft_dev_admin_stuff() {
+  return array(
+    'selectors' => {
+      ".links.inline",
+      ".gop-admin-only",
+    }
+  );
+}
+
+/**
  * Implements hook_loft_dev_menu
  *
  * Easily add links to the loft dev console

@@ -14,6 +14,18 @@
 
         $conf['loft_dev_free_access'] = TRUE;
 
+### Hide Admin Stuff
+1. Hold down the meta key when clicking Hide Admin Stuff for a 3 minute hide.
+1. Extend the admin stuff selectors using `hook_loft_dev_admin_stuff()`.
+
+## Automatic backups using Loft Deploy
+Add the following to your local settings to get auto snapshots of the database during development every 5 minutes of active use of the website (based on page loads, not actual time.)  To disable this feature set it to 0.
+        
+        $conf['loft_dev_which_ld'] = '/Volumes/Data/Users/aklump/bin/loft_deploy';
+        $conf['loft_dev_loft_deploy_export_period_mins'] = 5;
+    
+
+
 ##Suggested Use
 
 ## Design Decisions/Rationale

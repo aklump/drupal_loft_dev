@@ -4,6 +4,56 @@
  * Pages for loft_dev
  */
 
+/**
+ * Apply ld export via shell.
+ *
+ * @param  string $filename The arg to pass to ld export.
+ *
+ * @return bool           Success result.
+ */
+function loft_dev_loft_deploy_export($filename) {
+  if (!($cmd = variable_get('loft_dev_which_ld', ''))) {
+    return FALSE;
+  }
+
+  $web_root = DRUPAL_ROOT;
+  $cmd = "cd {$web_root}; {$cmd} export -f {$filename}";
+
+  // Check the mtime of the last one
+  $old_mtime = 0;
+  if (($path = variable_get('loft_dev_loft_deploy_export_path', ''))) {
+    $old_mtime = filemtime($path);
+
+    $date = new \DateTime();
+    $date
+      ->setTimestamp($old_mtime)
+      ->setTimezone(new \DateTimeZone('America/Los_Angeles'));
+    $prefix = date_format($date, 'Y-m-d_Hi');
+
+    // Archive the previous file
+    $archive = dirname($path) . '/loft_dev_auto/';
+    file_prepare_directory($archive, FILE_CREATE_DIRECTORY);
+    $to = $archive . "/{$prefix}_" . basename($path);
+    file_unmanaged_copy($path, $to);
+  }
+
+  $handle = popen("$cmd 2>&1", 'r');
+  $output = stream_get_contents($handle);
+  pclose($handle);
+
+  if (preg_match('/ database as (.*)\.\.\./', $output, $matches)
+    && isset($matches[1])
+    && file_exists($matches[1])) {
+    variable_set('loft_dev_loft_deploy_export_path', $matches[1]);
+    if (!$old_mtime
+      || ($old_mtime && $old_mtime < filemtime($matches[1]))) {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
+
 function loft_dev_playground_page() {
   global $theme, $_loft_dev_embedded_page_;
   $_loft_dev_embedded_page_ = TRUE;
@@ -363,6 +413,7 @@ function loft_dev_list_libraries_page() {
     '#rows' => $rows,
     '#header' => array(t('Library'), t('Machine'), t('Module')),
   );
+
   return $build;
 }
 
@@ -649,6 +700,8 @@ function loft_dev_list_functions_page($op) {
     'filters.compression.inc',
     'commerce_product.translation_handler.inc',
     'rules_i18n.i18n.inc',
+    'addressfield.migrate.inc',
+    'rules_scheduler_test.inc',
   );
   foreach ($result as $filename) {
     $dir = drupal_dirname($filename);

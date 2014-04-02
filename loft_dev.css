@@ -80,3 +80,10 @@ span.delta {
 li .element-details {
   display: none;
 }
+
+.loft-dev-show-admin-stuff {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  text-decoration: none;
+}
