@@ -440,22 +440,6 @@ function loft_dev_block_view($delta = '') {
           'class' => array('links', 'inline'), 
         ),
       );
-      
-      // Links from other modules
-      $links = module_invoke_all('loft_dev_menu');
-      $build['loft_menu'] = array(
-        '#theme' => 'links', 
-        '#links' => $links, 
-        '#heading' => array(
-          'text' => 'Loft Menu', 
-          'level' => 'h2', 
-          'class' => array(), 
-        ),
-        '#attributes' => array(
-          'class' => array('links', 'inline'), 
-        ),
-      );
-
 
       // Node suite
       $links = array();
@@ -470,6 +454,21 @@ function loft_dev_block_view($delta = '') {
         '#links' => $links, 
         '#heading' => array(
           'text' => 'Node Suite', 
+          'level' => 'h2', 
+          'class' => array(), 
+        ),
+        '#attributes' => array(
+          'class' => array('links', 'inline'), 
+        ),
+      );      
+      
+      // Links from other modules
+      $links = module_invoke_all('loft_dev_menu');
+      $build['loft_menu'] = array(
+        '#theme' => 'links', 
+        '#links' => $links, 
+        '#heading' => array(
+          'text' => 'Loft Menu', 
           'level' => 'h2', 
           'class' => array(), 
         ),
@@ -602,23 +601,32 @@ function loft_dev_init() {
   $build['#attached']['library'][] =  array('system', 'cookie');
   drupal_render($build);
 
-
-  if (variable_get('loft_dev_loft_deploy_export_period_mins', LOFT_DEV_LOFT_DEPLOY_EXPORT_PERIOD_MIN)) {
-    $now = new \DateTime('now', new \DateTimeZone('America/Los_Angeles'));
-    $now = $now->format('U');    
-    $threshold = variable_get('loft_dev_loft_deploy_export_last', 0) + (variable_get('loft_dev_loft_deploy_export_period_mins', LOFT_DEV_LOFT_DEPLOY_EXPORT_PERIOD_MIN) * 60);
-    if ($now >= $threshold) {
-      loft_dev_include('pages');
-      if (loft_dev_loft_deploy_export('loft_dev_auto')) {
-        variable_set('loft_dev_loft_deploy_export_last', $now);
-      }
-      else {
-        drupal_set_message(t("ld export failed; investigate immediately."), 'error');
-      }
-    }
+  // Suppress admin menu if admin stuff hidden
+  if (isset($_COOKIE['loft_dev_admin_stuff'])
+    && $_COOKIE['loft_dev_admin_stuff'] === 'hidden'
+    && function_exists('admin_menu_suppress')) {
+    admin_menu_suppress();
   }
 }
 
+/**
+ * Implements hook_exit().
+ */
+function loft_dev_exit() {
+  if (variable_get('loft_dev_loft_deploy_export_period_mins', LOFT_DEV_LOFT_DEPLOY_EXPORT_PERIOD_MIN)) {
+    $now = new \DateTime('now', new \DateTimeZone('America/Los_Angeles'));
+    $now = $now->format('U');    
+    $rollback = variable_get('loft_dev_loft_deploy_export_last', 0) + (variable_get('loft_dev_loft_deploy_export_period_mins', LOFT_DEV_LOFT_DEPLOY_EXPORT_PERIOD_MIN) * 60);
+    if ($now >= $rollback) {
+      loft_dev_include('pages');
+      variable_set('loft_dev_loft_deploy_export_last', $now);
+      if (!loft_dev_loft_deploy_export('loft_dev_auto')) {
+        variable_set('loft_dev_loft_deploy_export_last', $rollback);
+        drupal_set_message(t("Loft Dev was unabled to export the database using <code>ld export</code>; review <a href='!uri'>reports</a> for more info.", array('!uri' => url('admin/reports/dblog'))), 'error');
+      }
+    }
+  }  
+}
 
 /**
  * Implements hook_loft_dev_admin_stuff().
@@ -635,6 +643,7 @@ function loft_dev_loft_dev_admin_stuff() {
       "#toolbar",
       ".dev-query",
       "ul.tabs.primary",
+      ".views-field-edit-node",
     ),
   );
 }
@@ -802,9 +811,9 @@ function loft_dev_update_rewind_form_submit($form, &$form_state) {
 
 /**
  * These UTILITY FUNCTIONS can be copied into your module's .install file and
-   used for helping with one off updates; by copying them into your .install
-   file, you will not need to have this module running on production. Be sure to
-   rename the functions to match your module if you go this route.
+ * used for helping with one off updates; by copying them into your .install
+ * file, you will not need to have this module running on production. Be sure to
+ * rename the functions to match your module if you go this route.
  */
 
 /**
@@ -855,12 +864,12 @@ function loft_dev_move_block($module, $delta, $new_region, $themes = array(), $n
  *
  * @return string
  *   The return code can be added to hook_update_n to control placement of
-     blocks in regions
-
-   @code
-    drush ev "loft_dev_export_block_regions(NULL, array('og2_theme',
-    'fh_theme'))"
-   @endcode
+ *   blocks in regions
+ *
+ * @code
+ *  drush ev "loft_dev_export_block_regions(NULL, array('og2_theme',
+ *  'fh_theme'))"
+ * @endcode
  */
 function loft_dev_export_block_regions($theme = NULL, $themes = array()) {
   if (empty($theme)) {
@@ -1204,3 +1213,83 @@ function loft_dev_node_access_form_submit($form, &$form_state) {
   $_SESSION['loft_dev']['node_access'] = $form_state['values'];
 }
 
+/**
+ * Supplies information about a given authentication method to Services.
+ *
+ * @return
+ *   An associative array with information about the authentication method
+ *   and its callbacks. The possible keys are as follows (all keys are
+ *   optional unless noted).
+ *
+ *   - title (required): The display name for this authentication method.
+ *   - description (required): Longer text describing this authentciation
+ *     method.
+ *   - authenticate_call (required): The name of a function to be called
+ *     to perform the actual authentication. <details of params/return>
+ *   - security_settings: A callback function which returns an associative
+ *     array of Form API elements for a settings form.
+ *   - default_security_settings: A callback funtion which returns an array
+ *     with the default settings for the auth module.
+ *   - _services_security_settings_validate: The name of a standard form
+ *     validation callback for the form defined in 'security_settings'.
+ *   - _services_security_settings_submit: The name of a standard form
+ *     submit callback for the form defined in 'security_settings'.
+ *   - alter_controllers: The name of a callback function which will alter a
+ *     services method signature in order to add required arguments.
+ *   - controller_settings: A callback function which returns an associative
+ *     array of Form API elements for a controller settings form.
+ *   - file: An include file which contains the authentication callbacks.
+ */
+function loft_dev_services_authentication_info() {
+  return array(
+    'title' => 'Loft Dev Preset User Auth', 
+    'description' => 'Can be used to pre-authentate a given user for all calls during development.', 
+    'authenticate_call' => '_loft_dev_services_authenticate_call', 
+    'security_settings' => '_loft_dev_services_auth_form',
+  );
+}
+
+/**
+ * Authenticate a services call using the settings user.
+ *
+ * @param  array $settings 
+ * @param  string $method   
+ * @param  array $args     
+ *
+ * @return NULL||string           
+ */
+function _loft_dev_services_authenticate_call() {
+  global $user;
+  list($settings) = func_get_args();
+  
+  $user = user_load_by_name($settings['username']);
+  if (empty($user->uid)) {
+    return services_error(t("The username @name does not exist. Can't authenticate.", array(
+      '@name' => $settings['username']
+    )), 403);
+  }
+}
+
+/**
+ * Form builder for the _loft_dev_services_auth_form form.
+ *
+ * Settings for to define the uid of the user to use as authenticated.
+ *
+ * @param array $form
+ * @param array &$form_state
+ *
+ * @ingroup forms
+ */
+function _loft_dev_services_auth_form($settings, &$form_state) {
+  $form['username'] = array(
+    '#type' => 'textfield',
+    '#description' => t('All server calls will authenticate with this user.'),
+    '#title' => t('Username'),
+    '#default_value' => empty($settings['username']) ? '' : $settings['username'],
+    '#required' => TRUE,
+    '#autocomplete_path' => 'user/autocomplete',
+    '#maxlength' => 60,
+  );    
+
+  return $form;
+}

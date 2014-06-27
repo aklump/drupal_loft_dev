@@ -13,6 +13,7 @@
  */
 function loft_dev_loft_deploy_export($filename) {
   if (!($cmd = variable_get('loft_dev_which_ld', ''))) {
+    watchdog('loft_dev', 'Empty variable %name. See README for setup instructions.', array('%name' => 'loft_dev_which_ld'), WATCHDOG_DEBUG);
     return FALSE;
   }
 
@@ -37,18 +38,44 @@ function loft_dev_loft_deploy_export($filename) {
     file_unmanaged_copy($path, $to);
   }
 
-  $handle = popen("$cmd 2>&1", 'r');
-  $output = stream_get_contents($handle);
-  pclose($handle);
-
-  if (preg_match('/ database as (.*)\.\.\./', $output, $matches)
-    && isset($matches[1])
-    && file_exists($matches[1])) {
-    variable_set('loft_dev_loft_deploy_export_path', $matches[1]);
-    if (!$old_mtime
-      || ($old_mtime && $old_mtime < filemtime($matches[1]))) {
-      return TRUE;
+  // Can't get this to work it just hangs on exec
+  // if ($path && variable_get('loft_dev_loft_deploy_async', FALSE)) {
+  //   // This will fire off and let it do it's own thing
+  //   exec("$cmd > /dev/null 2 > /dev/null &");
+  //   variable_set('loft_dev_loft_deploy_export_path', time());
+  // }
+  // else {
+    // This will wait for feedback from ld export.
+    // This slows down site builders for large dbs.
+    $handle = popen("$cmd 2>&1 &", 'r');
+    $output = stream_get_contents($handle);
+    pclose($handle);
+  
+    if (preg_match('/ database as (.*)\.\.\./', $output, $matches)
+      && isset($matches[1])
+      && file_exists($matches[1])) {
+      variable_set('loft_dev_loft_deploy_export_path', $matches[1]);
+      if (!$old_mtime
+        || ($old_mtime && $old_mtime < filemtime($matches[1]))) {
+        return TRUE;
+      }
     }
+
+    $watchdog_message = '';
+    if (preg_match_all("/command not found\s*(\S+?):/", $output, $matches)) {
+      $missing_cmd = $matches[1][0];
+      switch ($missing_cmd) {
+        default;
+          $watchdog_message = "Add the full path to $missing_cmd to .loft_deploy/config e.g. ld_{$missing_cmd}='/Applications/MAMP/Library/bin/{$missing_cmd}'";
+          break;
+      }
+    }
+
+    watchdog('loft_dev', $output, array(), WATCHDOG_DEBUG);
+  //}
+
+  if ($watchdog_message) {
+    watchdog('loft_dev', $watchdog_message, array(), WATCHDOG_DEBUG);
   }
 
   return FALSE;
@@ -786,16 +813,20 @@ function _loft_dev_func_sort($a, $b) {
  * Render the REM font sizing page
  */
 function loft_dev_rem_page() {
+
   $sizes = '';
-  for ($i = 0; $i <= 2; $i+=.0625) {
-    $sizes[] = round($i, 3);
+  for ($i = 1; $i <= 32; $i++) { 
+    $rem = round($i / 16, 4);
+    $sizes[] = array($rem, $i);    
   }
-  drupal_add_http_header('Content-Type', 'text/html; charset=utf-8');
-  $build = array(
-    '#markup' => implode('<br />', $sizes),
+  $build[] = array(
+    '#theme' => 'table',
+    '#rows' => $sizes,
+    '#header' => array('rem', 'px'),
   );
+  drupal_add_http_header('Content-Type', 'text/html; charset=utf-8');
   print drupal_render($build);
-  exit;
+  drupal_exit;
 }
 
 /**

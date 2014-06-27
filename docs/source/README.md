@@ -23,6 +23,11 @@ Add the following to your local settings to get auto snapshots of the database d
         
         $conf['loft_dev_which_ld'] = '/Volumes/Data/Users/aklump/bin/loft_deploy';
         $conf['loft_dev_loft_deploy_export_period_mins'] = 5;
+
+You may also need to add the following to .loft_deploy/config
+
+        ld_mysqldump='/Applications/MAMP/Library/bin/mysqldump'
+        ld_gzip='/usr/bin/gzip'        
     
 
 
