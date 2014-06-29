@@ -19,7 +19,11 @@
 1. Extend the admin stuff selectors using `hook_loft_dev_admin_stuff()`.
 
 ## Automatic backups using Loft Deploy
-Add the following to your local settings to get auto snapshots of the database during development every 5 minutes of active use of the website (based on page loads, not actual time.)  To disable this feature set it to 0.
+Loft Dev module can automatically call `loft_deploy export` on regulary intervals of use.  This has the effect of automatically backing up the database to the normal output path, for every N minutes of active use.  For the most recent backup go there.  To see the incremental backups in time, descend into the _loft_dev_auto_ directory.
+
+This is not based on cron, but rather on elapsed time.  If you set this to back up every 15 minutes, it will only do so if you're activaly using the site.  It's like poor man's cron, it looks to see if N minutes has elapsed since the last backup, and it does this on a page load.  Thus, no use, no page load.  The following settings needed to be added to _settings.local.php_.
+
+To disable this feature set it to 0.
         
         $conf['loft_dev_which_ld'] = '/Volumes/Data/Users/aklump/bin/loft_deploy';
         $conf['loft_dev_loft_deploy_export_period_mins'] = 5;
@@ -30,10 +34,6 @@ You may also need to add the following to .loft_deploy/config
         ld_gzip='/usr/bin/gzip'        
     
 
-
-##Suggested Use
-
-## Design Decisions/Rationale
 
 ##Contact
 * **In the Loft Studios**

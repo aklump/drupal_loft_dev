@@ -96,6 +96,13 @@ function loft_dev_menu() {
     'type' => MENU_NORMAL_ITEM,
     'file' => loft_dev_include('pages', 2),
   );
+  $items['admin/loft-dev/migration'] = array(
+    'title' => 'Migration',
+    'page callback' => 'loft_dev_migration_page',
+    'access callback' => '_loft_dev_access',
+    'type' => MENU_NORMAL_ITEM,
+    'file' => loft_dev_include('pages', 2),
+  );
   $items['admin/loft-dev/parse-time'] = array(
     'title' => 'Pull Timestamps',
     'description' => 'Parse English Time from a string and convert to Unix',
@@ -1292,4 +1299,19 @@ function _loft_dev_services_auth_form($settings, &$form_state) {
   );    
 
   return $form;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function loft_dev_theme($existing, $type, $theme, $path) {
+  return array(
+    'loft_dev_migration' => array(
+      'variables' => array(
+        'urls' => NULL,
+        'results' => array(),
+      ),
+      'file' => loft_dev_include('theme', 2),
+    ),
+  );
 }

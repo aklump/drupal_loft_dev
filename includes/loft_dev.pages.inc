@@ -947,3 +947,80 @@ function _loft_dev_pull_time_string($string) {
 
   return FALSE;
 }
+
+function loft_dev_migration_page() {
+  $build    = array();
+  
+  $default = variable_get('loft_dev_migration_urls', array());
+  if ($default) {
+    $build['current_status'] = array(
+      '#theme' => 'loft_dev_migration',
+      '#urls' => $default,
+      '#results' => variable_get('loft_dev_migration_urls_results', array()),
+    );
+  }
+
+  $build['form'] = drupal_get_form('loft_dev_migration_urls_form', $default);
+
+  return $build;
+}
+
+/**
+ * Form builder for the loft_dev_migration_urls_form form.
+ *
+ * Input and process the migration urls from a previous site.
+ *
+ * @param array $form
+ * @param array &$form_state
+ *
+ * @see loft_dev_migration_urls_form_validate()
+ * @see loft_dev_migration_urls_form_submit()
+ * @ingroup forms
+ */
+function loft_dev_migration_urls_form($form, &$form_state, $default) {
+  $form['loft_dev_migration_canonical'] = array(
+    '#type' => 'textfield',
+    '#description' => t('Enter the base url of the current production site.'),
+    '#title' => t('Canonical URL'),
+    '#default_value' => variable_get('loft_dev_migration_canonical', ''),
+    '#required' => TRUE,
+  );
+
+  $form['loft_dev_migration_urls'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Expected URLs from previous website'),
+    '#description' => t('Enter all relative urls from the old website that you wish to assert exist in this, one per line.'),
+    '#rows' => 20,
+    '#resizable' => TRUE,
+    '#default_value' => implode(PHP_EOL, $default),
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save/Check Status'),
+  );
+
+  return $form;
+}
+
+/**
+ * Form submission handler for loft_dev_migration_urls_form().
+ *
+ * @see loft_dev_migration_urls_form()
+ * @see loft_dev_migration_urls_form_validate()
+ */
+function loft_dev_migration_urls_form_submit($form, &$form_state) {
+  
+  variable_set('loft_dev_migration_canonical', trim($form_state['values']['loft_dev_migration_canonical'], '/'));
+  variable_del('loft_dev_migration_urls_results');
+
+  if ($urls = trim($form_state['values']['loft_dev_migration_urls'])) {
+    $urls = explode(PHP_EOL, $urls);
+    $urls = array_unique($urls);
+    sort($urls);
+    foreach ($urls as $key => $value) {
+      $urls[$key] = trim($value);
+    }
+    variable_set('loft_dev_migration_urls', $urls);
+  }
+}
