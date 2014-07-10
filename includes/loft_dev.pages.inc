@@ -826,7 +826,7 @@ function loft_dev_rem_page() {
   );
   drupal_add_http_header('Content-Type', 'text/html; charset=utf-8');
   print drupal_render($build);
-  drupal_exit;
+  drupal_exit();
 }
 
 /**

@@ -35,7 +35,10 @@ define('LOFT_DEV_LOFT_DEPLOY_EXPORT_PERIOD_MIN', 5);
 function loft_dev_help($path, $arg) {
   $output = '';
   switch ($path) {
+    case 'admin/loft-dev/theme':
+    case 'admin/loft-dev/theme/admin':
     case 'loft-dev/theme':
+    case 'loft-dev/theme/admin':
       $output .= 'Help area text ' . _loft_dev_dummy_string(24);
       return $output;
   }
@@ -1314,4 +1317,16 @@ function loft_dev_theme($existing, $type, $theme, $path) {
       'file' => loft_dev_include('theme', 2),
     ),
   );
+}
+
+/**
+ * Implementation of hook_mail
+ */
+function loft_dev_mail_alter($message) {
+  if (variable_get('loft_dev_mail_capture', FALSE)) {
+    // Saves a copy of the message in the private files
+    $url = 'private://loft-dev/mail/' . time() . '.txt';
+    file_prepare_directory(dirname($url), FILE_CREATE_DIRECTORY);
+    file_unmanaged_save_data(var_export($message, TRUE), $url);
+  }
 }
