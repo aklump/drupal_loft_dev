@@ -345,6 +345,10 @@ function _loft_dev_access() {
  * Implements hook_preprocess_html().
  */
 function loft_dev_preprocess_html(&$vars) {
+  if (!_loft_dev_access()) {
+    return;
+  }
+
   global $_loft_dev_embedded_page_;
   if ($_loft_dev_embedded_page_ === TRUE) {
     $vars['theme_hook_suggestion'] = 'html__loft_dev_playground';
@@ -360,6 +364,10 @@ function loft_dev_preprocess_html(&$vars) {
  * Implements hook_preprocess_page().
  */
 function loft_dev_preprocess_page(&$vars) {
+  if (!_loft_dev_access()) {
+    return;
+  }
+
   global $_loft_dev_embedded_page_;
   if ($_loft_dev_embedded_page_ === TRUE) {
     $vars['theme_hook_suggestion'] = 'page__loft_dev_playground';
@@ -590,8 +598,11 @@ function _loft_dev_reroute_email_status() {
  * Implements hook_init().
  */
 function loft_dev_init() {
-  if (_loft_dev_access()
-    && !_loft_dev_reroute_email_status()
+  if (!_loft_dev_access()) {
+    return;
+  }
+  
+  if (!_loft_dev_reroute_email_status()
     && current_path() != 'admin/config/development/reroute_email') {
     drupal_set_message(t('Reroute email is not properly enabled/configured. <a href="@url">Fix immediately</a>.', array(
       '@url' => url('admin/config/development/reroute_email'),
@@ -624,7 +635,8 @@ function loft_dev_init() {
  * Implements hook_exit().
  */
 function loft_dev_exit() {
-  if (variable_get('loft_dev_loft_deploy_export_period_mins', LOFT_DEV_LOFT_DEPLOY_EXPORT_PERIOD_MIN)) {
+  if (_loft_dev_access() &&
+    variable_get('loft_dev_loft_deploy_export_period_mins', LOFT_DEV_LOFT_DEPLOY_EXPORT_PERIOD_MIN)) {
     $now = new \DateTime('now', new \DateTimeZone('America/Los_Angeles'));
     $now = $now->format('U');    
     $rollback = variable_get('loft_dev_loft_deploy_export_last', 0) + (variable_get('loft_dev_loft_deploy_export_period_mins', LOFT_DEV_LOFT_DEPLOY_EXPORT_PERIOD_MIN) * 60);
@@ -712,6 +724,10 @@ function loft_dev_loft_dev_menu() {
  * Implements hook_flush_caches().
  */
 function loft_dev_flush_caches() {
+  if (!_loft_dev_access()) {
+    return;
+  }
+  
   unset($_SESSION['loft_dev']['node_suite']);
 }
 
