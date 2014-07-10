@@ -633,7 +633,9 @@ function loft_dev_exit() {
       variable_set('loft_dev_loft_deploy_export_last', $now);
       if (!loft_dev_loft_deploy_export('loft_dev_auto')) {
         variable_set('loft_dev_loft_deploy_export_last', $rollback);
-        drupal_set_message(t("Loft Dev was unabled to export the database using <code>ld export</code>; review <a href='!uri'>reports</a> for more info.", array('!uri' => url('admin/reports/dblog'))), 'error');
+        if (_loft_dev_access()) {
+          drupal_set_message(t("Loft Dev was unabled to export the database using <code>ld export</code>; review <a href='!uri'>reports</a> for more info.", array('!uri' => url('admin/reports/dblog'))), 'error');
+        }
       }
     }
   }  
