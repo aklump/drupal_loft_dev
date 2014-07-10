@@ -631,10 +631,101 @@ function loft_dev_init() {
   }
 }
 
+
+/**
+ * Implementation of hook_mail
+ */
+function loft_dev_mail_alter($message) {
+  global $_loft_dev_mail_system_stashed_, $_loft_dev_mail_filename_; 
+  if (variable_get('loft_dev_mail_capture', FALSE)) {
+    
+    // Stashes and sets to the testing mail system.
+    $_loft_dev_mail_system_stashed_ = variable_get('mail_system');
+    variable_set('mail_system', array('default-system' => 'TestingMailSystem'));
+    
+    // Saves a copy of the message in the private files
+    $_loft_dev_mail_filename_ = 'private://loft-dev/mail/' . time();
+    $url = $_loft_dev_mail_filename_ . '.mail_alter.txt';
+    file_prepare_directory(dirname($url), FILE_CREATE_DIRECTORY);
+    file_unmanaged_save_data(var_export($message, TRUE), $url);
+    variable_set('mail_system', array('default-system' => 'TestingMailSystem'));
+  }
+}
+
+/**
+ * Converts a drupal mail array into a snippet of php code.
+ *
+ * @param  array $message
+ *
+ * @return string       
+ *
+ * @see  DefaultMailSystem
+ */
+function _loft_dev_compose_php_mail($message) {
+  $to = $message['to'];
+
+  if (isset($message['headers']['Return-Path']) && !ini_get('safe_mode')) {
+    $return_path_set = strpos(ini_get('sendmail_path'), ' -f');
+    if (!$return_path_set) {
+      $message['Return-Path'] = $message['headers']['Return-Path'];
+      unset($message['headers']['Return-Path']);
+    }
+  }
+  $mimeheaders = array();
+  foreach ($message['headers'] as $name => $value) {
+    $mimeheaders[] = $name . ': ' . mime_header_encode($value);
+  }
+  $line_endings = variable_get('mail_line_endings', MAIL_LINE_ENDINGS);
+  // Prepare mail commands.
+  $mail_subject = mime_header_encode($message['subject']);
+  // Note: e-mail uses CRLF for line-endings. PHP's API requires LF
+  // on Unix and CRLF on Windows. Drupal automatically guesses the
+  // line-ending format appropriate for your system. If you need to
+  // override this, adjust $conf['mail_line_endings'] in settings.php.
+  $mail_body = preg_replace('@\r?\n@', $line_endings, $message['body']);
+  // For headers, PHP's API suggests that we use CRLF normally,
+  // but some MTAs incorrectly replace LF with CRLF. See #234403.
+  $mail_headers = join("\n", $mimeheaders);  
+
+  $code = <<<EOD
+<?php
+\$success   = mail('{$to}', '{$mail_subject}', '{$mail_body}', '{$mail_headers}'));
+
+// Feedback to screen.
+print \$success ? 'mail() works' : 'mail() failed';
+  return $build;  
+EOD;
+
+  return $code;
+}
+
 /**
  * Implements hook_exit().
  */
 function loft_dev_exit() {
+
+  // Return the mail system to normal.
+  global $_loft_dev_mail_system_stashed_, $_loft_dev_mail_filename_;
+  if (!empty($_loft_dev_mail_system_stashed_)) {
+    
+    // Pop off our collected email.
+    $captured_emails = variable_get('drupal_test_email_collector');
+    $message = array_pop($captured_emails);
+    variable_set('drupal_test_email_collector', $captured_emails);
+
+    // Saves a copy of the message in the private files
+    $url = $_loft_dev_mail_filename_ . '.exit.txt';
+    file_unmanaged_save_data(var_export($message, TRUE), $url);
+    variable_set('mail_system', $_loft_dev_mail_system_stashed_);
+
+    // Save a php version of this for export testing.
+    if (($code = _loft_dev_compose_php_mail($message))) {
+      $url = $_loft_dev_mail_filename_ .  '.php';
+      file_unmanaged_save_data($code, $url);
+    }    
+  }
+
+  // Do an export if needed using loft_deploy shell script.
   if (_loft_dev_access() &&
     variable_get('loft_dev_loft_deploy_export_period_mins', LOFT_DEV_LOFT_DEPLOY_EXPORT_PERIOD_MIN)) {
     $now = new \DateTime('now', new \DateTimeZone('America/Los_Angeles'));
@@ -1336,16 +1427,4 @@ function loft_dev_theme($existing, $type, $theme, $path) {
       'file' => loft_dev_include('theme', 2),
     ),
   );
-}
-
-/**
- * Implementation of hook_mail
- */
-function loft_dev_mail_alter($message) {
-  if (variable_get('loft_dev_mail_capture', FALSE)) {
-    // Saves a copy of the message in the private files
-    $url = 'private://loft-dev/mail/' . time() . '.txt';
-    file_prepare_directory(dirname($url), FILE_CREATE_DIRECTORY);
-    file_unmanaged_save_data(var_export($message, TRUE), $url);
-  }
 }
