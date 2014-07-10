@@ -693,7 +693,7 @@ function _loft_dev_compose_php_mail($message) {
 
 // Feedback to screen.
 print \$success ? 'mail() works' : 'mail() failed';
-  return $build;  
+exit();
 EOD;
 
   return $code;
