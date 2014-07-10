@@ -28,7 +28,16 @@ $conf['loft_dev_free_access'] = TRUE;
        minute hide.
     2. Extend the admin stuff selectors using hook_loft_dev_admin_stuff().
 
-Automatic backups using Loft Deploy
+Usage
+
+  Troubleshooting mail issues
+
+   If you set the variable loft_dev_mail_capture to 1, emails will be
+   written to private://loft-dev/mail and you can see the emails that are
+   being sent. They will not be actually sent while this is true. See
+   loft_dev_mail_alter() and loft_dev_exit() for more info.
+
+  Automatic backups using Loft Deploy
 
    Loft Dev module can automatically call loft_deploy export on regulary
    intervals of use. This has the effect of automatically backing up the

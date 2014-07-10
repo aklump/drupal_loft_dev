@@ -29,7 +29,13 @@
 <li>Extend the admin stuff selectors using <code>hook_loft_dev_admin_stuff()</code>.</li>
 </ol>
 
-<h2>Automatic backups using Loft Deploy</h2>
+<h2>Usage</h2>
+
+<h3>Troubleshooting mail issues</h3>
+
+<p>If you set the variable <em>loft_dev_mail_capture</em> to 1, emails will be written to <em>private://loft-dev/mail</em> and you can see the emails that are being sent.  They will not be actually sent while this is true.  See <code>loft_dev_mail_alter()</code> and <code>loft_dev_exit()</code> for more info.</p>
+
+<h3>Automatic backups using Loft Deploy</h3>
 
 <p>Loft Dev module can automatically call <code>loft_deploy export</code> on regulary intervals of use.  This has the effect of automatically backing up the database to the normal output path, for every N minutes of active use.  For the most recent backup go there.  To see the incremental backups in time, descend into the <em>loft_dev_auto</em> directory.</p>
 

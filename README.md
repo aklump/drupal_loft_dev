@@ -18,7 +18,12 @@
 1. Hold down the meta key when clicking Hide Admin Stuff for a 3 minute hide.
 1. Extend the admin stuff selectors using `hook_loft_dev_admin_stuff()`.
 
-## Automatic backups using Loft Deploy
+## Usage
+
+### Troubleshooting mail issues
+If you set the variable _loft_dev_mail_capture_ to 1, emails will be written to _private://loft-dev/mail_ and you can see the emails that are being sent.  They will not be actually sent while this is true.  See `loft_dev_mail_alter()` and `loft_dev_exit()` for more info.
+
+### Automatic backups using Loft Deploy
 Loft Dev module can automatically call `loft_deploy export` on regulary intervals of use.  This has the effect of automatically backing up the database to the normal output path, for every N minutes of active use.  For the most recent backup go there.  To see the incremental backups in time, descend into the _loft_dev_auto_ directory.
 
 This is not based on cron, but rather on elapsed time.  If you set this to back up every 15 minutes, it will only do so if you're activaly using the site.  It's like poor man's cron, it looks to see if N minutes has elapsed since the last backup, and it does this on a page load.  Thus, no use, no page load.  The following settings needed to be added to _settings.local.php_.
