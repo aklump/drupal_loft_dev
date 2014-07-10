@@ -687,9 +687,14 @@ function _loft_dev_compose_php_mail($message) {
   // but some MTAs incorrectly replace LF with CRLF. See #234403.
   $mail_headers = join("\n", $mimeheaders);  
 
+  $mail_to = addslashes($mail_to);
+  $mail_subject = addslashes($mail_subject);
+  $mail_body = addslashes($mail_body);
+  $mail_headers = addslashes($mail_headers);
+
   $code = <<<EOD
 <?php
-\$success   = mail('{$to}', '{$mail_subject}', '{$mail_body}', '{$mail_headers}'));
+\$success   = mail('{$to}', '{$mail_subject}', '{$mail_body}', '{$mail_headers}');
 
 // Feedback to screen.
 print \$success ? 'mail() works' : 'mail() failed';
