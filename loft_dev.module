@@ -590,8 +590,9 @@ function _loft_dev_reroute_email_status() {
  * Implements hook_init().
  */
 function loft_dev_init() {
-  if (!_loft_dev_reroute_email_status() &&
-      current_path() != 'admin/config/development/reroute_email') {
+  if (_loft_dev_access()
+    && !_loft_dev_reroute_email_status()
+    && current_path() != 'admin/config/development/reroute_email') {
     drupal_set_message(t('Reroute email is not properly enabled/configured. <a href="@url">Fix immediately</a>.', array(
       '@url' => url('admin/config/development/reroute_email'),
     )), 'error', FALSE);
