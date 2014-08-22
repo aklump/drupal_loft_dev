@@ -115,6 +115,14 @@ function loft_dev_menu() {
     'type' => MENU_NORMAL_ITEM,
     'file' => loft_dev_include('pages', 2),
   );
+  $items['admin/loft-dev/css-aggregation'] = array(
+    'title' => 'CSS Aggregation',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('loft_dev_css_aggregation_form'),
+    'access callback' => '_loft_dev_access',
+    'type' => MENU_NORMAL_ITEM,
+    'file' => loft_dev_include('pages', 2),
+  );
   $items['admin/loft-dev/overview'] = array(
     'title' => 'Overview',
     'type' => MENU_DEFAULT_LOCAL_TASK,
@@ -499,7 +507,8 @@ function loft_dev_block_view($delta = '') {
       $output .= drupal_render($build);
       $output = str_replace('href="/%23"', 'href="#"', $output);
 
-      $output .= drupal_render(drupal_get_form('loft_dev_node_access_form')) . "\n";
+      $form = drupal_get_form('loft_dev_node_access_form');
+      $output .= drupal_render($form) . "\n";
 
       if (module_exists('masquerade') &&
           ($temp = module_invoke('masquerade', 'block_view', 0))) {
@@ -510,7 +519,8 @@ function loft_dev_block_view($delta = '') {
         $output .= drupal_render($temp['content']) ."\n";
       }
 
-      $output .= render(menu_tree('devel'));
+      $tree = menu_tree('devel');
+      $output .= render($tree);
 
       if (($temp = module_invoke('devel_node_access', 'block_view', 0))) {
         if (is_string($temp['content'])) {
@@ -559,7 +569,8 @@ function loft_dev_block_view($delta = '') {
       }
 
       // Rewind form
-      $output .= drupal_render(drupal_get_form('loft_dev_update_rewind_form'));
+      $form = drupal_get_form('loft_dev_update_rewind_form');
+      $output .= drupal_render($form);
 
       // No more changes/additions
       $output = '<div id="loft-dev-tools" class="loft-dev-closure">'. $output .'</div> <!-- /loft-dev-closure -->'."\n";
@@ -731,7 +742,7 @@ function loft_dev_exit() {
   }
 
   // Do an export if needed using loft_deploy shell script.
-  if (_loft_dev_access() &&
+  if (0 && _loft_dev_access() &&
     variable_get('loft_dev_loft_deploy_export_period_mins', LOFT_DEV_LOFT_DEPLOY_EXPORT_PERIOD_MIN)) {
     $now = new \DateTime('now', new \DateTimeZone('America/Los_Angeles'));
     $now = $now->format('U');    
@@ -1432,4 +1443,29 @@ function loft_dev_theme($existing, $type, $theme, $path) {
       'file' => loft_dev_include('theme', 2),
     ),
   );
+}
+
+/**
+ * Implements hook_css_cache_alter().
+ *
+ * You must hack core to use this hook.  To do so add the following
+ * line to the function shown.
+ * 
+ * @code
+ *   function drupal_build_css_cache($css) {
+ *     drupal_alter('css_cache', $css);
+ * @endcode
+ */
+function loft_dev_css_cache_alter(&$css) {
+  $omit = variable_get('loft_dev_css_files_omit', array());
+  $css_files = variable_get('loft_dev_css_files_options', array());
+  foreach ($css as $key => $data) {
+    if ($data['type'] === 'file') {
+      $css_files[$data['data']] = $data['data'];
+      if (in_array($data['data'], $omit)) {
+        unset($css[$key]);
+      }
+    }
+  }
+  variable_set('loft_dev_css_files_options', $css_files);
 }

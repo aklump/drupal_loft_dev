@@ -1024,3 +1024,40 @@ function loft_dev_migration_urls_form_submit($form, &$form_state) {
     variable_set('loft_dev_migration_urls', $urls);
   }
 }
+
+/**
+ * Form builder for the loft_dev_css_aggregation_form form.
+ *
+ * Interrupts which files get aggregated to debug issues.
+ *
+ * @param array $form
+ * @param array &$form_state
+ *
+ * @see loft_dev_css_aggregation_form_validate()
+ * @see loft_dev_css_aggregation_form_submit()
+ * @ingroup forms
+ */
+function loft_dev_css_aggregation_form($form, &$form_state) {
+  $default_value = variable_get('loft_dev_css_files_omit', array());
+  $options = variable_get('loft_dev_css_files_options', array());
+  $form['loft_dev_css_files_omit'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Omit these files from aggregation'),
+    '#default_value' => $default_value,
+    '#options' => $options,
+  );
+
+  return system_settings_form($form);
+
+  return $form;
+}
+
+/**
+ * Form validation handler for loft_dev_css_aggregation_form().
+ *
+ * @see loft_dev_css_aggregation_form()
+ * @see loft_dev_css_aggregation_form_submit()
+ */
+function loft_dev_css_aggregation_form_validate($form, &$form_state) {
+  $form_state['values']['loft_dev_css_files_omit'] = array_filter($form_state['values']['loft_dev_css_files_omit']);
+}
