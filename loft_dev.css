@@ -1,4 +1,4 @@
-#loft-dev-tools {
+.block-loft-dev {
   font-size: 14px;
   padding:10px;
   background-color: #000000;
@@ -7,34 +7,35 @@
   text-align: left;
 }
 
-#loft-dev-tools {
+.block-loft-dev {
   color: #66FF66;
-  font-family: "Panic Sans", monospace;
+  font-family: "Panic Sans", monospace !important;
 }
-#loft-dev-tools .form-submit,
-#loft-dev-tools .form-text,
-#loft-dev-tools .form-select option {
+.block-loft-dev .form-submit,
+.block-loft-dev .form-text,
+.block-loft-dev .form-select option {
   color: #000;
 }
-#loft-dev-tools tr.odd {
+.block-loft-dev tr.odd {
   background: #000;
 }
-#loft-dev-tools tr.even {
+.block-loft-dev tr.even {
   background: #333;
 }
-#loft-dev-tools th {
+.block-loft-dev th {
   background: #666;
   color: #000;
 }
-#loft-dev-tools table {
+.block-loft-dev table {
   width: 100%;
 }
 
-#loft-dev-tools a {
+.block-loft-dev a {
   color: #fff;
   text-decoration: none;
+  font-weight: normal;
 }
-#loft-dev-tools a:hover {
+.block-loft-dev a:hover {
   color: #fff;
   text-decoration: underline;
 }

@@ -13,3 +13,4 @@ dependencies[] = reroute_email
 dependencies[] = schema
 dependencies[] = coder
 dependencies[] = coder_review
+dependencies[] = xml_field

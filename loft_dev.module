@@ -364,7 +364,10 @@ function loft_dev_preprocess_html(&$vars) {
 
   // Append the loft dev tools to page_bottom
   $build    = array();
-  $build['loft_dev']['block'] = module_invoke('loft_dev', 'block_view', 0);
+  $build['loft_dev']['block'] = module_invoke('loft_dev', 'block_view', 'dev_tools');
+  $build['loft_dev']['#prefix'] = '<div class="block-loft-dev">';
+  $build['loft_dev']['#suffix'] = '</div>';
+
   $vars['page']['page_bottom']['loft_dev_block'] = $build;
 }
 
@@ -386,8 +389,13 @@ function loft_dev_preprocess_page(&$vars) {
  * Implements hook_block_info().
  */
 function loft_dev_block_info() {
-  $blocks['0'] = array(
-    'info' => t('Loft Dev Tools'),
+  $blocks['dev_tools'] = array(
+    'info' => t('LOFT DEV: Tools'),
+    'cache' => DRUPAL_NO_CACHE,
+  );
+
+  $blocks['page_review_checklist'] = array(
+    'info' => t('LOFT DEV: URL checklist'), 
     'cache' => DRUPAL_NO_CACHE,
   );
 
@@ -398,8 +406,19 @@ function loft_dev_block_info() {
  * Implements hook_block_view().
  */
 function loft_dev_block_view($delta = '') {
+  $block = array(
+    'subject' => NULL, 
+    'content' => NULL, 
+  );
   switch ($delta) {
-    case 0:
+    case 'page_review_checklist';
+      loft_dev_include('pages');
+      $form = drupal_get_form('page_review_checklist_form');
+      $block['content']['form'] = $form;
+
+      break;
+
+    case 'dev_tools':
 
       if (!_loft_dev_access()) {
         return array();
@@ -586,7 +605,73 @@ function loft_dev_block_view($delta = '') {
 
       break;
   }
+
   return $block;
+}
+
+/**
+ * Implements hook_block_configure().
+ */
+function loft_dev_block_configure($delta = '') {
+  $form = array();
+  if ($delta = 'page_review_checklist') {
+    $default = '<config>
+  <page weight="0">
+    <status>1</status>
+    <title></title>
+    <uri></uri>
+    <comp></comp>
+    <comp></comp>
+    <notes></notes>
+    <notes></notes>
+  </page>  
+</config>';
+    $default = variable_get('loft_dev_block_page_review_checklist', $default);
+    $form['page_review_checklist'] = array(
+      '#type' => 'xml_codemirror',
+      '#title' => t('Checklist config'),
+      '#description' => t('Enter a list of urls to review, one per line.'),
+      '#default_value' => $default,
+      '#xml_example' => $default,
+      '#rows' => 10,
+    );
+
+    $form['page_review_domain'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Export base domain'),
+      '#description' => t('This will be used to build the export URLs.'),
+      '#default_value' => variable_get('loft_dev_block_page_review_domain', url('', array('absolute' => TRUE))),
+      '#required' => TRUE,
+    );
+  }
+
+  return $form;
+}
+
+/**
+ * Implements hook_block_save().
+ */
+function loft_dev_block_save($delta = '', $edit = array()) {
+  if ($delta === 'page_review_checklist') {
+    variable_set('loft_dev_block_page_review_domain', $edit['page_review_domain']);
+
+    // Process pages.
+    $config = xml_field_xml($edit['page_review_checklist']);
+    $config = xml_field_sort($config);
+    foreach ($config->page as $value) {
+      $title        = xml_field($value, 'title');
+      $uri          = xml_field($value, 'uri');
+      $t            = loft_dev_get_path_title($uri);
+      $value->uri   = $uri;
+      if (empty($title)) {
+        $value->title = $t;
+      }
+    }
+
+    $config = xml_field_format($config);
+    variable_set('loft_dev_block_page_review_checklist', $config);
+    
+  }
 }
 
 /**
@@ -1468,4 +1553,25 @@ function loft_dev_css_cache_alter(&$css) {
     }
   }
   variable_set('loft_dev_css_files_options', $css_files);
+}
+
+/**
+ * Tries to return the page title of a path.
+ *
+ * @param  string &$path
+ *   $path may be modified as the normal path.
+ *
+ * @return string  If title can't be determined, $path is returned.
+ */
+function loft_dev_get_path_title(&$path) {
+  if (url_is_external($path)) {
+    $find = url('', array('absolute' => TRUE));
+    list($null, $path) = explode($find, $path);
+  }
+  $path = trim(trim($path), '/');
+  $path = drupal_get_normal_path($path);
+
+  $item = menu_get_item($path);
+
+  return isset($item['title']) ? $item['title'] : $path;
 }

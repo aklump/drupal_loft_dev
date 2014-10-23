@@ -1061,3 +1061,120 @@ function loft_dev_css_aggregation_form($form, &$form_state) {
 function loft_dev_css_aggregation_form_validate($form, &$form_state) {
   $form_state['values']['loft_dev_css_files_omit'] = array_filter($form_state['values']['loft_dev_css_files_omit']);
 }
+
+/**
+ * Form builder for the page_review_checklist_form form.
+ *
+ * Form for the page_review_checklist block.
+ *
+ * @param array $form
+ * @param array &$form_state
+ *
+ * @see page_review_checklist_form_validate()
+ * @see page_review_checklist_form_submit()
+ * @ingroup forms
+ */
+function page_review_checklist_form($form, &$form_state) {
+
+  $form['fieldset'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Design files and notes'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+
+  $base_domain = variable_get('loft_dev_block_page_review_domain', url('', array('absolute' => TRUE)));
+  $base_domain = trim($base_domain, '/') . '/';
+
+  $config = xml_field_xml(variable_get('loft_dev_block_page_review_checklist', ''));
+  $default = FALSE;
+
+  $copy = array(
+    '# Page(s) audit',
+    'A list of pages, links, comps and design notes for site review.',
+    '',
+  );
+  foreach ($config->page as $value) {
+    $uri          = xml_field($value, 'uri');
+    $path         = $uri;
+    $query        = '';
+    if (strpos($uri, '?')) {
+      list($path, $query) = explode('?', $uri);
+      parse_str($query, $query);
+    }
+
+    $comps = $export_comps = $args = array();
+    $notes = $export_notes = array();
+    $icons = array();
+    foreach ($value->comp as $value2) {
+      $index = '-' . count($comps) + 1;
+      if (count($value->comp) === 1) {
+        $index = '';
+      }
+      $comps[]                  = ' <a href="!comp' . $index . '" target="_blank">[comp' . $index . ']</a>';
+      $args['!comp' . $index]   = xml_field($value2);
+      $export_comps[]           = '<' . xml_field($value2) . '>';
+    }
+
+    foreach ($value->notes as $value2) {
+      $index = '-' . count($notes) + 1;
+      if (count($value->notes) === 1) {
+        $index = '';
+      }
+      $notes[]                  = ' <a href="!note' . $index . '" target="_blank">[notes' . $index . ']</a>';
+      $args['!note' . $index]   = xml_field($value2);
+      $export_notes[]           = '<' . xml_field($value2) . '>';
+    }
+
+    $title = xml_field($value, 'title');
+
+    $status = t('done');
+    if (!xml_field($value->status)) {
+      $icons[] = array(
+        '#theme'      => 'image',
+        '#path'       => drupal_get_path('module', 'loft_dev') . '/images/attention.png',
+        '#alt'        => 'attention icon',
+        '#title'      => 'This page needs work',
+        '#attributes' => array(),
+      );
+      $status = t('pending');
+    }
+    $icons = drupal_render($icons);
+
+    $form['fieldset'][$title] = array(
+      '#type' => 'checkbox',
+      '#title' => l($title . t(implode('', $comps) . implode('', $notes), $args), $path, array('html' => TRUE, 'query' => $query)) . ' ' . $icons,
+      '#default_value' => $default,
+    );
+    $copy[] = '';
+    $copy[] = "## $title [$status]";
+
+    if ($uri) {
+      $copy[] = '<' . trim($base_domain . $uri) . '>';
+    }
+    
+    if (count($export_comps)) {
+      $copy[] = '';
+      $copy[] = format_plural(count($export_comps), "Here is the comp:", "Here are the comps:");
+      $copy[] = '';
+      $copy = array_merge($copy, $export_comps);
+    }
+
+    if (count($export_notes)) {
+      $copy[] = '';
+      $copy[] = t("Here are design notes:");
+      $copy[] = '';
+      $copy = array_merge($copy, $export_notes);
+    }
+  }
+
+
+  $form['fieldset']['export'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Export'),
+    '#default_value' => implode(PHP_EOL, $copy),
+    '#rows' => 10,
+  );
+
+  return $form;
+}
