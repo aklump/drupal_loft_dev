@@ -120,6 +120,8 @@ function loft_dev_playground_page() {
     'group' => CSS_THEME,
     'weight' => 1000,
   );
+  // This does NOT work for library_load()
+  $css_js['#attached']['library'][] =  array('system', 'cookie');
   $css_js['#attached']['js'][] =  array(
     'type' => 'file', 
     'data' => drupal_get_path('module', 'loft_dev') . '/loft_dev.js',
@@ -489,8 +491,14 @@ function loft_dev_list_fapi_elements_page() {
       'js' => array(
         drupal_get_path('module', 'loft_dev') . '/loft_dev.js',
       ),
+      'library' => array(
+        array('system', 'cookie'),
+      ),
     ),
   );
+
+  // This does NOT work for library_load()
+  $build['#attached']['library'][] = array('system', 'cookie');
 
   $build[] = array(
     '#theme' => 'item_list',
@@ -758,6 +766,9 @@ function loft_dev_list_functions_page($op) {
       'js' => array(
         drupal_get_path('module', 'loft_dev') . '/loft_dev.js',
       ),
+      'library' => array(
+        array('system', 'cookie'),
+      ),      
     ),
   );
   $output .= drupal_render($form) . "\n";

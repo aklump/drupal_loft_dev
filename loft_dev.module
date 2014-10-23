@@ -598,6 +598,9 @@ function loft_dev_block_view($delta = '') {
         'content' => array(
           '#attached' => array(
             'js' => array(drupal_get_path('module', 'loft_dev') . '/loft_dev.js'),
+            'library' => array(
+              array('system', 'cookie'),
+            ),            
           ),
           '#markup' => $output,
         ),
