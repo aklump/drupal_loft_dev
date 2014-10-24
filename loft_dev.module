@@ -885,7 +885,7 @@ function loft_dev_loft_dev_menu() {
   $links = array(
     array(
       'title' => t('Hide Admin Stuff'),
-      'href' => '<front>',
+      'href' => '#',
       'attributes' => array(
         'class' => array(
           'loft-dev-closure-hide',
