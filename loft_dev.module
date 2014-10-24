@@ -990,6 +990,14 @@ function loft_dev_update_rewind_form($form, &$form_state) {
   $form = array();
 
   $modules = module_list(FALSE, FALSE, TRUE);
+  $form['#rollbacks'] = array();
+  foreach ($modules as $key => $module_name) {
+    $modules[$key] = $module_name;
+    if (($form['#rollbacks'][$key] = variable_get('loft_dev:update_rollback_' . $module_name, NULL))) {
+      $modules[$key] .= ':' . $form['#rollbacks'][$key];
+    }
+  }
+
   $form['module'] = array(
     '#type' => 'select',
     '#title' => t('Replay Last Module Update'),
@@ -1001,7 +1009,6 @@ function loft_dev_update_rewind_form($form, &$form_state) {
     '#value' => t('Replay Update'),
   );
 
-
   return $form;
 }
 
@@ -1012,19 +1019,28 @@ function loft_dev_update_rewind_form($form, &$form_state) {
  * @see loft_dev_update_rewind_form_validate()
  */
 function loft_dev_update_rewind_form_submit($form, &$form_state) {
-  $_SESSION['loft_dev']['last_rewind'] = $form_state['values']['module'];
+  $module   = $form_state['values']['module'];
+  $version  = $form['#rollbacks'][$module];
+  $_SESSION['loft_dev']['last_rewind'] = $module;
 
   $query = db_select('system', 's');
-  $version = $query
-    ->fields('s', array('schema_version'))
-    ->condition('name', $form_state['values']['module'])
-    ->execute()->fetchField();
+  
+  // If not submitted then we use one before the current.
+  
+  if (empty($version)) {
+    $version = $query
+      ->fields('s', array('schema_version'))
+      ->condition('name', $form_state['values']['module'])
+      ->execute()->fetchField();
+    --$version;
+  }
+
   $count = db_update('system')
-    ->fields(array('schema_version' => --$version))
+    ->fields(array('schema_version' => $version))
     ->condition('name', $form_state['values']['module'])
     ->execute();
   if ($count) {
-    drupal_set_message(t('%module has been rewound to schema version %version', array(
+    drupal_set_message(t('%module has been rewound to version %version', array(
       '%module' => $form_state['values']['module'],
       '%version' => $version,
     )));
