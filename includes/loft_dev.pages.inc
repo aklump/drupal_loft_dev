@@ -1101,8 +1101,8 @@ function page_review_checklist_form($form, &$form_state) {
   $default = FALSE;
 
   $copy = array(
-    '# Page(s) audit',
-    'A list of pages, links, comps and design notes for site review.',
+    t('# Page(s) audit (As of @date)', array('@date' => date_now()->format('r'))),
+    t('A list of pages, links, comps and design notes for site review.'),
     '',
   );
   foreach ($config->page as $value) {
