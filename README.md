@@ -23,6 +23,11 @@
 ### Troubleshooting mail issues
 If you set the variable _loft_dev_mail_capture_ to 1, emails will be written to _private://loft-dev/mail_ and you can see the emails that are being sent.  They will not be actually sent while this is true.  See `loft_dev_mail_alter()` and `loft_dev_exit()` for more info.
 
+### Database Schema Rollbacks
+You can easily rollback the module version using the loft dev tools block "Replay Update" button.  By default the schema will be rolled back by one number.  You can also target a specific rollback number by setting the following variable to the schema version you want to rollback to:
+
+    drush vset loft_dev:update_rollback_{module name} {schema version, e.g. 7004}
+
 ### Automatic backups using Loft Deploy
 Loft Dev module can automatically call `loft_deploy export` on regulary intervals of use.  This has the effect of automatically backing up the database to the normal output path, for every N minutes of active use.  For the most recent backup go there.  To see the incremental backups in time, descend into the _loft_dev_auto_ directory.
 
