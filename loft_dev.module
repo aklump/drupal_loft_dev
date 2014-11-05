@@ -646,6 +646,16 @@ function loft_dev_block_configure($delta = '') {
       '#default_value' => variable_get('loft_dev_block_page_review_domain', url('', array('absolute' => TRUE))),
       '#required' => TRUE,
     );
+
+    $form['page_review_export_format'] = array(
+      '#type' => 'select',
+      '#title' => t('Export format'),
+      '#default_value' => variable_get('loft_dev_block_page_review_export_format', 'markdown'),
+      '#options' => array(
+        'markdown' => 'Markdown',
+        'basecamp' => 'Basecamp',
+      ),
+    );
   }
 
   return $form;
@@ -656,6 +666,8 @@ function loft_dev_block_configure($delta = '') {
  */
 function loft_dev_block_save($delta = '', $edit = array()) {
   if ($delta === 'page_review_checklist') {
+
+    variable_set('loft_dev_block_page_review_export_format', $edit['page_review_export_format']);
     variable_set('loft_dev_block_page_review_domain', $edit['page_review_domain']);
 
     // Process pages.

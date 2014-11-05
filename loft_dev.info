@@ -3,7 +3,7 @@ description = Used by ITLS during development of a website.
 homepage = https://github.com/aklump/drupal_loft_dev
 package = In the Loft Studios
 core = 7.x
-version = "7.x-2.2-rc14"
+version = "7.x-2.2-rc15"
 
 package = Development
 dependencies[] = simpletest

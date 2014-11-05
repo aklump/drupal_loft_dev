@@ -1100,11 +1100,16 @@ function page_review_checklist_form($form, &$form_state) {
   $config = xml_field_xml(variable_get('loft_dev_block_page_review_checklist', ''));
   $default = FALSE;
 
-  $copy = array(
-    t('# Page(s) audit (As of @date)', array('@date' => date_now()->format('r'))),
-    t('A list of pages, links, comps and design notes for site review.'),
-    '',
-  );
+  // Begin the export string.
+  $ex_markdown = $ex_basecamp = array();
+  $ex_markdown[] = t('# Page(s) audit (As of @date)', array('@date' => date_now()->format('r')));
+  $ex_basecamp[] = t('h1. Page(s) audit (As of @date)', array('@date' => date_now()->format('r')));
+  $ex_basecamp[] = '';
+
+  $string = t('A list of pages, links, comps and design notes for site review.');
+  $ex_markdown[] = $string;
+  $ex_basecamp[] = $string; 
+
   foreach ($config->page as $value) {
     $uri          = xml_field($value, 'uri');
     $path         = $uri;
@@ -1114,17 +1119,19 @@ function page_review_checklist_form($form, &$form_state) {
       parse_str($query, $query);
     }
 
-    $comps = $export_comps = $args = array();
-    $notes = $export_notes = array();
+    $comps = $ex_comps_markdown = $ex_comps_basecamp = $args = array();
+    $notes = $ex_notes_markdown = $ex_notes_basecamp = array();
     $icons = array();
     foreach ($value->comp as $value2) {
       $index = '-' . count($comps) + 1;
       if (count($value->comp) === 1) {
         $index = '';
       }
-      $comps[]                  = ' <a href="!comp' . $index . '" target="_blank">[comp' . $index . ']</a>';
-      $args['!comp' . $index]   = xml_field($value2);
-      $export_comps[]           = '<' . xml_field($value2) . '>';
+      $comps[]                      = ' <a href="!comp' . $index . '" target="_blank">[comp' . $index . ']</a>';
+      $args['!comp' . $index]       = xml_field($value2);
+      $ex_comps_markdown[]          = '<' . xml_field($value2) . '>';
+      $ex_comps_basecamp[]          = '"' . ($url = xml_field($value2)) . '":' . $url;
+      // $ex_comps_basecamp[]          = '"comp' . $index . '":' . xml_field($value2);
     }
 
     foreach ($value->notes as $value2) {
@@ -1132,9 +1139,11 @@ function page_review_checklist_form($form, &$form_state) {
       if (count($value->notes) === 1) {
         $index = '';
       }
-      $notes[]                  = ' <a href="!note' . $index . '" target="_blank">[notes' . $index . ']</a>';
-      $args['!note' . $index]   = xml_field($value2);
-      $export_notes[]           = '<' . xml_field($value2) . '>';
+      $notes[]                      = ' <a href="!note' . $index . '" target="_blank">[notes' . $index . ']</a>';
+      $args['!note' . $index]       = xml_field($value2);
+      $ex_notes_markdown[]          = '<' . xml_field($value2) . '>';
+      $ex_notes_basecamp[]          = '"' . ($url = xml_field($value2)) . '":' . $url;
+      // $ex_notes_basecamp[]          = '"notes' . $index . '":' . xml_field($value2);
     }
 
     $title = xml_field($value, 'title');
@@ -1148,7 +1157,7 @@ function page_review_checklist_form($form, &$form_state) {
         '#title'      => 'This page needs work',
         '#attributes' => array(),
       );
-      $status = t('pending');
+      $status = t('in dev');
     }
     $icons = drupal_render($icons);
 
@@ -1157,33 +1166,52 @@ function page_review_checklist_form($form, &$form_state) {
       '#title' => l($title . t(implode('', $comps) . implode('', $notes), $args), $path, array('html' => TRUE, 'query' => $query)) . ' ' . $icons,
       '#default_value' => $default,
     );
-    $copy[] = '';
-    $copy[] = "## $title [$status]";
+    $string = '';
+    $ex_markdown[] = $string;
+    $ex_basecamp[] = $string; 
+    $ex_markdown[] = "## $title [$status]";
+    $ex_basecamp[] = "h2. $title [$status]";
+    $ex_basecamp[] = '';
 
     if ($uri) {
-      $copy[] = '<' . trim($base_domain . $uri) . '>';
+      $ex_markdown[] = '<' . trim($base_domain . $uri) . '>';
+      $ex_basecamp[] = '"' . ($url = trim($base_domain . $uri)) . '":' . $url;
     }
     
-    if (count($export_comps)) {
-      $copy[] = '';
-      $copy[] = format_plural(count($export_comps), "Here is the comp:", "Here are the comps:");
-      $copy[] = '';
-      $copy = array_merge($copy, $export_comps);
+    if (count($ex_comps_markdown)) {
+      $string = '';
+      $ex_markdown[] = $string;
+      $ex_basecamp[] = $string; 
+      $string = format_plural(count($ex_comps_markdown), "Here is the comp:", "Here are the comps:");
+      $ex_markdown[] = $string;
+      $ex_basecamp[] = $string;
+      $string = '';
+      $ex_markdown[] = $string;
+      $ex_basecamp[] = $string; 
+      $ex_markdown = array_merge($ex_markdown, $ex_comps_markdown);
+      $ex_basecamp = array_merge($ex_basecamp, $ex_comps_basecamp);
     }
 
-    if (count($export_notes)) {
-      $copy[] = '';
-      $copy[] = t("Here are design notes:");
-      $copy[] = '';
-      $copy = array_merge($copy, $export_notes);
+    if (count($ex_notes_markdown)) {
+      $string = '';
+      $ex_markdown[] = $string;
+      $ex_basecamp[] = $string; 
+      $string = t("Here are design notes:");
+      $ex_markdown[] = $string;
+      $ex_basecamp[] = $string; 
+      $string = '';
+      $ex_markdown[] = $string;
+      $ex_basecamp[] = $string; 
+      $ex_markdown = array_merge($ex_markdown, $ex_notes_markdown);
+      $ex_basecamp = array_merge($ex_basecamp, $ex_notes_basecamp);
     }
   }
 
-
+  $format = 'ex_' . variable_get('loft_dev_block_page_review_export_format', 'markdown');
   $form['fieldset']['export'] = array(
     '#type' => 'textarea',
     '#title' => t('Export'),
-    '#default_value' => implode(PHP_EOL, $copy),
+    '#default_value' => implode(PHP_EOL, $$format),
     '#rows' => 10,
   );
 
