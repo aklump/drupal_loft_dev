@@ -674,12 +674,12 @@ function loft_dev_block_save($delta = '', $edit = array()) {
     $config = xml_field_xml($edit['page_review_checklist']);
     $config = xml_field_sort($config);
     foreach ($config->page as $value) {
-      $title        = xml_field($value, 'title');
-      $uri          = xml_field($value, 'uri');
-      $t            = loft_dev_get_path_title($uri);
-      $value->uri   = $uri;
-      if (empty($title)) {
-        $value->title = $t;
+      $title = xml_field($value, 'title');
+      if ($uri = xml_field($value, 'uri')) {
+        $value->uri   = $uri;  
+      }
+      if (empty($title) && $uri) {
+        $value->title = loft_dev_get_path_title($uri);
       }
     }
 
