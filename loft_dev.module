@@ -654,6 +654,7 @@ function loft_dev_block_configure($delta = '') {
       '#options' => array(
         'markdown' => 'Markdown',
         'basecamp' => 'Basecamp',
+        'todos'    => 'Todo list',
       ),
     );
   }

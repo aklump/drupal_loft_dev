@@ -1086,7 +1086,6 @@ function loft_dev_css_aggregation_form_validate($form, &$form_state) {
  * @ingroup forms
  */
 function page_review_checklist_form($form, &$form_state) {
-
   $form['fieldset'] = array(
     '#type' => 'fieldset',
     '#title' => t('Design files and notes'),
@@ -1101,10 +1100,11 @@ function page_review_checklist_form($form, &$form_state) {
   $default = FALSE;
 
   // Begin the export string.
-  $ex_markdown = $ex_basecamp = array();
+  $ex_markdown = $ex_basecamp = $ex_todos = array();
   $ex_markdown[] = t('# Page(s) audit (As of @date)', array('@date' => date_now()->format('r')));
   $ex_basecamp[] = t('h1. Page(s) audit (As of @date)', array('@date' => date_now()->format('r')));
   $ex_basecamp[] = '';
+  $ex_todos[]    = t('## Page(s) Audit Todo List');
 
   $string = t('A list of pages, links, comps and design notes for site review.');
   $ex_markdown[] = $string;
@@ -1176,6 +1176,10 @@ function page_review_checklist_form($form, &$form_state) {
     if ($uri) {
       $ex_markdown[] = '<' . trim($base_domain . $uri) . '>';
       $ex_basecamp[] = '"' . ($url = trim($base_domain . $uri)) . '":' . $url;
+      $ex_todos[]    = "- [ ] $title $uri\n" . trim($base_domain . $uri);
+    }
+    else {
+      $ex_todos[]    = "- [ ] $title";
     }
     
     if (count($ex_comps_markdown)) {
@@ -1211,7 +1215,7 @@ function page_review_checklist_form($form, &$form_state) {
   $form['fieldset']['export'] = array(
     '#type' => 'textarea',
     '#title' => t('Export'),
-    '#default_value' => implode(PHP_EOL, $$format),
+    '#default_value' => implode(PHP_EOL, ${$format}),
     '#rows' => 10,
   );
 
