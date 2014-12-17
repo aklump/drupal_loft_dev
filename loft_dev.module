@@ -668,8 +668,10 @@ function loft_dev_block_configure($delta = '') {
 function loft_dev_block_save($delta = '', $edit = array()) {
   if ($delta === 'page_review_checklist') {
 
-    variable_set('loft_dev_block_page_review_export_format', $edit['page_review_export_format']);
-    variable_set('loft_dev_block_page_review_domain', $edit['page_review_domain']);
+    $data['settings.json'] = json_encode(array(
+      'export_format' => $edit['page_review_export_format'],
+      'domain' => $edit['page_review_domain'],
+    ));
 
     // Process pages.
     $config = xml_field_xml($edit['page_review_checklist']);
@@ -685,9 +687,42 @@ function loft_dev_block_save($delta = '', $edit = array()) {
     }
 
     $config = xml_field_format($config);
-    variable_set('loft_dev_block_page_review_checklist', $config);
-    
+    $data['checklist.xml'] = $config;
+    loft_dev_private_storage('page_review', $data);
   }
+}
+
+/**
+ * Getter/setter for private storage of data
+ *
+ * This is used so that we bypass the database and store this in the private
+ * directory; by doing this we avoid nuking this when we pull from prod.  In
+ * essence its a supersceding storage mechanism.
+ *
+ * @param  string $group A key to group related data.
+ * @param  array $data Keyed by filename, the values will become the file
+ *   contents.
+ *
+ * @return array  The currently stored values.
+ */
+function loft_dev_private_storage($group, $data = NULL) {
+  $dir = 'private://loft_dev/' . $group;
+  try {
+    file_prepare_directory($dir, FILE_CREATE_DIRECTORY);
+    if (isset($data)) {
+      foreach ($data as $filename => $value) {
+        file_unmanaged_save_data($value, $dir  . '/' . $filename, FILE_EXISTS_REPLACE);
+      }
+    }
+    $data = file_scan_directory($dir, '/.+/', array('key' => 'filename'));  
+    foreach (array_keys($data) as $filename) {
+      $data[$filename] = file_get_contents($dir  . '/' . $filename);
+    }  
+  } catch (Exception $e) {
+    watchdog_exception('loft_dev', $e);
+  }
+
+  return $data;
 }
 
 /**

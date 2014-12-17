@@ -1093,10 +1093,13 @@ function page_review_checklist_form($form, &$form_state) {
     '#collapsed' => TRUE,
   );
 
-  $base_domain = variable_get('loft_dev_block_page_review_domain', url('', array('absolute' => TRUE)));
+  $storage = loft_dev_private_storage('page_review');
+  $json = json_decode($storage['settings.json']);
+  $base_domain = isset($json->domain) ? $json->domain : url('', array('absolute' => TRUE));
   $base_domain = trim($base_domain, '/') . '/';
 
-  $config = xml_field_xml(variable_get('loft_dev_block_page_review_checklist', ''));
+  $config = isset($storage['checklist.xml']) ? $storage['checklist.xml'] : '';
+  $config = xml_field_xml($config);
   $default = FALSE;
 
   // Begin the export string.
@@ -1176,10 +1179,11 @@ function page_review_checklist_form($form, &$form_state) {
     if ($uri) {
       $ex_markdown[] = '<' . trim($base_domain . $uri) . '>';
       $ex_basecamp[] = '"' . ($url = trim($base_domain . $uri)) . '":' . $url;
-      $ex_todos[]    = "- [ ] $title $uri\n" . trim($base_domain . $uri);
+      // $ex_todos[]    = "- [ ] $title $uri\n" . trim($base_domain . $uri);
+      $ex_todos[]    = "- [ ] ($status) $title $uri";
     }
     else {
-      $ex_todos[]    = "- [ ] $title";
+      $ex_todos[]    = "- [ ] ($status) $title";
     }
     
     if (count($ex_comps_markdown)) {
@@ -1211,7 +1215,7 @@ function page_review_checklist_form($form, &$form_state) {
     }
   }
 
-  $format = 'ex_' . variable_get('loft_dev_block_page_review_export_format', 'markdown');
+  $format = 'ex_' . (isset($json->export_format) ? $json->export_format : 'markdown');
   $form['fieldset']['export'] = array(
     '#type' => 'textarea',
     '#title' => t('Export'),
