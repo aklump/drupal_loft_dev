@@ -617,7 +617,7 @@ function loft_dev_block_view($delta = '') {
  */
 function loft_dev_block_configure($delta = '') {
   $form = array();
-  if ($delta = 'page_review_checklist') {
+  if ($delta = 'page_review_checklist') {    
     $default = '<config>
   <page weight="0">
     <status>1</status>
@@ -629,7 +629,11 @@ function loft_dev_block_configure($delta = '') {
     <notes></notes>
   </page>  
 </config>';
-    $default = variable_get('loft_dev_block_page_review_checklist', $default);
+
+    $storage = loft_dev_private_storage('page_review');
+    $json = json_decode($storage['settings.json']);
+    $default = isset($storage['checklist.xml']) ? $storage['checklist.xml'] : $default;
+    // $default = variable_get('loft_dev_block_page_review_checklist', $default);
     $form['page_review_checklist'] = array(
       '#type' => 'xml_codemirror',
       '#title' => t('Checklist config'),
@@ -639,18 +643,20 @@ function loft_dev_block_configure($delta = '') {
       '#rows' => 10,
     );
 
+    $default = isset($json->domain) ? $json->domain : url('', array('absolute' => TRUE));
     $form['page_review_domain'] = array(
       '#type' => 'textfield',
       '#title' => t('Export base domain'),
       '#description' => t('This will be used to build the export URLs.'),
-      '#default_value' => variable_get('loft_dev_block_page_review_domain', url('', array('absolute' => TRUE))),
+      '#default_value' => $default,
       '#required' => TRUE,
     );
 
+    $default = isset($json->export_format) ? $json->export_format : 'markdown';
     $form['page_review_export_format'] = array(
       '#type' => 'select',
       '#title' => t('Export format'),
-      '#default_value' => variable_get('loft_dev_block_page_review_export_format', 'markdown'),
+      '#default_value' => $default,
       '#options' => array(
         'markdown' => 'Markdown',
         'basecamp' => 'Basecamp',
