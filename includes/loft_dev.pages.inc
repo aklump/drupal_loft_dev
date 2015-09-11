@@ -107,7 +107,7 @@ function loft_dev_playground_page() {
     '#type' => 'ol',
     '#items' => array(
       t('Make sure your theme implements <em>page.tpl.php</em>.'),
-      t('Create this file <em>%path/tpl/page--loft-dev-playground.tpl.php</em>.  Treat this like a vanilla html page and just add html markup to see how the theme affects it.', $args),
+      t('Create this file <em>%path/tpl/page--loft-dev-playground.tpl.php</em> and then <strong>flush caches</strong>.  Treat this like a vanilla html page and just add html markup to see how the theme affects it.', $args),
       t('Create this file <em>%path/css/loft_dev_playground.css</em>. You may isolate css in this file as it will be autoloaded on this page only.  This file will come after all your theme css', $args),
       t("The above applies to all of these template suggestions: !list", $args),
     ), 
@@ -823,11 +823,11 @@ function _loft_dev_func_sort($a, $b) {
 /**
  * Render the REM font sizing page
  */
-function loft_dev_rem_page() {
+function loft_dev_rem_page($base = 16) {
 
   $sizes = '';
   for ($i = 1; $i <= 32; $i++) { 
-    $rem = round($i / 16, 4);
+    $rem = round($i / $base, 4);
     $sizes[] = array($rem, $i);    
   }
   $build[] = array(
@@ -1093,13 +1093,17 @@ function page_review_checklist_form($form, &$form_state) {
     '#collapsed' => TRUE,
   );
 
-  $storage = loft_dev_private_storage('page_review');
+  if (!($storage = loft_dev_private_storage('page_review'))) {
+    return;
+  }
+  
   $json = json_decode($storage['settings.json']);
   $base_domain = isset($json->domain) ? $json->domain : url('', array('absolute' => TRUE));
   $base_domain = trim($base_domain, '/') . '/';
 
   $config = isset($storage['checklist.xml']) ? $storage['checklist.xml'] : '';
   $config = xml_field_xml($config);
+
   $default = FALSE;
 
   // Begin the export string.
@@ -1109,112 +1113,188 @@ function page_review_checklist_form($form, &$form_state) {
   $ex_basecamp[] = '';
   $ex_todos[]    = t('## Page(s) Audit Todo List');
 
-  $string = t('A list of pages, links, comps and design notes for site review.');
+  $string = t('A list of pages, links, comps, prototypes and design notes for site review.');
+
+  if (($header = xml_field($config, 'header'))) {
+    $string .= PHP_EOL . $header;
+  }
+
   $ex_markdown[] = $string;
   $ex_basecamp[] = $string; 
 
-  foreach ($config->page as $value) {
-    $uri          = xml_field($value, 'uri');
-    $path         = $uri;
-    $query        = '';
-    if (strpos($uri, '?')) {
-      list($path, $query) = explode('?', $uri);
-      parse_str($query, $query);
-    }
-
-    $comps = $ex_comps_markdown = $ex_comps_basecamp = $args = array();
-    $notes = $ex_notes_markdown = $ex_notes_basecamp = array();
-    $icons = array();
-    foreach ($value->comp as $value2) {
-      $index = '-' . count($comps) + 1;
-      if (count($value->comp) === 1) {
-        $index = '';
+  if (isset($config->page)) {
+    foreach ($config->page as $value) {
+      $uri          = xml_field_raw($value, 'uri');
+      $path         = $uri;
+      $query        = '';
+      if (strpos($uri, '?')) {
+        list($path, $query) = explode('?', $uri);
+        parse_str($query, $query);
       }
-      $comps[]                      = ' <a href="!comp' . $index . '" target="_blank">[comp' . $index . ']</a>';
-      $args['!comp' . $index]       = xml_field($value2);
-      $ex_comps_markdown[]          = '<' . xml_field($value2) . '>';
-      $ex_comps_basecamp[]          = '"' . ($url = xml_field($value2)) . '":' . $url;
-      // $ex_comps_basecamp[]          = '"comp' . $index . '":' . xml_field($value2);
-    }
 
-    foreach ($value->notes as $value2) {
-      $index = '-' . count($notes) + 1;
-      if (count($value->notes) === 1) {
-        $index = '';
+      $args = array();
+      $guides = $ex_guides_markdown = $ex_guides_basecamp = array();
+      $comps = $ex_comps_markdown = $ex_comps_basecamp = array();
+      $notes = $ex_notes_markdown = $ex_notes_basecamp = array();
+      $icons = array();
+
+      // 
+      // 
+      // page > comp
+      // 
+      foreach ($value->comp as $value2) {
+        $xml_value = xml_field_raw($value2);
+        $index = '-' . count($comps) + 1;
+        if (count($value->comp) === 1) {
+          $index = '';
+        }
+        $comps[]                      = ' <a href="!comp' . $index . '" target="_blank">[comp' . $index . ']</a>';
+        $args['!comp' . $index]       = $xml_value;
+        $ex_comps_markdown[]          = '* <' . $xml_value . '>';
+        $ex_comps_basecamp[]          = '"' . ($url = $xml_value) . '":' . $url;
+        // $ex_comps_basecamp[]          = '"comp' . $index . '":' . xml_field($value2);
       }
-      $notes[]                      = ' <a href="!note' . $index . '" target="_blank">[notes' . $index . ']</a>';
-      $args['!note' . $index]       = xml_field($value2);
-      $ex_notes_markdown[]          = '<' . xml_field($value2) . '>';
-      $ex_notes_basecamp[]          = '"' . ($url = xml_field($value2)) . '":' . $url;
-      // $ex_notes_basecamp[]          = '"notes' . $index . '":' . xml_field($value2);
-    }
 
-    $title = xml_field($value, 'title');
+      // 
+      // 
+      // page > guide
+      // 
+      $tally = 1;
+      foreach ($value->guide as $value2) {
+        $xml_value = xml_field_raw($value2);
+        // $index     = '-' . count($guides) + 1;
+        $index = $tally++;
+        // if (count($value->guide) === 1) {
+        //   $index = '';
+        // }
+        $guides[]                      = ' <a href="!guide' . $index . '" target="_blank">[proto' . $index . ']</a>';
+        $args['!guide' . $index]       = $xml_value;
+        $ex_guides_markdown[]          = '* <' . $xml_value . '>';
+        $ex_guides_basecamp[]          = '"' . ($url = $xml_value) . '":' . $url;
+        // $ex_guides_basecamp[]          = '"guide' . $index . '":' . xml_field($value2);
+      }
 
-    $status = t('done');
-    if (!xml_field($value->status)) {
-      $icons[] = array(
-        '#theme'      => 'image',
-        '#path'       => drupal_get_path('module', 'loft_dev') . '/images/attention.png',
-        '#alt'        => 'attention icon',
-        '#title'      => 'This page needs work',
-        '#attributes' => array(),
+      // 
+      // 
+      // page > note | page > notes
+      // 
+      $notes = array();
+      foreach ($value->notes as $value2) {
+        $notes[] = xml_field_raw($value2);
+      }
+      foreach ($value->note as $value2) {
+        $notes[] = xml_field_raw($value2);
+      }
+      foreach ($notes as $tally => $note) {
+        $bullet = count($notes) > 1 ? '1. ' : '';
+        $index = $tally + 1;
+        $notes[]                      = ' <a href="!note' . $index . '" target="_blank">[notes' . $index . ']</a>';
+        $args['!note' . $index]       = $note;
+        $ex_notes_markdown[]          = $bullet . $note;
+        $ex_notes_basecamp[]          = '"' . ($url = $note) . '":' . $url;
+        // $ex_notes_basecamp[]          = '"notes' . $index . '":' . xml_field($value2);
+      }
+
+      // 
+      // 
+      // page > title
+      // 
+      $title = xml_field($value, 'title');
+
+      // 
+      // 
+      // page > status
+      // 
+      $statuses = array(
+        0 => t('in dev'),
+        1 => t('done'),
+        2 => t('prototype in process'),
+        3 => t('prototype finished'),
       );
-      $status = t('in dev');
-    }
-    $icons = drupal_render($icons);
+      $status = xml_field($value->status, NULL, NULL, 0);
+      if ($status != 1) {
+        $icons[] = array(
+          '#theme'      => 'image',
+          '#path'       => drupal_get_path('module', 'loft_dev') . '/images/attention.png',
+          '#alt'        => 'attention icon',
+          '#title'      => 'This page needs work',
+          '#attributes' => array(),
+        );
+      }
+      $status = $statuses[$status];
+      $icons = drupal_render($icons);
 
-    $form['fieldset'][$title] = array(
-      '#type' => 'checkbox',
-      '#title' => l($title . t(implode('', $comps) . implode('', $notes), $args), $path, array('html' => TRUE, 'query' => $query)) . ' ' . $icons,
-      '#default_value' => $default,
-    );
-    $string = '';
-    $ex_markdown[] = $string;
-    $ex_basecamp[] = $string; 
-    $ex_markdown[] = "## $title [$status]";
-    $ex_basecamp[] = "h2. $title [$status]";
-    $ex_basecamp[] = '';
+      $form['fieldset'][$title] = array(
+        '#type' => 'checkbox',
+        '#title' => l($title . t(implode('', $comps) . implode('', $guides) . implode('', $notes), $args), $path, array('html' => TRUE, 'query' => $query)) . ' ' . $icons,
+        '#default_value' => $default,
+      );
+      $string = '';
+      $ex_markdown[] = $string;
+      $ex_basecamp[] = $string; 
+      $ex_markdown[] = "## $title [$status]";
+      $ex_basecamp[] = "h2. $title [$status]";
+      $ex_basecamp[] = '';
 
-    if ($uri) {
-      $ex_markdown[] = '<' . trim($base_domain . $uri) . '>';
-      $ex_basecamp[] = '"' . ($url = trim($base_domain . $uri)) . '":' . $url;
-      // $ex_todos[]    = "- [ ] $title $uri\n" . trim($base_domain . $uri);
-      $ex_todos[]    = "- [ ] ($status) $title $uri";
-    }
-    else {
-      $ex_todos[]    = "- [ ] ($status) $title";
-    }
-    
-    if (count($ex_comps_markdown)) {
-      $string = '';
-      $ex_markdown[] = $string;
-      $ex_basecamp[] = $string; 
-      $string = format_plural(count($ex_comps_markdown), "Here is the comp:", "Here are the comps:");
-      $ex_markdown[] = $string;
-      $ex_basecamp[] = $string;
-      $string = '';
-      $ex_markdown[] = $string;
-      $ex_basecamp[] = $string; 
-      $ex_markdown = array_merge($ex_markdown, $ex_comps_markdown);
-      $ex_basecamp = array_merge($ex_basecamp, $ex_comps_basecamp);
-    }
+      if ($uri) {
+        $url = $uri;
+        if (strpos($uri, 'http') !== 0) {
+          $url =$base_domain . $uri;
+        }
 
-    if (count($ex_notes_markdown)) {
-      $string = '';
-      $ex_markdown[] = $string;
-      $ex_basecamp[] = $string; 
-      $string = t("Here are design notes:");
-      $ex_markdown[] = $string;
-      $ex_basecamp[] = $string; 
-      $string = '';
-      $ex_markdown[] = $string;
-      $ex_basecamp[] = $string; 
-      $ex_markdown = array_merge($ex_markdown, $ex_notes_markdown);
-      $ex_basecamp = array_merge($ex_basecamp, $ex_notes_basecamp);
+        $ex_markdown[] = '* <' . trim($url) . '>';
+        $ex_basecamp[] = '"' . ($url = trim($url)) . '":' . $url;
+        // $ex_todos[]    = "- [ ] $title $uri\n" . trim($url);
+        $ex_todos[]    = "- [ ] ($status) $title $uri";
+      }
+      else {
+        $ex_todos[]    = "- [ ] ($status) $title";
+      }
+      
+      if (count($ex_comps_markdown)) {
+        $string = '';
+        $ex_markdown[] = $string;
+        $ex_basecamp[] = $string; 
+        $string = format_plural(count($ex_comps_markdown), "Here is the comp:", "Here are the comps:");
+        $ex_markdown[] = $string;
+        $ex_basecamp[] = $string;
+        $string = '';
+        $ex_markdown[] = $string;
+        $ex_basecamp[] = $string; 
+        $ex_markdown = array_merge($ex_markdown, $ex_comps_markdown);
+        $ex_basecamp = array_merge($ex_basecamp, $ex_comps_basecamp);
+      }
+
+      if (count($ex_guides_markdown)) {
+        $string = '';
+        $ex_markdown[] = $string;
+        $ex_basecamp[] = $string; 
+        $string = format_plural(count($ex_guides_markdown), "Here is the prototype:", "Here are the prototypes:");
+        $ex_markdown[] = $string;
+        $ex_basecamp[] = $string;
+        $string = '';
+        $ex_markdown[] = $string;
+        $ex_basecamp[] = $string; 
+        $ex_markdown = array_merge($ex_markdown, $ex_guides_markdown);
+        $ex_basecamp = array_merge($ex_basecamp, $ex_guides_basecamp);
+      }
+
+      if (count($ex_notes_markdown)) {
+        $string = '';
+        $ex_markdown[] = $string;
+        $ex_basecamp[] = $string; 
+        $string = t("Here are design notes:");
+        $ex_markdown[] = $string;
+        $ex_basecamp[] = $string; 
+        $string = '';
+        $ex_markdown[] = $string;
+        $ex_basecamp[] = $string; 
+        $ex_markdown = array_merge($ex_markdown, $ex_notes_markdown);
+        $ex_basecamp = array_merge($ex_basecamp, $ex_notes_basecamp);
+      }
     }
   }
-
+  
   $format = 'ex_' . (isset($json->export_format) ? $json->export_format : 'markdown');
   $form['fieldset']['export'] = array(
     '#type' => 'textarea',

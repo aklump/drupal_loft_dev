@@ -21,7 +21,7 @@
 ## Usage
 
 ### Troubleshooting mail issues
-If you set the variable _loft_dev_mail_capture_ to 1, emails will be written to _private://loft-dev/mail_ and you can see the emails that are being sent.  They will not be actually sent while this is true.  See `loft_dev_mail_alter()` and `loft_dev_exit()` for more info.
+If you set the variable loft_dev_mail_capture_ to 1, emails will be written to _private://loft-dev/mail_ and you can see the emails that are being sent.  They will not be actually sent while this is true.  See `loft_dev_mail_alter()` and `loft_dev_exit()` for more info.
 
 ### Database Schema Rollbacks
 You can easily rollback the module version using the loft dev tools block "Replay Update" button.  By default the schema will be rolled back by one number.  You can also target a specific rollback number by setting the following variable to the schema version you want to rollback to:

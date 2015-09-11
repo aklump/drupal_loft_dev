@@ -1,0 +1,120 @@
+$green: #66FF66;
+
+body.page-loft-dev-theme-playground {
+  #admin-menu {
+    display: none;
+  }
+}
+
+
+.block-loft-dev {
+  
+  // Typography
+  font-size: 14px !important;
+  h2, h3, legend {
+    font-size: 18px !important
+  }
+  legend {
+    border: none !important;
+  }
+  h2:first-child {
+    margin-top: 0;
+  }
+
+
+  
+  background-color: #000000;
+  margin-top: 100px;
+  position: relative;
+  text-align: left;
+  color: $green;
+  font-family: "Panic Sans", monospace !important;
+  .loft-dev-closure {
+    padding: 20px;
+  }
+  .form-submit,
+  .form-text,
+  .form-select option {
+    color: #000 !important;
+    border-color: #333 !important;
+    background-color: #333 !important;
+  }
+  .form-text {
+    display: auto !important;
+    width: auto !important;
+  }
+  tr.odd {
+    background: #000;
+  }
+  tr.even {
+    background: #333;
+  }
+  th {
+    background: #666;
+    color: #000;
+  }
+  table {
+    width: 100%;
+  }
+  a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: normal;
+  }
+  a.active {
+    color: $green;
+  }
+  a:hover {
+    color: #fff;
+    text-decoration: underline;
+  }
+}
+
+#loft-dev-update-rewind-form .form-item,
+#loft-dev-update-rewind-form label {
+  display: inline-block;
+}
+
+span.alt {
+  color: red;
+}
+span.tri {
+  color: green;
+}
+span.tetra {
+  color: blue;
+}
+span.alpha {
+  color: orange;
+}
+span.beta {
+  color: purple;
+}
+span.gamma {
+  color: pink;
+}
+span.delta {
+  color: grey;
+}
+
+#loft-dev-node-access-form th,
+#loft-dev-node-access-form td {
+  text-align: center;
+}
+#loft-dev-node-access-form {
+  margin: 20px 0;
+}
+
+/**
+ * drupal elements
+ */
+li .element-details {
+  display: none;
+}
+
+.loft-dev-show-admin-stuff {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  text-decoration: none;
+}

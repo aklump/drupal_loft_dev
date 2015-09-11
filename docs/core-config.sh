@@ -27,7 +27,7 @@ lynx = $(which lynx)
  # The name of the drupal module to build advanced help output for, if
  # applicable
  #
-drupal_module = 'loft_dev';
+drupal_module = 'loft_dev'
 
 ##
  # The location of the advanced help output; this location is used in place of

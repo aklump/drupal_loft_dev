@@ -357,6 +357,8 @@ function loft_dev_preprocess_html(&$vars) {
     return;
   }
 
+  _loft_dev_playground_data('html', $vars);
+
   global $_loft_dev_embedded_page_;
   if ($_loft_dev_embedded_page_ === TRUE) {
     $vars['theme_hook_suggestion'] = 'html__loft_dev_playground';
@@ -379,10 +381,91 @@ function loft_dev_preprocess_page(&$vars) {
     return;
   }
 
+  _loft_dev_playground_data('page', $vars);
+
   global $_loft_dev_embedded_page_;
   if ($_loft_dev_embedded_page_ === TRUE) {
     $vars['theme_hook_suggestion'] = 'page__loft_dev_playground';
   }
+}
+
+/**
+ * Set an array element deep inside based on an array of nested keys.
+ *
+ * @code
+ *   $vars   = array();
+ *   $string = 'some.string.of.keys';
+ *   $tree   = explode('.', $string);
+ *   $value  = 'final value';
+ *   loft_dev_array_set_nested_element($vars, $tree, $value);
+ * @endcode
+ *
+ * The end result is $vars['some']['string']['of']['keys'] = 'final value';
+ *
+ * @param  array &$array The base array.
+ * @param  array &$keys An array of keys, each successive a child of the former.
+ * @param  mixed $value The final value to set on the last child key.
+ */
+function loft_dev_array_set_nested_element(&$array, &$keys, $value) {
+  if (!($key = array_shift($keys))) {
+    $array = $value;
+    return;
+  }
+  if (!isset($array[$key])) {
+    $array[$key] = array();
+  }
+  $self = __FUNCTION__;
+  return $self($array[$key], $keys, $value);
+}
+
+/**
+ * Loads data from flatfiles for a given scope, e.g., html, page.
+ *
+ * @param  string $scope Expecting html, page, etc.
+ * @param  array &$vars The vars for that scope.
+ */
+function _loft_dev_playground_data($scope, &$vars) {
+  if (!array_key_exists('ldp_data', $_GET)
+    && !variable_get('loft_dev_playground_load_data', FALSE)) {
+    return;
+  }
+  if (isset($_GET['ldp_data']) && $_GET['ldp_data'] == 0) {
+    return;
+  }
+  $info = module_invoke_all('loft_dev_playground_info');
+  $data = array();
+  foreach (module_implements('loft_dev_playground_info') as $module) {
+    if (($info = module_invoke($module, 'loft_dev_playground_info'))
+      && file_exists($info['data_path'])) {
+      $regex = '/' . preg_quote($scope) . "\.(.+)\.php$/";
+      file_scan_directory($info['data_path'], $regex, array('callback' => function($uri) use ($scope, $regex, &$vars) {
+        preg_match($regex, $uri, $matches);
+        ob_start();
+        require_once  DRUPAL_ROOT . '/' . $uri;
+        $content = ob_get_contents();
+        ob_end_clean();
+
+        if (trim($content)) {
+          $content = array('#markup' => $content);
+          $tree    = explode('.', $matches[1]);
+          array_unshift($tree, $scope);
+          loft_dev_array_set_nested_element($vars, $tree, $content);
+        }
+      },), $depth = 0);
+    }
+  }
+}
+
+
+/**
+ * Implements hook_loft_dev_playground_info().
+ *
+ * Registers the active theme
+ */
+function loft_dev_loft_dev_playground_info() {
+  return array(
+    'data_path' => path_to_theme() . '/loft_dev_playground',
+  );
 }
 
 /**
@@ -782,8 +865,24 @@ function loft_dev_init() {
     && function_exists('admin_menu_suppress')) {
     admin_menu_suppress();
   }
+
+  // Process the sandbox stuff
+  _loft_dev_process_sandboxes();
 }
 
+/**
+ * Processes hook_loft_dev_sandbox and loads files if needed.
+ */
+function _loft_dev_process_sandboxes() {
+  $sandboxes = module_invoke_all('loft_dev_sandbox');
+  foreach ($sandboxes as $sandbox) {
+    if (isset($_GET[$sandbox['query']])) {
+      $function = $sandbox['callback'];
+      call_user_func_array($function, $sandbox['callback arguments']);
+      drupal_exit();
+    }
+  }
+}
 
 /**
  * Implementation of hook_mail

@@ -42,8 +42,24 @@ You may also need to add the following to .loft_deploy/config
 
         ld_mysqldump='/Applications/MAMP/Library/bin/mysqldump'
         ld_gzip='/usr/bin/gzip'        
-    
 
+## Sandbox
+Sandbox mode is activated by appending to the query string.  What you append, depends upon what you've provided in the hook callback.  When you active this mode, the file that is provided in the hook will be called after a full bootstrap; use it to test code without having to change paths.
+    
+## Theme Playground
+For rapid development, a feature exists called the theme playground.
+
+### `{scope}--loft-dev-playground.tpl.php`
+* You can try out different page.tpl.php options without messing up your page.tpl.php:
+* If this page returns an empty string, the help will show.
+
+### Providing page content as flat files
+* Apped `?ldp_data=1` to any url to load content from the theme directory `loft_dev_playground`.  Alternately, you may set a system var and content will be pulled always, so long as the file contains something; set this var:
+
+    $conf['loft_dev_playground_load_data'] = TRUE;
+
+* You can also disable by adding `ldp_data=0` to the url.
+* See `hook_loft_dev_playground_info`.
 
 ##Contact
 * **In the Loft Studios**

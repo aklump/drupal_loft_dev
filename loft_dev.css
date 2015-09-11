@@ -1,90 +1,90 @@
+body.page-loft-dev-theme-playground #admin-menu {
+  display: none; }
+
 .block-loft-dev {
-  font-size: 14px;
-  padding:10px;
+  font-size: 14px !important;
   background-color: #000000;
   margin-top: 100px;
   position: relative;
   text-align: left;
-}
-
-.block-loft-dev {
   color: #66FF66;
-  font-family: "Panic Sans", monospace !important;
-}
-.block-loft-dev .form-submit,
-.block-loft-dev .form-text,
-.block-loft-dev .form-select option {
-  color: #000;
-}
-.block-loft-dev tr.odd {
-  background: #000;
-}
-.block-loft-dev tr.even {
-  background: #333;
-}
-.block-loft-dev th {
-  background: #666;
-  color: #000;
-}
-.block-loft-dev table {
-  width: 100%;
-}
-
-.block-loft-dev a {
-  color: #fff;
-  text-decoration: none;
-  font-weight: normal;
-}
-.block-loft-dev a:hover {
-  color: #fff;
-  text-decoration: underline;
-}
+  font-family: "Panic Sans", monospace !important; }
+  .block-loft-dev h2, .block-loft-dev h3, .block-loft-dev legend {
+    font-size: 18px !important; }
+  .block-loft-dev legend {
+    border: none !important; }
+  .block-loft-dev h2:first-child {
+    margin-top: 0; }
+  .block-loft-dev .loft-dev-closure {
+    padding: 20px; }
+  .block-loft-dev .form-submit,
+  .block-loft-dev .form-text,
+  .block-loft-dev .form-select option {
+    color: #000 !important;
+    border-color: #333 !important;
+    background-color: #333 !important; }
+  .block-loft-dev .form-text {
+    display: auto !important;
+    width: auto !important; }
+  .block-loft-dev tr.odd {
+    background: #000; }
+  .block-loft-dev tr.even {
+    background: #333; }
+  .block-loft-dev th {
+    background: #666;
+    color: #000; }
+  .block-loft-dev table {
+    width: 100%; }
+  .block-loft-dev a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: normal; }
+  .block-loft-dev a.active {
+    color: #66FF66; }
+  .block-loft-dev a:hover {
+    color: #fff;
+    text-decoration: underline; }
 
 #loft-dev-update-rewind-form .form-item,
 #loft-dev-update-rewind-form label {
-  display: inline-block;
-}
+  display: inline-block; }
 
 span.alt {
-  color: red;
-}
+  color: red; }
+
 span.tri {
-  color: green;
-}
+  color: green; }
+
 span.tetra {
-  color: blue;
-}
+  color: blue; }
+
 span.alpha {
-  color: orange;
-}
+  color: orange; }
+
 span.beta {
-  color: purple;
-}
+  color: purple; }
+
 span.gamma {
-  color: pink;
-}
+  color: pink; }
+
 span.delta {
-  color: grey;
-}
+  color: grey; }
 
 #loft-dev-node-access-form th,
 #loft-dev-node-access-form td {
-  text-align: center;
-}
+  text-align: center; }
+
 #loft-dev-node-access-form {
-  margin: 20px 0;
-}
+  margin: 20px 0; }
 
 /**
  * drupal elements
  */
 li .element-details {
-  display: none;
-}
+  display: none; }
 
 .loft-dev-show-admin-stuff {
   position: fixed;
   bottom: 0;
   right: 0;
-  text-decoration: none;
-}
+  text-decoration: none; }

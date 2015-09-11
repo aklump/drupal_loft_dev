@@ -7,7 +7,6 @@
  */
 
 (function ($) {
-
   Drupal.loftDev = Drupal.loftDev || {};
 
   /**

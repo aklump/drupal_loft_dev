@@ -15,10 +15,10 @@
  */
 function hook_loft_dev_admin_stuff() {
   return array(
-    'selectors' => {
+    'selectors' => array(
       ".links.inline",
       ".gop-admin-only",
-    }
+    ),
   );
 }
 
@@ -85,6 +85,31 @@ function hook_loft_dev_function_includes() {
 function hook_loft_dev_module_dependencies() {
   return array(
     'ova_dev'
+  );
+}
+
+/**
+ * Implements hook_loft_dev_playground_info().
+ */
+function hook_loft_dev_playground_info(&$info) {
+  return array(
+    'data_path' => drupal_get_path('theme', 'my_theme') . '/loft_dev_playground',
+  );
+}
+
+/**
+ * Implements hook_loft_dev_api().
+ */
+function hook_loft_dev_sandbox() {
+  return array(
+    // You may have more than one trigger...
+    array(
+      // Appending ?sb to the url will cause callback to be executed with
+      // callback arguments.
+      'query' => 'sb',
+      'callback' => 'module_load_include',
+      'callback arguments' => array('inc', 'my_module', 'loft_dev_sandbox.php'),
+    ),
   );
 }
 
