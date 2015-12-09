@@ -30,6 +30,21 @@ Configuration
 
 Usage
 
+  Load a view mode with all fields hidden, weights & labels reset
+
+     In order to make this work you will first have to disable any
+     Display Suite layout that is chosen for the view mode!
+
+   Append ?resetto the url of the view mode edit page and refresh
+
+   These options available are:
+
+   query param     desctiption
+   &label=     above|inline|hidden
+
+   Example usage:
+admin/structure/types/manage/video/display/teaser?reset&label=hidden
+
   Troubleshooting mail issues
 
    If you set the variable loft_dev_mail_capture to 1, emails will be

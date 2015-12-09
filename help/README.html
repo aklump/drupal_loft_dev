@@ -30,6 +30,36 @@
 
 <h2>Usage</h2>
 
+<h3>Load a view mode with all fields hidden, weights &amp; labels reset</h3>
+
+<blockquote>
+  <p>In order to make this work you will first have to disable any Display Suite layout that is chosen for the view mode!</p>
+</blockquote>
+
+<p>Append <code>?reset</code>to the url of the view mode edit page and refresh</p>
+
+<p>These options available are:</p>
+
+<table>
+<thead>
+<tr>
+  <th>query param</th>
+  <th>desctiption</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>&amp;label=</td>
+  <td>above|inline|hidden</td>
+</tr>
+</tbody>
+</table>
+
+<p>Example usage:</p>
+
+<pre><code>admin/structure/types/manage/video/display/teaser?reset&amp;label=hidden
+</code></pre>
+
 <h3>Troubleshooting mail issues</h3>
 
 <p>If you set the variable <em>loft_dev_mail_capture</em> to 1, emails will be written to <em>private://loft-dev/mail</em> and you can see the emails that are being sent.  They will not be actually sent while this is true.  See <code>loft_dev_mail_alter()</code> and <code>loft_dev_exit()</code> for more info.</p>
