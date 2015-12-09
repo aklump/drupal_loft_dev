@@ -42,4 +42,4 @@ drupal_dir = '../help'
 #README = '../README.txt'
 
 # This would also copy README.md as well as README.txt
-README = '../README.txt ../README.md'
+README = '../../README.txt ../../README.md'

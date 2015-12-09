@@ -74,12 +74,12 @@ function theme_loft_dev_migration($vars) {
     $row = array(
       $path,
       $result->status ? t('migrated') : t('?'),
-      $result->status ? l($result->path, $result->path) : '?',
+      $result->status ? l($result->path, $result->path) :'?',
       l(t('Add redirect'), 'admin/config/search/redirect/add', array('query' => drupal_get_destination() + array(
         'source' => $result->path,
       ))),
     );
-    $rows[$result->status][] = array('data' => $row, 'class' => array($result->status ? '' : 'error'));
+    $rows[$result->status][] = array('data' => $row, 'class' => array($result->status ? '' :'error'));
   }
 
   $build['table'] = array(
@@ -96,6 +96,43 @@ function theme_loft_dev_migration($vars) {
   // Wrap it all up
   $vars['attributes']['class'][] = 'loft-dev-migration';
   $output = '<div' . drupal_attributes($vars['attributes']) . '><div class="border"><div class="padding">' . drupal_render($build) . '</div></div></div>';
+
+  return $output;
+}
+
+/**
+ * Provides output for a solid css circle.
+ *
+ * @param array $vars
+ *   $width
+ *   $color
+ *
+ * @return string
+ *
+ * @ingroup themeable
+ */
+function theme_loft_dev_css_circle($vars) {
+  preg_match('/(\d+)(.*)/', $vars['width'], $matches);
+  $w = $matches[1] / 2 . (empty($matches[2]) ? 'px' : $matches[2]);
+  $style = array();
+  $style[] = '-webkit-border-radius:' . $w;
+  $style[] = '-moz-border-radius:' . $w;
+  $style[] = 'border-radius:' . $w;
+  $style[] = 'width:0';
+  $style[] = 'height:0';
+  $style[] = 'vertical-align:middle';
+  $style[] = 'display:inline-block';
+  $style[] = 'border:' . $w . ' solid ' . $vars['color'];
+  $style = implode(';', $style);
+
+  $build[] = array(
+    '#theme' => 'html_tag', 
+    '#tag' => 'div', 
+    '#attributes' => array('class' => array('circle'), 'style' => $style),
+    '#value' => '',
+  );
+
+  $output = drupal_render($build);
 
   return $output;
 }

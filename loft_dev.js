@@ -41,8 +41,8 @@
       .append('<a class="loft-dev-show-admin-stuff" onclick="Drupal.loftDev.showAdminStuff(); return false;">[+]</a>');
     }
     
-    // Duration of the adminStuff cookie in mins
-    var duration = 10;
+    // Duration of the adminStuff cookie in seconds
+    var duration = typeof settings.loftDeploy !== 'undefined' && typeof settings.loftDeploy.metaTimeout !== 'undefined' ? settings.loftDeploy.metaTimeout : 600;
 
     $('.loft-dev-hide-admin-trigger')
     .once('loft-dev')
@@ -51,13 +51,12 @@
 
       // Was the meta key held down? Set cookie?
       if (e.metaKey) {
-        console.log('metaKey');
         var expiry = new Date();
         var time = expiry.getTime();
-        time += duration * 60 * 1000;
-        expiry.setTime(time);        
+        time += duration * 1000;
+        expiry.setTime(time);
         $.cookie('loft_dev_admin_stuff', "hidden", {"expires": expiry});
-      };   
+      }
 
       return false;
     });

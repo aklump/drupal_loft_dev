@@ -39,9 +39,12 @@ body.page-loft-dev-theme-playground {
     border-color: #333 !important;
     background-color: #333 !important;
   }
+  select {
+    width: 100% !important;
+  }
   .form-text {
     display: auto !important;
-    width: auto !important;
+    width: 100% !important;
   }
   tr.odd {
     background: #000;

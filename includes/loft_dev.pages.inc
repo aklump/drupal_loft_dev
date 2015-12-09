@@ -82,8 +82,8 @@ function loft_dev_loft_deploy_export($filename) {
 }
 
 function loft_dev_playground_page() {
-  global $theme, $_loft_dev_embedded_page_;
-  $_loft_dev_embedded_page_ = TRUE;
+  global $theme, $_loft_dev_playground;
+  $_loft_dev_playground = TRUE;
   $args = array(
     '%theme' => $theme,
     '%path' => path_to_theme(),
@@ -1089,8 +1089,8 @@ function page_review_checklist_form($form, &$form_state) {
   $form['fieldset'] = array(
     '#type' => 'fieldset',
     '#title' => t('Design files and notes'),
-    '#collapsible' => TRUE,
-    '#collapsed' => TRUE,
+    '#collapsible' => FALSE,
+    '#collapsed' => FALSE,
   );
 
   if (!($storage = loft_dev_private_storage('page_review'))) {
@@ -1104,6 +1104,28 @@ function page_review_checklist_form($form, &$form_state) {
   $config = isset($storage['checklist.xml']) ? $storage['checklist.xml'] : '';
   $config = xml_field_xml($config);
 
+  // The xml can write it's own status values, but 1 should always
+  // mean that it is complete and finished and 0 that is least completed.
+  $statuses = array(
+    0 => t('not started'),
+    1 => t('done'),
+    2 => t('prototype in process'),
+    3 => t('prototype finished'),
+    4 => t('minor CSS only needed'),
+    5 => t('prototype will not be built'),
+  );
+  $status_weights = array_fill_keys(array_keys($statuses), 0);
+  $colors = array_fill_keys(array_keys($statuses), '#ff0000');
+  if (isset($config->status)) {
+    $statuses = array();
+    foreach ($config->status as $status) {
+      $statuses[(int)$status->attributes()->value] = (string) $status;
+      $status_weights[(int)$status->attributes()->value] = (int) $status->attributes()->weight;
+      if (($color = (string) $status->attributes()->color)) {
+        $colors[(int)$status->attributes()->value] = $color;
+      }
+    }
+  }
   $default = FALSE;
 
   // Begin the export string.
@@ -1122,8 +1144,21 @@ function page_review_checklist_form($form, &$form_state) {
   $ex_markdown[] = $string;
   $ex_basecamp[] = $string; 
 
+  $pages = array();
   if (isset($config->page)) {
+
+    // Sort our pages first.
     foreach ($config->page as $value) {
+      $status = xml_field($value->status, NULL, NULL, 0);
+      $weight = xml_field($value, 'weight', NULL, $status_weights[$status]);
+      $pages[] = array('#value' => $value, '#weight' => $weight, '#status' => $status);
+    }
+    uasort($pages, 'element_sort');
+
+    // Now go through the sorted pages.
+    foreach ($pages as $page) {
+      $value = $page['#value'];
+
       $uri          = xml_field_raw($value, 'uri');
       $path         = $uri;
       $query        = '';
@@ -1205,30 +1240,25 @@ function page_review_checklist_form($form, &$form_state) {
       // 
       // page > status
       // 
-      $statuses = array(
-        0 => t('in dev'),
-        1 => t('done'),
-        2 => t('prototype in process'),
-        3 => t('prototype finished'),
+      $status = $page['#status'];
+      $icons[]  = array(
+        '#theme' => 'loft_dev_css_circle',
+        '#width' => '25px',
+        '#color' => isset($colors[$status]) ? $colors[$status] : $colors[0],
       );
-      $status = xml_field($value->status, NULL, NULL, 0);
-      if ($status != 1) {
-        $icons[] = array(
-          '#theme'      => 'image',
-          '#path'       => drupal_get_path('module', 'loft_dev') . '/images/attention.png',
-          '#alt'        => 'attention icon',
-          '#title'      => 'This page needs work',
-          '#attributes' => array(),
-        );
-      }
-      $status = $statuses[$status];
       $icons = drupal_render($icons);
+      $status = $statuses[$status];
+
+      // $form['fieldset'][$title] = array(
+      //   '#type' => 'checkbox',
+      //   '#title' => l($title . t(implode('', $comps) . implode('', $guides) , $args), $path, array('html' => TRUE, 'query' => $query)) . ' ' . $icons,
+      //   '#default_value' => $default,
+      // );
 
       $form['fieldset'][$title] = array(
-        '#type' => 'checkbox',
-        '#title' => l($title . t(implode('', $comps) . implode('', $guides) . implode('', $notes), $args), $path, array('html' => TRUE, 'query' => $query)) . ' ' . $icons,
-        '#default_value' => $default,
+        '#markup' => '<p>' . $icons . ' ' . l($title . t(implode('', $comps) . implode('', $guides) , $args), $path, array('html' => TRUE, 'query' => $query)) . '</p>',
       );
+
       $string = '';
       $ex_markdown[] = $string;
       $ex_basecamp[] = $string; 
@@ -1245,7 +1275,7 @@ function page_review_checklist_form($form, &$form_state) {
         $ex_markdown[] = '* <' . trim($url) . '>';
         $ex_basecamp[] = '"' . ($url = trim($url)) . '":' . $url;
         // $ex_todos[]    = "- [ ] $title $uri\n" . trim($url);
-        $ex_todos[]    = "- [ ] ($status) $title $uri";
+        $ex_todos[]    = "- [ ] ($status) $title <$uri>";
       }
       else {
         $ex_todos[]    = "- [ ] ($status) $title";

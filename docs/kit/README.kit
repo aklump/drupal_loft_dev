@@ -1,0 +1,168 @@
+
+<!--$prev_id = index-->
+<!--$prev = index.html-->
+<!--$prev_title = Index-->
+<!--$id = readme-->
+<!--$title = README-->
+<!--$file = README.html-->
+<!--$next_id = index-->
+<!--$next = index.html-->
+<!--$next_title = Index-->
+<!--$classes = page-readme-->
+<!--$date = Wed, 02 Dec 2015 13:04:54 -0800-->
+<!--$version = 1.0-->
+<!-- @include ../core/tpl/header.kit -->
+<h1>Drupal Module: Loft Dev</h1>
+
+<p><strong>Author:</strong> Aaron Klump  <a href="&#x6d;&#97;&#105;&#x6c;&#x74;&#111;:&#x73;&#111;&#117;&#x72;&#x63;&#101;c&#x6f;&#100;&#101;&#x40;&#x69;&#110;&#116;&#x68;&#x65;&#108;&#x6f;&#x66;&#116;&#115;&#x74;&#x75;&#100;i&#x6f;&#115;&#46;&#x63;&#x6f;&#109;">&#x73;&#111;&#117;&#x72;&#x63;&#101;c&#x6f;&#100;&#101;&#x40;&#x69;&#110;&#116;&#x68;&#x65;&#108;&#x6f;&#x66;&#116;&#115;&#x74;&#x75;&#100;i&#x6f;&#115;&#46;&#x63;&#x6f;&#109;</a></p>
+
+<h2>Summary</h2>
+
+<p><strong>Provides a suite of development tools for Drupal.</strong></p>
+
+<h2>Requirements</h2>
+
+<h2>Installation</h2>
+
+<ol>
+<li>Install as usual, see <a href="http://drupal.org/node/70151">http://drupal.org/node/70151</a> for further information.</li>
+</ol>
+
+<h2>Configuration</h2>
+
+<ol start="2">
+<li><p>You most likely want to add the following line to <em>settings.local.php</em>.  This will insure that the <strong>dev tools appear on every page, for every role, regardless of permissions</strong>.  The alternative is to setup roles for the permission <em>loft_dev:use tools</em>.</p>
+
+<p>$conf['loft_dev_free_access'] = TRUE;</p></li>
+</ol>
+
+<h3>Hide Admin Stuff</h3>
+
+<ol>
+<li>Hold down the meta key when clicking Hide Admin Stuff for a 3 minute hide.</li>
+<li>Extend the admin stuff selectors using <code>hook_loft_dev_admin_stuff()</code>.</li>
+</ol>
+
+<h2>Usage</h2>
+
+<h3>Troubleshooting mail issues</h3>
+
+<p>If you set the variable <em>loft_dev_mail_capture</em> to 1, emails will be written to <em>private://loft-dev/mail</em> and you can see the emails that are being sent.  They will not be actually sent while this is true.  See <code>loft_dev_mail_alter()</code> and <code>loft_dev_exit()</code> for more info.</p>
+
+<h3>Database Schema Rollbacks</h3>
+
+<p>You can easily rollback the module version using the loft dev tools block "Replay Update" button.  By default the schema will be rolled back by one number.  You can also target a specific rollback number by setting the following variable to the schema version you want to rollback to:</p>
+
+<pre><code>drush vset loft_dev:update_rollback_{module name} {schema version, e.g. 7004}
+</code></pre>
+
+<h3>Automatic backups using Loft Deploy</h3>
+
+<p>Loft Dev module can automatically call <code>loft_deploy export</code> on regulary intervals of use.  This has the effect of automatically backing up the database to the normal output path, for every N minutes of active use.  For the most recent backup go there.  To see the incremental backups in time, descend into the <em>loft_dev_auto</em> directory.</p>
+
+<p>This is not based on cron, but rather on elapsed time.  If you set this to back up every 15 minutes, it will only do so if you're activaly using the site.  It's like poor man's cron, it looks to see if N minutes has elapsed since the last backup, and it does this on a page load.  Thus, no use, no page load.  The following settings needed to be added to <em>settings.local.php</em>.</p>
+
+<p>To disable this feature set it to 0.</p>
+
+<pre><code>$conf['loft_dev_which_ld'] = '/Volumes/Data/Users/aklump/bin/loft_deploy';
+$conf['loft_dev_loft_deploy_export_period_mins'] = 5;
+</code></pre>
+
+<p>You may also need to add the following to .loft_deploy/config</p>
+
+<pre><code>ld_mysqldump='/Applications/MAMP/Library/bin/mysqldump'
+ld_gzip='/usr/bin/gzip'        
+</code></pre>
+
+<h2>Integration with drupal_deploy</h2>
+
+<p>Add the somthing like the following to your settings file so the current deploy folder can be located:</p>
+
+<pre><code>$conf['loft_dev_drupal_deploy_path'] = realpath(DRUPAL_ROOT . '/../drupal_deploy/user/deploy_2.0');
+</code></pre>
+
+<h2>Sandbox (on <code>?sb</code> or off <code>?sb=0</code>)</h2>
+
+<p>Sandbox mode is activated by appending to the query string.  What you append, depends upon what you've provided in the hook callback.  When you active this mode, the file that is provided in the hook will be called after a full bootstrap; use it to test code without having to change paths.</p>
+
+<h2>Theme Playground Templates (on <code>?pg</code> or off <code>?pg=0</code>)</h2>
+
+<p>For rapid development, a feature exists called the theme playground where you can swap out flat file versions of your tpl files.  This is good when your content is not ready, or you just want to try out a different version of a tpl file.</p>
+
+<ol>
+<li><p>In your active theme, create tpl variations following this pattern <code>{theme}--loft-dev-playground.tpl.php</code>, e.g., <code>html--loft-dev-playground.tpl.php</code>.</p></li>
+<li><p>Activate these templates by either visiting the playground url <code>/loft-dev/theme/playground</code>or by appending <code>?pg</code> to the query string at any path.  When activated, these template files will be used instead of the normal ones.</p></li>
+</ol>
+
+<h2>Hardcoded data/variables</h2>
+
+<p>Normally template variables are provided by the database and other functions.  You can hardcode variable values for your templates using files in a folder called <code>loft_dev_playground</code>.</p>
+
+<ol>
+<li>In your active theme, create a folder called loft_dev_playground.</li>
+<li><p>In this folder place files that contain values, e.g. <code>page.content.php</code>.  The filename is important as it maps to a php array like this:</p>
+
+<p>page.content.php -> $page['content']
+page.foo.bar.baz.php -> $page['foo']['bar']['baz']</p></li>
+<li><p>The value of the variable is whatever is printed by that file, e.g.</p>
+
+<?php
+/**
+ * @file
+ * Provides a hardcoded variable for $page['content']
+ *
+ * This file is named page.content.php
+ */
+?>
+
+<p>This is the value of the variable</p></li>
+<li><p>Or it could also be something like this:</p>
+
+<p>&lt;?php
+/**</p>
+
+<ul>
+<li>@file</li>
+<li>Provides a hardcoded variable for $page['content']</li>
+<li></li>
+<li>This file is named page.content.php
+*/
+$build['item_list'] = array(
+'#theme' => 'item_list',
+'#items' => array('do', 're', 'mi'),
+'#type' => 'ol',
+);
+print render($build);</li>
+</ul></li>
+<li><p>Append <code>?ldp_data</code> to any url to load content from the theme directory <code>loft_dev_playground</code>.  Alternately, you may set a system var and content will be pulled always, so long as the file contains something; set this var:</p>
+
+<p>$conf['loft_dev_playground_load_data'] = TRUE;</p></li>
+</ol>
+
+<ul>
+<li>You can also disable by adding <code>ldp_data=0</code> to the url.</li>
+<li>See <code>hook_loft_dev_playground_info</code>.</li>
+</ul>
+
+<ol>
+<li><p>You can ignore certain files without having to delete them by using a file <code>loft_dev_playground/config.json</code>, e.g.:</p>
+
+<p>{
+    "ignore": [
+        "page.content.php"
+    ]
+}</p></li>
+</ol>
+
+<h2>Contact</h2>
+
+<ul>
+<li><strong>In the Loft Studios</strong></li>
+<li>Aaron Klump - Developer</li>
+<li>PO Box 29294 Bellingham, WA 98228-1294</li>
+<li><em>aim</em>: theloft101</li>
+<li><em>skype</em>: intheloftstudios</li>
+<li><em>d.o</em>: aklump</li>
+<li><a href="http://www.InTheLoftStudios.com">http://www.InTheLoftStudios.com</a></li>
+</ul>
+<!-- @include ../core/tpl/footer.kit -->

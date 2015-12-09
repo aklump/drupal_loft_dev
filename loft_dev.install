@@ -32,8 +32,7 @@ function loft_dev_enable() {
   drupal_set_message(t('You may adjust settings for Loft Dev Tools by visiting <a href="@url">@url</a>.', array('@url' => url('admin/loft-dev'))));
 
   //change the system weight for the module, if needed
-  //$weight = db_query("SELECT weight FROM {system} WHERE name = 'fieldgroup'")->fetchField();
-  //db_query("UPDATE {system} SET `weight` = ". ++$weight ." WHERE name = 'loft_dev'"); //don't do alimit on this query in case there are more than one entries?
+  db_query("UPDATE {system} SET `weight` = 10 WHERE name = 'loft_dev'"); //don't do alimit on this query in case there are more than one entries?
 
   // Give all devel perms to all rids automatically
   $all_rids = array_keys(user_roles());

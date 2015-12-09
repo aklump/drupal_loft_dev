@@ -11,6 +11,22 @@
 define('LOFT_DEV_LOFT_DEPLOY_EXPORT_PERIOD_MIN', 5);
 
 /**
+ * Tests for a GET var
+ *
+ * @param  string $key The $_GET var key.
+ * @param  string $default The default when the $GET var is not present
+ *
+ * @return bool
+ *   TRUE $_GET[$key] is set and not === 0
+ *   FALSE $_GET[$key] not present or equals 0
+ */
+function _loft_dev_check_get_var($key, $default = FALSE) {
+  if (!isset($_GET[$key])) {
+    return $default;
+  }
+  return (is_numeric($_GET[$key]) && $_GET[$key] * 1 === 0) ? FALSE : TRUE;
+}
+/**
  * Implements hook_help().
  *
  * http://api.drupal.org/api/function/hook_help
@@ -59,6 +75,7 @@ function loft_dev_help($path, $arg) {
  *   1: include the module(s)
  *   2: return the path relative to the module, e.g., hook_menu()
  *   3: return the complete Drupal path per drupal_get_path()
+ *   4: return the complete Drupal path to the includes folder, e.g. hook_views_api() call it like this: loft_dev_include(4),
  *
  * @return string
  *   The path to the FIRST include file requested, but only if $return is set to TRUE
@@ -76,6 +93,9 @@ function loft_dev_include() {
     switch ($action) {
       case 3:
         $module = drupal_get_path('module', 'loft_dev') . '/' . $module;
+        break;
+      case 4:
+        $module = drupal_get_path('module', 'loft_dev') . '/includes';
         break;
     }
     return $module;
@@ -303,6 +323,55 @@ function loft_dev_menu() {
 }
 
 /**
+ * Implements hook_form_alter().
+ */
+function loft_dev_form_field_ui_display_overview_form_alter(&$form, &$form_state, $form_id) {
+
+  if (!isset($_GET['reset'])) {
+    return;
+  }
+  $entity_type = $form['#entity_type'];
+  $bundle = $form['#bundle'];
+  $view_mode = $form['#view_mode'];
+
+  $label = isset($_GET['label']) ? $_GET['label'] : 'above';
+  $field_names = array_merge($form['#fields'], $form['#extra'], $form['#groups']);
+  foreach ($field_names as $field_name) {
+
+    // if (empty($_GET['no_refresh'])) {
+    //   $refresh = FALSE;
+    //   $s = field_bundle_settings($entity_type, $bundle);
+    //   if (isset($s['extra_fields']['display'])) {
+    //     foreach ($s['extra_fields']['display'] as $field_name => &$view_modes) {
+    //       if (isset($view_modes[$view_mode])) {
+    //         $view_modes[$view_mode]['weight']  = 0;
+    //         $view_modes[$view_mode]['visible'] = FALSE;
+    //         $refresh = TRUE;
+    //       }
+    //     }
+    //   }
+
+    //   if ($refresh) {
+    //     field_bundle_settings($entity_type, $bundle, $s);
+    //     $url = $_SERVER['REQUEST_URI'];
+    //     $url .= '&no_refresh=TRUE';
+    //     header('Location: ' . $url, TRUE, 301);
+    //     drupal_exit($url);
+    //   }
+    // }
+
+    if (isset($form['fields'][$field_name])) {
+      $field = &$form['fields'][$field_name];
+      $field['weight']['#default_value']                   = 0;
+      $field['label']['#default_value']                    = $label;
+      $field['parent_wrapper']['parent']['#default_value'] = NULL;
+      $field['format']['type']['#default_value']           = 'hidden';
+    }
+  }
+}
+
+
+/**
  * Implements hook_form_alter
  */
 function loft_dev_form_alter(&$form, $form_state, $form_id) {
@@ -359,8 +428,8 @@ function loft_dev_preprocess_html(&$vars) {
 
   _loft_dev_playground_data('html', $vars);
 
-  global $_loft_dev_embedded_page_;
-  if ($_loft_dev_embedded_page_ === TRUE) {
+  global $_loft_dev_playground;
+  if ($_loft_dev_playground === TRUE) {
     $vars['theme_hook_suggestion'] = 'html__loft_dev_playground';
   }  
 
@@ -383,8 +452,8 @@ function loft_dev_preprocess_page(&$vars) {
 
   _loft_dev_playground_data('page', $vars);
 
-  global $_loft_dev_embedded_page_;
-  if ($_loft_dev_embedded_page_ === TRUE) {
+  global $_loft_dev_playground;
+  if ($_loft_dev_playground === TRUE) {
     $vars['theme_hook_suggestion'] = 'page__loft_dev_playground';
   }
 }
@@ -425,11 +494,8 @@ function loft_dev_array_set_nested_element(&$array, &$keys, $value) {
  * @param  array &$vars The vars for that scope.
  */
 function _loft_dev_playground_data($scope, &$vars) {
-  if (!array_key_exists('ldp_data', $_GET)
-    && !variable_get('loft_dev_playground_load_data', FALSE)) {
-    return;
-  }
-  if (isset($_GET['ldp_data']) && $_GET['ldp_data'] == 0) {
+  $default = variable_get('loft_dev_playground_load_data', FALSE);
+  if (!_loft_dev_check_get_var('ldp_data', $default)) {
     return;
   }
   $info = module_invoke_all('loft_dev_playground_info');
@@ -438,7 +504,16 @@ function _loft_dev_playground_data($scope, &$vars) {
     if (($info = module_invoke($module, 'loft_dev_playground_info'))
       && file_exists($info['data_path'])) {
       $regex = '/' . preg_quote($scope) . "\.(.+)\.php$/";
-      file_scan_directory($info['data_path'], $regex, array('callback' => function($uri) use ($scope, $regex, &$vars) {
+      
+      $config_file = $info['data_path'] . '/config.json';
+      $config      = is_readable($config_file) && ($config = json_decode(file_get_contents($config_file), TRUE)) ? $config : array();
+      
+      file_scan_directory($info['data_path'], $regex, array('callback' => function($uri) use ($scope, $regex, &$vars, $config) {
+        
+        if (in_array(pathinfo($uri, PATHINFO_BASENAME), $config['ignore'])) {
+          return;
+        }
+        
         preg_match($regex, $uri, $matches);
         ob_start();
         require_once  DRUPAL_ROOT . '/' . $uri;
@@ -483,6 +558,16 @@ function loft_dev_block_info() {
   );
 
   return $blocks;
+}
+
+/**
+ * Implements hook_block_view_alter().
+ */
+function loft_dev_block_view_alter(&$data, $block) {
+  loft_dev_include('drupal_deploy');
+  if (($disk = loft_dev_drupal_deploy_get_block($block->module, $block->delta))) {
+    $data = $disk;
+  }
 }
 
 /**
@@ -680,13 +765,18 @@ function loft_dev_block_view($delta = '') {
         //'subject' =>  t('Loft Dev Tools'),
         'content' => array(
           '#attached' => array(
-            'js' => array(drupal_get_path('module', 'loft_dev') . '/loft_dev.js'),
             'library' => array(
               array('system', 'cookie'),
             ),            
           ),
           '#markup' => $output,
         ),
+      );
+
+      $block['content']['#attached']['js'][] =  array(
+        'type' => 'file', 
+        'data' => drupal_get_path('module', 'loft_dev') . '/loft_dev.js',
+        'scope' => 'footer', 
       );
 
       break;
@@ -834,9 +924,13 @@ function _loft_dev_reroute_email_status() {
  * Implements hook_init().
  */
 function loft_dev_init() {
+  global $_loft_dev_playground;
+
   if (!_loft_dev_access()) {
     return;
   }
+  
+  $_loft_dev_playground = _loft_dev_check_get_var('pg');
   
   if (!_loft_dev_reroute_email_status()
     && current_path() != 'admin/config/development/reroute_email') {
@@ -876,7 +970,7 @@ function loft_dev_init() {
 function _loft_dev_process_sandboxes() {
   $sandboxes = module_invoke_all('loft_dev_sandbox');
   foreach ($sandboxes as $sandbox) {
-    if (isset($_GET[$sandbox['query']])) {
+    if (_loft_dev_check_get_var($sandbox['query'])) {
       $function = $sandbox['callback'];
       call_user_func_array($function, $sandbox['callback arguments']);
       drupal_exit();
@@ -1007,6 +1101,7 @@ function loft_dev_exit() {
 function loft_dev_loft_dev_admin_stuff() {
   return array(
     'selectors' => array(
+      ".block-alter-partials-dev",
       ".contextual-links-trigger",
       ".contextual-links-wrapper",
       ".block-masquerade",
@@ -1017,6 +1112,7 @@ function loft_dev_loft_dev_admin_stuff() {
       ".dev-query",
       "ul.tabs.primary",
       ".views-field-edit-node",
+      ".block-loft-dev-page-review-checklist",
     ),
   );
 }
@@ -1040,6 +1136,7 @@ function loft_dev_loft_dev_menu() {
       'title' => t('Hide Admin Stuff'),
       'href' => '#',
       'attributes' => array(
+        'script' => 'return false;',
         'class' => array(
           'loft-dev-closure-hide',
           'loft-dev-hide-admin-trigger'
@@ -1696,6 +1793,13 @@ function loft_dev_theme($existing, $type, $theme, $path) {
       'variables' => array(
         'urls' => NULL,
         'results' => array(),
+      ),
+      'file' => loft_dev_include('theme', 2),
+    ),
+    'loft_dev_css_circle' => array(
+      'variables' => array(
+        'width' => '8px',
+        'color' => '#ffffff',
       ),
       'file' => loft_dev_include('theme', 2),
     ),

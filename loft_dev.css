@@ -23,9 +23,11 @@ body.page-loft-dev-theme-playground #admin-menu {
     color: #000 !important;
     border-color: #333 !important;
     background-color: #333 !important; }
+  .block-loft-dev select {
+    width: 100% !important; }
   .block-loft-dev .form-text {
     display: auto !important;
-    width: auto !important; }
+    width: 100% !important; }
   .block-loft-dev tr.odd {
     background: #000; }
   .block-loft-dev tr.even {
