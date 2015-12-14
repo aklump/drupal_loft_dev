@@ -1800,6 +1800,8 @@ function loft_dev_theme($existing, $type, $theme, $path) {
       'variables' => array(
         'width' => '8px',
         'color' => '#ffffff',
+        'tag' => 'div',
+        'attributes' => array(),
       ),
       'file' => loft_dev_include('theme', 2),
     ),

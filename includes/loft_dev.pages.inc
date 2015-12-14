@@ -1104,6 +1104,8 @@ function page_review_checklist_form($form, &$form_state) {
   $config = isset($storage['checklist.xml']) ? $storage['checklist.xml'] : '';
   $config = xml_field_xml($config);
 
+  $base_domain = xml_field($config, 'baseUrl');
+
   // The xml can write it's own status values, but 1 should always
   // mean that it is complete and finished and 0 that is least completed.
   $statuses = array(
@@ -1153,18 +1155,20 @@ function page_review_checklist_form($form, &$form_state) {
       $weight = xml_field($value, 'weight', NULL, $status_weights[$status]);
       $pages[] = array('#value' => $value, '#weight' => $weight, '#status' => $status);
     }
-    uasort($pages, 'element_sort');
+    uasort($pages, 'page_review_sort');
 
     // Now go through the sorted pages.
     foreach ($pages as $page) {
       $value = $page['#value'];
 
-      $uri          = xml_field_raw($value, 'uri');
-      $path         = $uri;
-      $query        = '';
-      if (strpos($uri, '?')) {
-        list($path, $query) = explode('?', $uri);
-        parse_str($query, $query);
+      $query = array();
+      if (($page_url = xml_field_raw($value, 'uri'))) {
+        $page_url = parse_url($page_url, PHP_URL_PATH);
+        if (($query = parse_url($page_url, PHP_URL_QUERY))) {
+          parse_str($query, $query);
+        }
+        $page_url = trim($base_domain, '/') . '/' . ltrim($page_url, '/');
+        $page_url = trim($page_url);
       }
 
       $args = array();
@@ -1241,8 +1245,11 @@ function page_review_checklist_form($form, &$form_state) {
       // page > status
       // 
       $status = $page['#status'];
+      $icons = array();
       $icons[]  = array(
         '#theme' => 'loft_dev_css_circle',
+        '#tag' => 'a',
+        '#attributes' => array('title' => $statuses[$status]),
         '#width' => '25px',
         '#color' => isset($colors[$status]) ? $colors[$status] : $colors[0],
       );
@@ -1256,7 +1263,10 @@ function page_review_checklist_form($form, &$form_state) {
       // );
 
       $form['fieldset'][$title] = array(
-        '#markup' => '<p>' . $icons . ' ' . l($title . t(implode('', $comps) . implode('', $guides) , $args), $path, array('html' => TRUE, 'query' => $query)) . '</p>',
+        '#prefix' => '<p>' . $icons,
+        '#suffix' => t(implode('', $comps) . implode('', $guides) , $args) . '</p>',  
+        // '#suffix' => '</p>',  
+        '#markup' => l($title, $page_url, array('html' => TRUE, 'query' => $query)),
       );
 
       $string = '';
@@ -1266,16 +1276,11 @@ function page_review_checklist_form($form, &$form_state) {
       $ex_basecamp[] = "h2. $title [$status]";
       $ex_basecamp[] = '';
 
-      if ($uri) {
-        $url = $uri;
-        if (strpos($uri, 'http') !== 0) {
-          $url =$base_domain . $uri;
-        }
-
-        $ex_markdown[] = '* <' . trim($url) . '>';
-        $ex_basecamp[] = '"' . ($url = trim($url)) . '":' . $url;
-        // $ex_todos[]    = "- [ ] $title $uri\n" . trim($url);
-        $ex_todos[]    = "- [ ] ($status) $title <$uri>";
+      if ($url) {
+        $ex_markdown[] = '* <' . $url . '>';
+        $ex_basecamp[] = '"' . $url . '":' . $url;
+        // $ex_todos[]    = "- [ ] $title $url\n" . trim($url);
+        $ex_todos[]    = "- [ ] ($status) $title <$url>";
       }
       else {
         $ex_todos[]    = "- [ ] ($status) $title";
@@ -1334,4 +1339,22 @@ function page_review_checklist_form($form, &$form_state) {
   );
 
   return $form;
+}
+
+/**
+ * Helper for uasort.
+ *
+ * Sorts first by weight and then by title.
+ */
+function page_review_sort($a, $b) {
+  if ($a['#weight'] == $b['#weight']) {
+    $a_title = reset(explode('[', $a['#value']->title));
+    $b_title = reset(explode('[', $b['#value']->title));
+    if ($a_title == $b_title) {
+      return 0;
+    }
+    return $a_title < $b_title ? -1 : 1;
+  }
+
+  return $a['#weight'] < $b['#weight'] ? -1 : 1;
 }

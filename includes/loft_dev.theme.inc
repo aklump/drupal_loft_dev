@@ -106,6 +106,8 @@ function theme_loft_dev_migration($vars) {
  * @param array $vars
  *   $width
  *   $color
+ *   $tag
+ *   $attributes
  *
  * @return string
  *
@@ -124,11 +126,12 @@ function theme_loft_dev_css_circle($vars) {
   $style[] = 'display:inline-block';
   $style[] = 'border:' . $w . ' solid ' . $vars['color'];
   $style = implode(';', $style);
+  $attributes = drupal_array_merge_deep(array('class' => array('circle'), 'style' => $style), $vars['attributes']);
 
   $build[] = array(
     '#theme' => 'html_tag', 
-    '#tag' => 'div', 
-    '#attributes' => array('class' => array('circle'), 'style' => $style),
+    '#tag' => $vars['tag'], 
+    '#attributes' => $attributes,
     '#value' => '',
   );
 

@@ -121,3 +121,17 @@ li .element-details {
   right: 0;
   text-decoration: none;
 }
+
+#page-review-checklist-form {
+  margin: 10px;
+  background-color: #fff;
+  &,
+  a {
+    color: #000;
+    text-decoration: none;
+    font-family: Arial, sans-serif;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+}
