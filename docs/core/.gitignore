@@ -1,1 +1,5 @@
-Markdown.pl
+/*
+!"$file"
+!core-config.sh
+!source
+!source/*

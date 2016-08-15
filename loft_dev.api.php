@@ -108,7 +108,7 @@ function hook_loft_dev_sandbox() {
       // callback arguments.
       'query' => 'sb',
       'callback' => 'module_load_include',
-      'callback arguments' => array('inc', 'my_module', 'includes/loft_dev_sandbox'),
+      'callback arguments' => array('inc', 'my_module', 'includes/my_module.sandbox'),
     ),
   );
 }

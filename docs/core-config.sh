@@ -11,7 +11,7 @@ disabled = "website html text mediawiki doxygene"
 ##
  # File path to the php you want to use for compiling
  #
-php = '/Applications/MAMP/bin/php/php5.3.14/bin/php'
+php = $(which php)
 
 ##
  # Lynx is required for output of .txt files
@@ -27,7 +27,7 @@ lynx = $(which lynx)
  # The name of the drupal module to build advanced help output for, if
  # applicable
  #
-drupal_module = 'loft_dev'
+drupal_module = 'loft_dev';
 
 ##
  # The location of the advanced help output; this location is used in place of
@@ -43,3 +43,7 @@ drupal_dir = '../help'
 
 # This would also copy README.md as well as README.txt
 README = '../../README.txt ../../README.md'
+
+#
+# web_package support: path to web_package.info file
+#version_file = "../slim_time.info"
