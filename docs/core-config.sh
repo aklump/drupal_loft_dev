@@ -6,7 +6,7 @@
 ##
  # An array of output formats to disable, if any
  #
-disabled = "website html text mediawiki doxygene"
+disabled = "html text mediawiki doxygene"
 
 ##
  # File path to the php you want to use for compiling
@@ -42,8 +42,8 @@ drupal_dir = '../help'
 #README = '../README.txt'
 
 # This would also copy README.md as well as README.txt
-README = '../../README.txt ../../README.md'
+README = '../README.txt ../README.md'
 
 #
 # web_package support: path to web_package.info file
-#version_file = "../slim_time.info"
+version_file = "../loft_dev.info"

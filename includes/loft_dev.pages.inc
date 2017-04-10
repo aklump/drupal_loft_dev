@@ -45,33 +45,35 @@ function loft_dev_loft_deploy_export($filename) {
   //   variable_set('loft_dev_loft_deploy_export_path', time());
   // }
   // else {
-    // This will wait for feedback from ld export.
-    // This slows down site builders for large dbs.
-    $handle = popen("$cmd 2>&1 &", 'r');
-    $output = stream_get_contents($handle);
-    pclose($handle);
-  
-    if (preg_match('/ database as (.*)\.\.\./', $output, $matches)
-      && isset($matches[1])
-      && file_exists($matches[1])) {
-      variable_set('loft_dev_loft_deploy_export_path', $matches[1]);
-      if (!$old_mtime
-        || ($old_mtime && $old_mtime < filemtime($matches[1]))) {
-        return TRUE;
-      }
-    }
+  // This will wait for feedback from ld export.
+  // This slows down site builders for large dbs.
+  $handle = popen("$cmd 2>&1 &", 'r');
+  $output = stream_get_contents($handle);
+  pclose($handle);
 
-    $watchdog_message = '';
-    if (preg_match_all("/command not found\s*(\S+?):/", $output, $matches)) {
-      $missing_cmd = $matches[1][0];
-      switch ($missing_cmd) {
-        default;
-          $watchdog_message = "Add the full path to $missing_cmd to .loft_deploy/config e.g. ld_{$missing_cmd}='/Applications/MAMP/Library/bin/{$missing_cmd}'";
-          break;
-      }
+  if (preg_match('/ database as (.*)\.\.\./', $output, $matches)
+    && isset($matches[1])
+    && file_exists($matches[1])
+  ) {
+    variable_set('loft_dev_loft_deploy_export_path', $matches[1]);
+    if (!$old_mtime
+      || ($old_mtime && $old_mtime < filemtime($matches[1]))
+    ) {
+      return TRUE;
     }
+  }
 
-    watchdog('loft_dev', $output, array(), WATCHDOG_DEBUG);
+  $watchdog_message = '';
+  if (preg_match_all("/command not found\s*(\S+?):/", $output, $matches)) {
+    $missing_cmd = $matches[1][0];
+    switch ($missing_cmd) {
+      default;
+        $watchdog_message = "Add the full path to $missing_cmd to .loft_deploy/config e.g. ld_{$missing_cmd}='/Applications/MAMP/Library/bin/{$missing_cmd}'";
+        break;
+    }
+  }
+
+  watchdog('loft_dev', $output, array(), WATCHDOG_DEBUG);
   //}
 
   if ($watchdog_message) {
@@ -86,50 +88,50 @@ function loft_dev_playground_page() {
   $_loft_dev_playground = TRUE;
   $args = array(
     '%theme' => $theme,
-    '%path' => path_to_theme(),
-    '!list' => array(
-      '#theme' => 'item_list', 
+    '%path'  => path_to_theme(),
+    '!list'  => array(
+      '#theme' => 'item_list',
       '#items' => array(
         '<em>html--loft-dev-playground.tpl.php</em>',
         '<em>page--loft-dev-playground.tpl.php</em>',
-      ), 
+      ),
     ),
   );
   $args['!list'] = drupal_render($args['!list']);
 
-  $build    = array();
+  $build = array();
   $build['goal'] = array(
-    '#markup' => t('<h2>Goal: To provide a canvas where you can play with html and css inside your current theme, free from the distraction of the CMS.</h2>'), 
+    '#markup' => t('<h2>Goal: To provide a canvas where you can play with html and css inside your current theme, free from the distraction of the CMS.</h2>'),
   );;
 
   $build['content'] = array(
     '#theme' => 'item_list',
-    '#type' => 'ol',
+    '#type'  => 'ol',
     '#items' => array(
       t('Make sure your theme implements <em>page.tpl.php</em>.'),
       t('Create this file <em>%path/tpl/page--loft-dev-playground.tpl.php</em> and then <strong>flush caches</strong>.  Treat this like a vanilla html page and just add html markup to see how the theme affects it.', $args),
       t('Create this file <em>%path/css/loft_dev_playground.css</em>. You may isolate css in this file as it will be autoloaded on this page only.  This file will come after all your theme css', $args),
       t("The above applies to all of these template suggestions: !list", $args),
-    ), 
+    ),
   );
 
   $css_js = array();
-  $css_js['#attached']['css'][] =  array(
-    'type' => 'file', 
-    'data' => $args['%path'] . '/css/loft_dev_playground.css',
-    'group' => CSS_THEME,
+  $css_js['#attached']['css'][] = array(
+    'type'   => 'file',
+    'data'   => $args['%path'] . '/css/loft_dev_playground.css',
+    'group'  => CSS_THEME,
     'weight' => 1000,
   );
   // This does NOT work for library_load()
-  $css_js['#attached']['library'][] =  array('system', 'cookie');
-  $css_js['#attached']['js'][] =  array(
-    'type' => 'file', 
+  $css_js['#attached']['library'][] = array('system', 'cookie');
+  $css_js['#attached']['js'][] = array(
+    'type' => 'file',
     'data' => drupal_get_path('module', 'loft_dev') . '/loft_dev.js',
   );
   $css_js['#attached']['js'][] = array(
-    'type' => 'file', 
+    'type'  => 'file',
     'group' => JS_THEME,
-    'data' => drupal_get_path('module', 'loft_dev') . '/js/playground.js',
+    'data'  => drupal_get_path('module', 'loft_dev') . '/js/playground.js',
   );
   drupal_render($css_js);
 
@@ -141,7 +143,7 @@ function loft_dev_playground_page() {
  */
 function loft_dev_page() {
   $output = '';
-  $output .= check_markup(file_get_contents(drupal_get_path('module', 'loft_dev') .'/README.txt'), 'plain_text');
+  $output .= check_markup(file_get_contents(drupal_get_path('module', 'loft_dev') . '/README.txt'), 'plain_text');
   return $output;
 }
 
@@ -161,51 +163,51 @@ function loft_dev_theme_test_page() {
 
   //headings
   for ($i = 0; $i < 6; ++$i) {
-    $output .= '<h'. ($i+1) .'>&lt;h'. ($i+1) .'> '. _loft_dev_dummy_string(5) .'</h'. ($i+1) .'>'."\n";
+    $output .= '<h' . ($i + 1) . '>&lt;h' . ($i + 1) . '> ' . _loft_dev_dummy_string(5) . '</h' . ($i + 1) . '>' . "\n";
   }
 
-  $output .= '<strong>&lt;strong> '. _loft_dev_dummy_string(4).'</strong>'."\n";
+  $output .= '<strong>&lt;strong> ' . _loft_dev_dummy_string(4) . '</strong>' . "\n";
 
-  $output .= '<a href="#" onclick="return: false;">&lt;a> '. _loft_dev_dummy_string(3) .'</a>'."\n";
+  $output .= '<a href="#" onclick="return: false;">&lt;a> ' . _loft_dev_dummy_string(3) . '</a>' . "\n";
 
-  $output .= '<em>&lt;em> '. _loft_dev_dummy_string(4).'</em>'."\n";
+  $output .= '<em>&lt;em> ' . _loft_dev_dummy_string(4) . '</em>' . "\n";
 
-  $output .= '<code>&lt;code> '. _loft_dev_dummy_string(10) .'</code>'."\n";
+  $output .= '<code>&lt;code> ' . _loft_dev_dummy_string(10) . '</code>' . "\n";
 
-  $output .= '<div>'."\n";
-  $output .= _loft_dev_dummy_string(5) .'<sub>&lt;sub> '. _loft_dev_dummy_string(3) .'</sub>'."\n";
+  $output .= '<div>' . "\n";
+  $output .= _loft_dev_dummy_string(5) . '<sub>&lt;sub> ' . _loft_dev_dummy_string(3) . '</sub>' . "\n";
 
-  $output .= _loft_dev_dummy_string(20) .'<sup>&lt;sup> '. _loft_dev_dummy_string(3) .'</sup>'. _loft_dev_dummy_string(20). "\n";
+  $output .= _loft_dev_dummy_string(20) . '<sup>&lt;sup> ' . _loft_dev_dummy_string(3) . '</sup>' . _loft_dev_dummy_string(20) . "\n";
 
-  $output .= '</div>'."\n";
+  $output .= '</div>' . "\n";
 
   $output .= '<pre>&lt;pre>10 print "Hello World"' . "\n" . '20 goto 10</pre>' . "\n";
 
   //ordered list
   $output .= theme('item_list', array(
-    'items' => _loft_dev_dummy_array(5, NULL, 20),
-    'title' => '&lt;ol> '. _loft_dev_dummy_string(4),
-    'type'  => 'ol',
-  )) . "\n";
+      'items' => _loft_dev_dummy_array(5, NULL, 20),
+      'title' => '&lt;ol> ' . _loft_dev_dummy_string(4),
+      'type'  => 'ol',
+    )) . "\n";
 
   //unordered list
   $output .= theme('item_list', array(
-    'items' => _loft_dev_dummy_array(5, NULL, 20),
-    'title' => '&lt;ul> '. _loft_dev_dummy_string(4),
-    'type'  => 'ul',
-  )) . "\n";
+      'items' => _loft_dev_dummy_array(5, NULL, 20),
+      'title' => '&lt;ul> ' . _loft_dev_dummy_string(4),
+      'type'  => 'ul',
+    )) . "\n";
 
   //p tags
-  $output .= '<p>p tag: Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>'."\n";
+  $output .= '<p>p tag: Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>' . "\n";
 
   $output .= '<blockquote>blockquote tag: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla at massa sed nulla consectetur malesuada.</blockquote>' . "\n";
 
-  $output .= '<p>p tag: Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>'."\n";
+  $output .= '<p>p tag: Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>' . "\n";
 
   //hr
   $output .= '<hr />' . "\n";
 
-  $output .= '<p>p tag: Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>'."\n";
+  $output .= '<p>p tag: Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>' . "\n";
 
   //table
   $rows = _loft_dev_dummy_array(10, 10);
@@ -215,10 +217,9 @@ function loft_dev_theme_test_page() {
     $rows[0][$cell_key] = '<a href="#" onclick="return false;">' . $cell . '</a>';
   }
   $output .= theme('table', array(
-    'header' => _loft_dev_dummy_array(10),
-    'rows' => $rows,
-  )) . "\n";
-
+      'header' => _loft_dev_dummy_array(10),
+      'rows'   => $rows,
+    )) . "\n";
 
 
   // Throbber
@@ -228,7 +229,7 @@ function loft_dev_theme_test_page() {
 
 
   //form
-  $output .= drupal_render(drupal_get_form('test_form_form')) ."\n";
+  $output .= drupal_render(drupal_get_form('test_form_form')) . "\n";
 
   //confirm form
   //@todo fix this; wasn't working on gop3 - aklump 05/08/2012 20:21:46
@@ -246,7 +247,7 @@ function loft_dev_theme_test_page() {
   global $pager_page_array, $pager_total;
   $pager_page_array = array(empty($_GET['page']) ? 0 : $_GET['page']);
   $pager_total = array(100);
-  $output .= theme('pager') ."\n";
+  $output .= theme('pager') . "\n";
 
   return $output;
 }
@@ -254,12 +255,12 @@ function loft_dev_theme_test_page() {
 /**
  * get a dummy array
  *
- * @param $count int
- *   The number of elements in the array
- * @param $multi_dim int
- *   The length of the multi dim array
+ * @param $count          int
+ *                        The number of elements in the array
+ * @param $multi_dim      int
+ *                        The length of the multi dim array
  * @param $element_length int
- *   How many words in each element
+ *                        How many words in each element
  */
 function _loft_dev_dummy_array($count, $multi_dim = 0, $element_length = 1) {
   $array = array();
@@ -275,7 +276,77 @@ function _loft_dev_dummy_array($count, $multi_dim = 0, $element_length = 1) {
 }
 
 function _loft_dev_dummy_string($length) {
-  $latin = array('lorem','ipsum','dolor','sit','amet','consectetur','adipisicing','elit,','sed','do','eiusmod','tempor','incididunt','ut','labore','et','dolore','magna','aliqua','ut','enim','ad','minim','veniam','quis','nostrud','exercitation','ullamco','laboris','nisi','ut','aliquip','ex','ea','commodo','consequat','duis','aute','irure','dolor','in','reprehenderit','in','voluptate','velit','esse','cillum','dolore','eu','fugiat','nulla','pariatur','excepteur','sint','occaecat','cupidatat','non','proident','sunt','in','culpa','qui','officia','deserunt','mollit','anim','id','est','laborum');
+  $latin = array(
+    'lorem',
+    'ipsum',
+    'dolor',
+    'sit',
+    'amet',
+    'consectetur',
+    'adipisicing',
+    'elit,',
+    'sed',
+    'do',
+    'eiusmod',
+    'tempor',
+    'incididunt',
+    'ut',
+    'labore',
+    'et',
+    'dolore',
+    'magna',
+    'aliqua',
+    'ut',
+    'enim',
+    'ad',
+    'minim',
+    'veniam',
+    'quis',
+    'nostrud',
+    'exercitation',
+    'ullamco',
+    'laboris',
+    'nisi',
+    'ut',
+    'aliquip',
+    'ex',
+    'ea',
+    'commodo',
+    'consequat',
+    'duis',
+    'aute',
+    'irure',
+    'dolor',
+    'in',
+    'reprehenderit',
+    'in',
+    'voluptate',
+    'velit',
+    'esse',
+    'cillum',
+    'dolore',
+    'eu',
+    'fugiat',
+    'nulla',
+    'pariatur',
+    'excepteur',
+    'sint',
+    'occaecat',
+    'cupidatat',
+    'non',
+    'proident',
+    'sunt',
+    'in',
+    'culpa',
+    'qui',
+    'officia',
+    'deserunt',
+    'mollit',
+    'anim',
+    'id',
+    'est',
+    'laborum',
+  );
   $word = array();
   while (count($word) < $length) {
     $word[] = $latin[rand(0, count($latin) - 1)];
@@ -288,8 +359,8 @@ function _loft_dev_dummy_string($length) {
  *
  * This is an example of a form for theme testing
  *
- * @see test_form_form_validate()
- * @see test_form_form_submit()
+ * @see     test_form_form_validate()
+ * @see     test_form_form_submit()
  * @ingroup forms
  */
 function test_form_form($form_state) {
@@ -298,65 +369,72 @@ function test_form_form($form_state) {
   $form['#attributes']['onsubmit'] = 'return false;';
 
   $form['fieldset'] = array(
-    '#type' => 'fieldset',
-    '#title' => _loft_dev_dummy_string(3),
+    '#type'        => 'fieldset',
+    '#title'       => _loft_dev_dummy_string(3),
     '#collapsible' => TRUE,
-    '#collapsed' => FALSE,
+    '#collapsed'   => FALSE,
   );
 
   $form['fieldset']['text'] = array(
-    '#type' => 'textfield',
-    '#description' => _loft_dev_dummy_string(10),
-    '#title' => _loft_dev_dummy_string(3),
-    '#required' => TRUE,
-    '#size' => 60,
+    '#type'              => 'textfield',
+    '#description'       => _loft_dev_dummy_string(10),
+    '#title'             => _loft_dev_dummy_string(3),
+    '#required'          => TRUE,
+    '#size'              => 60,
     '#autocomplete_path' => 'user/autocomplete',
   );
 
   $form['fieldset']['text2'] = array(
-    '#type' => 'textfield',
+    '#type'        => 'textfield',
     '#description' => _loft_dev_dummy_string(10),
-    '#title' => _loft_dev_dummy_string(3),
-    '#required' => TRUE,
-    '#size' => 60,
+    '#title'       => _loft_dev_dummy_string(3),
+    '#required'    => TRUE,
+    '#size'        => 60,
   );
   $form['fieldset']['checkboxes'] = array(
-    '#type' => 'checkboxes',
-    '#title' => _loft_dev_dummy_string(4),
-    '#options' => _loft_dev_dummy_array(3),
+    '#type'        => 'checkboxes',
+    '#title'       => _loft_dev_dummy_string(4),
+    '#options'     => _loft_dev_dummy_array(3),
     '#description' => _loft_dev_dummy_string(8),
   );
 
   $form['fieldset']['date'] = array(
-    '#type' => 'date',
-    '#title' => _loft_dev_dummy_string(3),
+    '#type'        => 'date',
+    '#title'       => _loft_dev_dummy_string(3),
     '#description' => _loft_dev_dummy_string(8),
-    '#required' => TRUE,
+    '#required'    => TRUE,
   );
 
   $form['fieldset']['comment_preview'] = array(
-    '#type' => 'radios',
-    '#title' => _loft_dev_dummy_string(3),
+    '#type'          => 'radios',
+    '#title'         => _loft_dev_dummy_string(3),
     '#default_value' => 0,
-    '#options' => _loft_dev_dummy_array(3),
+    '#options'       => _loft_dev_dummy_array(3),
+    '#description'   => _loft_dev_dummy_string(8),
+  );
+
+  $form['fieldset']['body_req'] = array(
+    '#required'    => TRUE,
+    '#type'        => 'textarea',
+    '#title'       => _loft_dev_dummy_string(3),
     '#description' => _loft_dev_dummy_string(8),
   );
 
   $form['fieldset']['body'] = array(
-    '#type' => 'textarea',
-    '#title' => _loft_dev_dummy_string(3),
+    '#type'        => 'textarea',
+    '#title'       => _loft_dev_dummy_string(3),
     '#description' => _loft_dev_dummy_string(8),
   );
 
   $form['fieldset']['upload'] = array(
-    '#type' => 'file',
-    '#title' => _loft_dev_dummy_string(4),
+    '#type'        => 'file',
+    '#title'       => _loft_dev_dummy_string(4),
     '#description' => _loft_dev_dummy_string(8),
   );
 
   $form['fieldset']['submit'] = array(
-    '#type' => 'submit',
-    '#value' => _loft_dev_dummy_string(3),
+    '#type'   => 'submit',
+    '#value'  => _loft_dev_dummy_string(3),
     '#weight' => 40,
   );
 
@@ -382,7 +460,7 @@ function test_form_validate($form, &$form_state) {
  * @see test_form_form_validate()
  */
 function test_form_form_submit($form, &$form_state) {
-  db_query("INSERT INTO {table} (name, log, hidden) VALUES ('%s', %d, '%s')", $form_state['values']['name'], $form_state['values']['access']['log'],  $form_state['values']['hidden']);
+  db_query("INSERT INTO {table} (name, log, hidden) VALUES ('%s', %d, '%s')", $form_state['values']['name'], $form_state['values']['access']['log'], $form_state['values']['hidden']);
   drupal_set_message(t('Your form has been saved.'));
 }
 
@@ -390,7 +468,7 @@ function test_form_form_submit($form, &$form_state) {
  * Generate a true 404 page where the active menu item is blank
  */
 function drupal_not_found_page() {
-  menu_set_active_item('');
+  menu_set_active_item('page/not/found');
   return drupal_not_found();
 }
 
@@ -438,8 +516,8 @@ function loft_dev_list_libraries_page() {
   ksort($rows);
   $build = array();
   $build[] = array(
-    '#theme' => 'table',
-    '#rows' => $rows,
+    '#theme'  => 'table',
+    '#rows'   => $rows,
     '#header' => array(t('Library'), t('Machine'), t('Module')),
   );
 
@@ -462,7 +540,8 @@ function loft_dev_list_fapi_elements_page() {
     }
 
     if (isset($data['#theme_wrappers'])
-        && in_array('form_element', (array) $data['#theme_wrappers'])) {
+      && in_array('form_element', (array) $data['#theme_wrappers'])
+    ) {
       $name = $name . ' (fapi)';
     }
     $item = '';
@@ -480,15 +559,15 @@ function loft_dev_list_fapi_elements_page() {
 
   // Create a textbox for jquery to user for filtering
   $build['filter'] = array(
-    '#attributes' => array(
+    '#attributes'    => array(
       'id' => 'loft-dev-elements-filter',
     ),
-    '#type' => 'textfield',
-    '#description' => t('Use this box to filter the list below'),
-    '#title' => t('Filter'),
+    '#type'          => 'textfield',
+    '#description'   => t('Use this box to filter the list below'),
+    '#title'         => t('Filter'),
     '#default_value' => '',
-    '#attached' => array(
-      'js' => array(
+    '#attached'      => array(
+      'js'      => array(
         drupal_get_path('module', 'loft_dev') . '/loft_dev.js',
       ),
       'library' => array(
@@ -501,8 +580,8 @@ function loft_dev_list_fapi_elements_page() {
   $build['#attached']['library'][] = array('system', 'cookie');
 
   $build[] = array(
-    '#theme' => 'item_list',
-    '#items' => $items,
+    '#theme'      => 'item_list',
+    '#items'      => $items,
     '#attributes' => array(
       'id' => 'loft-dev-elements-list',
     ),
@@ -566,7 +645,7 @@ function loft_dev_zebra_striping_page($max = 100) {
   $build[] = array(
     '#theme' => 'item_list',
     '#items' => $items,
-    '#type' => 'ol',
+    '#type'  => 'ol',
   );
   return $build;
 }
@@ -591,10 +670,21 @@ function loft_dev_zebra_stripes(&$classes_array, $zebra_group = 'default') {
   // array(4); If you want to be able to apply a 2,3,4,5 column display then set
   // $column_classes = array(2,3,4,5). And so fourth... By default we'll set
   // this up for 3 and 4 columns.
-  $column_classes = array(3,4,5,6,7,8);
+  $column_classes = array(3, 4, 5, 6, 7, 8);
   // end config
 
-  $word = array('zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine');
+  $word = array(
+    'zero',
+    'one',
+    'two',
+    'three',
+    'four',
+    'five',
+    'six',
+    'seven',
+    'eight',
+    'nine',
+  );
   $increment = &drupal_static('gop3_zebra', array());
   $classes_array = (array) $classes_array;
 
@@ -646,9 +736,42 @@ function loft_dev_zebra_stripes(&$classes_array, $zebra_group = 'default') {
  * @return string
  */
 function _loft_dev_get_ordinal($number) {
-  $first_word = array('eth', 'first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth', 'tenth', 'eleventh', 'twelfth', 'thirteenth', 'fourteenth', 'fifteenth', 'sixteenth', 'seventeenth', 'eighteenth', 'nineteenth', 'twentieth');
-  $second_word =array('', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninty');
-  if($number <= 20) {
+  $first_word = array(
+    'eth',
+    'first',
+    'second',
+    'third',
+    'fourth',
+    'fifth',
+    'sixth',
+    'seventh',
+    'eighth',
+    'ninth',
+    'tenth',
+    'eleventh',
+    'twelfth',
+    'thirteenth',
+    'fourteenth',
+    'fifteenth',
+    'sixteenth',
+    'seventeenth',
+    'eighteenth',
+    'nineteenth',
+    'twentieth',
+  );
+  $second_word = array(
+    '',
+    '',
+    'twenty',
+    'thirty',
+    'forty',
+    'fifty',
+    'sixty',
+    'seventy',
+    'eighty',
+    'ninty',
+  );
+  if ($number <= 20) {
     return $first_word[$number];
   }
   $first_num = substr($number, -1, 1);
@@ -659,8 +782,9 @@ function _loft_dev_get_ordinal($number) {
 /**
  * Reset zebra striping
  *
- * @param strings...
- *   Optional, keys of zebra groups to reset.  Leave blank to reset all
+ * @param strings ...
+ *                Optional, keys of zebra groups to reset.  Leave blank to
+ *                reset all
  *
  * @return NULL
  */
@@ -692,7 +816,7 @@ function loft_dev_fpo_image_page() {
  */
 function loft_dev_list_functions_page($op) {
 
-  ini_set('memory_limit','192M');
+  ini_set('memory_limit', '192M');
 
   $output = '';
 
@@ -711,7 +835,8 @@ function loft_dev_list_functions_page($op) {
       }
     }
     if (!empty($array['file']['#mask']) &&
-        ($files = file_scan_directory($dir, $array['file']['#mask']))) {
+      ($files = file_scan_directory($dir, $array['file']['#mask']))
+    ) {
       foreach ($files as $file) {
         $file = drupal_realpath($file->uri);
         require_once $file;
@@ -725,9 +850,22 @@ function loft_dev_list_functions_page($op) {
   $result = db_select('system', 's')
     ->fields('s', array('filename'))
     ->condition('status', '1')
-
     //@todo figure out why these cause trouble; has to do with classes
-    ->condition('name', array('backup_migrate', 'date', 'metatag', 'print', 'prod_check', 'email', 'fb_social', 'imageapi', 'mailchimp', 'coder', 'comment_notify', 'link', 'commerce_product'), 'NOT IN')
+    ->condition('name', array(
+      'backup_migrate',
+      'date',
+      'metatag',
+      'print',
+      'prod_check',
+      'email',
+      'fb_social',
+      'imageapi',
+      'mailchimp',
+      'coder',
+      'comment_notify',
+      'link',
+      'commerce_product',
+    ), 'NOT IN')
     ->execute()->fetchCol();
 
   $skipped_files = array(
@@ -747,7 +885,8 @@ function loft_dev_list_functions_page($op) {
       $file = drupal_realpath($file->uri);
       $info = pathinfo($file);
       if (!in_array($info['basename'], $skipped_files)
-          && preg_match('/^<\?php/s', file_get_contents($file))) {
+        && preg_match('/^<\?php/s', file_get_contents($file))
+      ) {
         require_once $file;
       }
     }
@@ -755,25 +894,25 @@ function loft_dev_list_functions_page($op) {
 
   // Create a textbox for jquery to user for filtering
   $form['filter'] = array(
-    '#attributes' => array(
+    '#attributes'    => array(
       'id' => 'loft-dev-functions-filter',
     ),
-    '#type' => 'textfield',
-    '#description' => t('Use this box to filter the list below'),
-    '#title' => t('Filter'),
+    '#type'          => 'textfield',
+    '#description'   => t('Use this box to filter the list below'),
+    '#title'         => t('Filter'),
     '#default_value' => '',
-    '#attached' => array(
-      'js' => array(
+    '#attached'      => array(
+      'js'      => array(
         drupal_get_path('module', 'loft_dev') . '/loft_dev.js',
       ),
       'library' => array(
         array('system', 'cookie'),
-      ),      
+      ),
     ),
   );
   $output .= drupal_render($form) . "\n";
 
-  $output .= '<ol id="loft-dev-functions-list">'."\n";
+  $output .= '<ol id="loft-dev-functions-list">' . "\n";
 
   $list = array();
 
@@ -790,7 +929,7 @@ function loft_dev_list_functions_page($op) {
     case 'functions':
       $functions = get_defined_functions();
       $list = array();
-      foreach($functions['user'] as $function) {
+      foreach ($functions['user'] as $function) {
         $list[] = "<a href='http://api.drupal.org/api/HEAD/function/$function' target='_blank'>$function</a>";
         //$list[trim($function, '_')] = "<a href='http://api.drupal.org/api/HEAD/function/$function' target='_blank'>$function</a>";
       }
@@ -798,8 +937,8 @@ function loft_dev_list_functions_page($op) {
       break;
   }
 
-  $output .= '<li>' .  implode("</li>\n<li>", $list) ."</li>\n";
-  $output .= '</ol>'."\n";
+  $output .= '<li>' . implode("</li>\n<li>", $list) . "</li>\n";
+  $output .= '</ol>' . "\n";
 
   return $output;
 }
@@ -826,13 +965,13 @@ function _loft_dev_func_sort($a, $b) {
 function loft_dev_rem_page($base = 16) {
 
   $sizes = '';
-  for ($i = 1; $i <= 32; $i++) { 
+  for ($i = 1; $i <= 32; $i++) {
     $rem = round($i / $base, 4);
-    $sizes[] = array($rem, $i);    
+    $sizes[] = array($rem, $i);
   }
   $build[] = array(
-    '#theme' => 'table',
-    '#rows' => $sizes,
+    '#theme'  => 'table',
+    '#rows'   => $sizes,
     '#header' => array('rem', 'px'),
   );
   drupal_add_http_header('Content-Type', 'text/html; charset=utf-8');
@@ -848,8 +987,8 @@ function loft_dev_rem_page($base = 16) {
  * @param array $form
  * @param array &$form_state
  *
- * @see loft_dev_parse_time_form_validate()
- * @see loft_dev_parse_time_form_submit()
+ * @see     loft_dev_parse_time_form_validate()
+ * @see     loft_dev_parse_time_form_submit()
  * @ingroup forms
  */
 function loft_dev_parse_time_form($form, &$form_state) {
@@ -867,32 +1006,32 @@ function loft_dev_parse_time_form($form, &$form_state) {
   }
 
   $form['input'] = array(
-    '#type' => 'textarea',
-    '#description' => t('Paste a string containing english time here'),
-    '#title' => t('Input String'),
+    '#type'          => 'textarea',
+    '#description'   => t('Paste a string containing english time here'),
+    '#title'         => t('Input String'),
     '#default_value' => '',
-    '#required' => TRUE,
-    '#rows' => 20,
+    '#required'      => TRUE,
+    '#rows'          => 20,
   );
 
   $form['time_out'] = array(
-    '#type' => 'select',
-    '#title' => t('Time Output Format'),
+    '#type'          => 'select',
+    '#title'         => t('Time Output Format'),
     '#default_value' => 'unix',
-    '#options' => array(
+    '#options'       => array(
       'unix' => 'Unix Timestamp',
     ),
   );
 
   $form['append_to_line'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Append to the end of the line'),
+    '#type'          => 'checkbox',
+    '#title'         => t('Append to the end of the line'),
     '#default_value' => variable_get('loft_dev_parse_time:append_to_line', TRUE),
   );
 
   //http://api.drupal.org/api/drupal/includes%21common.inc/function/drupal_process_states/7
   $form['append_options'] = array(
-    '#type' => 'container',
+    '#type'   => 'container',
     '#states' => array(
       'visible' => array(
         ':input[name=append_to_line]' => array('value' => 1),
@@ -902,15 +1041,15 @@ function loft_dev_parse_time_form($form, &$form_state) {
 
   //@todo fix; not hiding
   $form['append_options']['append_prefix'] = array(
-    '#type' => 'textfield',
-    '#description' => t('When appending the output time, place this string between the line and the output.'),
-    '#title' => t('Append Prefix'),
+    '#type'          => 'textfield',
+    '#description'   => t('When appending the output time, place this string between the line and the output.'),
+    '#title'         => t('Append Prefix'),
     '#default_value' => variable_get('loft_dev_parse_time:append_prefix', '|'),
-    '#size' => 10,
+    '#size'          => 10,
   );
 
   $form['submit'] = array(
-    '#type' => 'submit',
+    '#type'  => 'submit',
     '#value' => t('Parse Now'),
   );
 
@@ -960,13 +1099,13 @@ function _loft_dev_pull_time_string($string) {
 }
 
 function loft_dev_migration_page() {
-  $build    = array();
-  
+  $build = array();
+
   $default = variable_get('loft_dev_migration_urls', array());
   if ($default) {
     $build['current_status'] = array(
-      '#theme' => 'loft_dev_migration',
-      '#urls' => $default,
+      '#theme'   => 'loft_dev_migration',
+      '#urls'    => $default,
       '#results' => variable_get('loft_dev_migration_urls_results', array()),
     );
   }
@@ -984,30 +1123,30 @@ function loft_dev_migration_page() {
  * @param array $form
  * @param array &$form_state
  *
- * @see loft_dev_migration_urls_form_validate()
- * @see loft_dev_migration_urls_form_submit()
+ * @see     loft_dev_migration_urls_form_validate()
+ * @see     loft_dev_migration_urls_form_submit()
  * @ingroup forms
  */
 function loft_dev_migration_urls_form($form, &$form_state, $default) {
   $form['loft_dev_migration_canonical'] = array(
-    '#type' => 'textfield',
-    '#description' => t('Enter the base url of the current production site.'),
-    '#title' => t('Canonical URL'),
+    '#type'          => 'textfield',
+    '#description'   => t('Enter the base url of the current production site.'),
+    '#title'         => t('Canonical URL'),
     '#default_value' => variable_get('loft_dev_migration_canonical', ''),
-    '#required' => TRUE,
+    '#required'      => TRUE,
   );
 
   $form['loft_dev_migration_urls'] = array(
-    '#type' => 'textarea',
-    '#title' => t('Expected URLs from previous website'),
-    '#description' => t('Enter all relative urls from the old website that you wish to assert exist in this, one per line.'),
-    '#rows' => 20,
-    '#resizable' => TRUE,
+    '#type'          => 'textarea',
+    '#title'         => t('Expected URLs from previous website'),
+    '#description'   => t('Enter all relative urls from the old website that you wish to assert exist in this, one per line.'),
+    '#rows'          => 20,
+    '#resizable'     => TRUE,
     '#default_value' => implode(PHP_EOL, $default),
   );
 
   $form['submit'] = array(
-    '#type' => 'submit',
+    '#type'  => 'submit',
     '#value' => t('Save/Check Status'),
   );
 
@@ -1021,7 +1160,7 @@ function loft_dev_migration_urls_form($form, &$form_state, $default) {
  * @see loft_dev_migration_urls_form_validate()
  */
 function loft_dev_migration_urls_form_submit($form, &$form_state) {
-  
+
   variable_set('loft_dev_migration_canonical', trim($form_state['values']['loft_dev_migration_canonical'], '/'));
   variable_del('loft_dev_migration_urls_results');
 
@@ -1044,18 +1183,18 @@ function loft_dev_migration_urls_form_submit($form, &$form_state) {
  * @param array $form
  * @param array &$form_state
  *
- * @see loft_dev_css_aggregation_form_validate()
- * @see loft_dev_css_aggregation_form_submit()
+ * @see     loft_dev_css_aggregation_form_validate()
+ * @see     loft_dev_css_aggregation_form_submit()
  * @ingroup forms
  */
 function loft_dev_css_aggregation_form($form, &$form_state) {
   $default_value = variable_get('loft_dev_css_files_omit', array());
   $options = variable_get('loft_dev_css_files_options', array());
   $form['loft_dev_css_files_omit'] = array(
-    '#type' => 'checkboxes',
-    '#title' => t('Omit these files from aggregation'),
+    '#type'          => 'checkboxes',
+    '#title'         => t('Omit these files from aggregation'),
     '#default_value' => $default_value,
-    '#options' => $options,
+    '#options'       => $options,
   );
 
   return system_settings_form($form);
@@ -1081,22 +1220,22 @@ function loft_dev_css_aggregation_form_validate($form, &$form_state) {
  * @param array $form
  * @param array &$form_state
  *
- * @see page_review_checklist_form_validate()
- * @see page_review_checklist_form_submit()
+ * @see     page_review_checklist_form_validate()
+ * @see     page_review_checklist_form_submit()
  * @ingroup forms
  */
 function page_review_checklist_form($form, &$form_state) {
   $form['fieldset'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Design files and notes'),
+    '#type'        => 'fieldset',
+    '#title'       => t('Design files and notes'),
     '#collapsible' => FALSE,
-    '#collapsed' => FALSE,
+    '#collapsed'   => FALSE,
   );
 
   if (!($storage = loft_dev_private_storage('page_review'))) {
     return;
   }
-  
+
   $json = json_decode($storage['settings.json']);
   $base_domain = isset($json->domain) ? $json->domain : url('', array('absolute' => TRUE));
   $base_domain = trim($base_domain, '/') . '/';
@@ -1121,10 +1260,10 @@ function page_review_checklist_form($form, &$form_state) {
   if (isset($config->status)) {
     $statuses = array();
     foreach ($config->status as $status) {
-      $statuses[(int)$status->attributes()->value] = (string) $status;
-      $status_weights[(int)$status->attributes()->value] = (int) $status->attributes()->weight;
+      $statuses[(int) $status->attributes()->value] = (string) $status;
+      $status_weights[(int) $status->attributes()->value] = (int) $status->attributes()->weight;
       if (($color = (string) $status->attributes()->color)) {
-        $colors[(int)$status->attributes()->value] = $color;
+        $colors[(int) $status->attributes()->value] = $color;
       }
     }
   }
@@ -1135,7 +1274,7 @@ function page_review_checklist_form($form, &$form_state) {
   $ex_markdown[] = t('# Page(s) audit (As of @date)', array('@date' => date_now()->format('r')));
   $ex_basecamp[] = t('h1. Page(s) audit (As of @date)', array('@date' => date_now()->format('r')));
   $ex_basecamp[] = '';
-  $ex_todos[]    = t('## Page(s) Audit Todo List');
+  $ex_todos[] = t('## Page(s) Audit Todo List');
 
   $string = t('A list of pages, links, comps, prototypes and design notes for site review.');
 
@@ -1144,7 +1283,7 @@ function page_review_checklist_form($form, &$form_state) {
   }
 
   $ex_markdown[] = $string;
-  $ex_basecamp[] = $string; 
+  $ex_basecamp[] = $string;
 
   $pages = array();
   if (isset($config->page)) {
@@ -1153,7 +1292,11 @@ function page_review_checklist_form($form, &$form_state) {
     foreach ($config->page as $value) {
       $status = xml_field($value->status, NULL, NULL, 0);
       $weight = xml_field($value, 'weight', NULL, $status_weights[$status]);
-      $pages[] = array('#value' => $value, '#weight' => $weight, '#status' => $status);
+      $pages[] = array(
+        '#value'  => $value,
+        '#weight' => $weight,
+        '#status' => $status,
+      );
     }
     uasort($pages, 'page_review_sort');
 
@@ -1187,10 +1330,10 @@ function page_review_checklist_form($form, &$form_state) {
         if (count($value->comp) === 1) {
           $index = '';
         }
-        $comps[]                      = ' <a href="!comp' . $index . '" target="_blank">[comp' . $index . ']</a>';
-        $args['!comp' . $index]       = $xml_value;
-        $ex_comps_markdown[]          = '* <' . $xml_value . '>';
-        $ex_comps_basecamp[]          = '"' . ($url = $xml_value) . '":' . $url;
+        $comps[] = ' <a href="!comp' . $index . '" target="_blank">[comp' . $index . ']</a>';
+        $args['!comp' . $index] = $xml_value;
+        $ex_comps_markdown[] = '* <' . $xml_value . '>';
+        $ex_comps_basecamp[] = '"' . ($url = $xml_value) . '":' . $url;
         // $ex_comps_basecamp[]          = '"comp' . $index . '":' . xml_field($value2);
       }
 
@@ -1206,10 +1349,10 @@ function page_review_checklist_form($form, &$form_state) {
         // if (count($value->guide) === 1) {
         //   $index = '';
         // }
-        $guides[]                      = ' <a href="!guide' . $index . '" target="_blank">[proto' . $index . ']</a>';
-        $args['!guide' . $index]       = $xml_value;
-        $ex_guides_markdown[]          = '* <' . $xml_value . '>';
-        $ex_guides_basecamp[]          = '"' . ($url = $xml_value) . '":' . $url;
+        $guides[] = ' <a href="!guide' . $index . '" target="_blank">[proto' . $index . ']</a>';
+        $args['!guide' . $index] = $xml_value;
+        $ex_guides_markdown[] = '* <' . $xml_value . '>';
+        $ex_guides_basecamp[] = '"' . ($url = $xml_value) . '":' . $url;
         // $ex_guides_basecamp[]          = '"guide' . $index . '":' . xml_field($value2);
       }
 
@@ -1227,10 +1370,10 @@ function page_review_checklist_form($form, &$form_state) {
       foreach ($notes as $tally => $note) {
         $bullet = count($notes) > 1 ? '1. ' : '';
         $index = $tally + 1;
-        $notes[]                      = ' <a href="!note' . $index . '" target="_blank">[notes' . $index . ']</a>';
-        $args['!note' . $index]       = $note;
-        $ex_notes_markdown[]          = $bullet . $note;
-        $ex_notes_basecamp[]          = '"' . ($url = $note) . '":' . $url;
+        $notes[] = ' <a href="!note' . $index . '" target="_blank">[notes' . $index . ']</a>';
+        $args['!note' . $index] = $note;
+        $ex_notes_markdown[] = $bullet . $note;
+        $ex_notes_basecamp[] = '"' . ($url = $note) . '":' . $url;
         // $ex_notes_basecamp[]          = '"notes' . $index . '":' . xml_field($value2);
       }
 
@@ -1246,12 +1389,12 @@ function page_review_checklist_form($form, &$form_state) {
       // 
       $status = $page['#status'];
       $icons = array();
-      $icons[]  = array(
-        '#theme' => 'loft_dev_css_circle',
-        '#tag' => 'a',
+      $icons[] = array(
+        '#theme'      => 'loft_dev_css_circle',
+        '#tag'        => 'a',
         '#attributes' => array('title' => $statuses[$status]),
-        '#width' => '25px',
-        '#color' => isset($colors[$status]) ? $colors[$status] : $colors[0],
+        '#width'      => '25px',
+        '#color'      => isset($colors[$status]) ? $colors[$status] : $colors[0],
       );
       $icons = drupal_render($icons);
       $status = $statuses[$status];
@@ -1264,14 +1407,17 @@ function page_review_checklist_form($form, &$form_state) {
 
       $form['fieldset'][$title] = array(
         '#prefix' => '<p>' . $icons,
-        '#suffix' => t(implode('', $comps) . implode('', $guides) , $args) . '</p>',  
+        '#suffix' => t(implode('', $comps) . implode('', $guides), $args) . '</p>',
         // '#suffix' => '</p>',  
-        '#markup' => l($title, $page_url, array('html' => TRUE, 'query' => $query)),
+        '#markup' => l($title, $page_url, array(
+          'html'  => TRUE,
+          'query' => $query,
+        )),
       );
 
       $string = '';
       $ex_markdown[] = $string;
-      $ex_basecamp[] = $string; 
+      $ex_basecamp[] = $string;
       $ex_markdown[] = "## $title [$status]";
       $ex_basecamp[] = "h2. $title [$status]";
       $ex_basecamp[] = '';
@@ -1280,22 +1426,22 @@ function page_review_checklist_form($form, &$form_state) {
         $ex_markdown[] = '* <' . $url . '>';
         $ex_basecamp[] = '"' . $url . '":' . $url;
         // $ex_todos[]    = "- [ ] $title $url\n" . trim($url);
-        $ex_todos[]    = "- [ ] ($status) $title <$url>";
+        $ex_todos[] = "- [ ] ($status) $title <$url>";
       }
       else {
-        $ex_todos[]    = "- [ ] ($status) $title";
+        $ex_todos[] = "- [ ] ($status) $title";
       }
-      
+
       if (count($ex_comps_markdown)) {
         $string = '';
         $ex_markdown[] = $string;
-        $ex_basecamp[] = $string; 
+        $ex_basecamp[] = $string;
         $string = format_plural(count($ex_comps_markdown), "Here is the comp:", "Here are the comps:");
         $ex_markdown[] = $string;
         $ex_basecamp[] = $string;
         $string = '';
         $ex_markdown[] = $string;
-        $ex_basecamp[] = $string; 
+        $ex_basecamp[] = $string;
         $ex_markdown = array_merge($ex_markdown, $ex_comps_markdown);
         $ex_basecamp = array_merge($ex_basecamp, $ex_comps_basecamp);
       }
@@ -1303,13 +1449,13 @@ function page_review_checklist_form($form, &$form_state) {
       if (count($ex_guides_markdown)) {
         $string = '';
         $ex_markdown[] = $string;
-        $ex_basecamp[] = $string; 
+        $ex_basecamp[] = $string;
         $string = format_plural(count($ex_guides_markdown), "Here is the prototype:", "Here are the prototypes:");
         $ex_markdown[] = $string;
         $ex_basecamp[] = $string;
         $string = '';
         $ex_markdown[] = $string;
-        $ex_basecamp[] = $string; 
+        $ex_basecamp[] = $string;
         $ex_markdown = array_merge($ex_markdown, $ex_guides_markdown);
         $ex_basecamp = array_merge($ex_basecamp, $ex_guides_basecamp);
       }
@@ -1317,25 +1463,25 @@ function page_review_checklist_form($form, &$form_state) {
       if (count($ex_notes_markdown)) {
         $string = '';
         $ex_markdown[] = $string;
-        $ex_basecamp[] = $string; 
+        $ex_basecamp[] = $string;
         $string = t("Here are design notes:");
         $ex_markdown[] = $string;
-        $ex_basecamp[] = $string; 
+        $ex_basecamp[] = $string;
         $string = '';
         $ex_markdown[] = $string;
-        $ex_basecamp[] = $string; 
+        $ex_basecamp[] = $string;
         $ex_markdown = array_merge($ex_markdown, $ex_notes_markdown);
         $ex_basecamp = array_merge($ex_basecamp, $ex_notes_basecamp);
       }
     }
   }
-  
+
   $format = 'ex_' . (isset($json->export_format) ? $json->export_format : 'markdown');
   $form['fieldset']['export'] = array(
-    '#type' => 'textarea',
-    '#title' => t('Export'),
+    '#type'          => 'textarea',
+    '#title'         => t('Export'),
     '#default_value' => implode(PHP_EOL, ${$format}),
-    '#rows' => 10,
+    '#rows'          => 10,
   );
 
   return $form;
@@ -1348,8 +1494,10 @@ function page_review_checklist_form($form, &$form_state) {
  */
 function page_review_sort($a, $b) {
   if ($a['#weight'] == $b['#weight']) {
-    $a_title = reset(explode('[', $a['#value']->title));
-    $b_title = reset(explode('[', $b['#value']->title));
+    $a_parts = explode('[', $a['#value']->title);
+    $b_parts = explode('[', $b['#value']->title);
+    $a_title = reset($a_parts);
+    $b_title = reset($b_parts);
     if ($a_title == $b_title) {
       return 0;
     }

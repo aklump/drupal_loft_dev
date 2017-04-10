@@ -51,11 +51,18 @@
 
       // Was the meta key held down? Set cookie?
       if (e.metaKey) {
-        var expiry = new Date();
-        var time = expiry.getTime();
-        time += duration * 1000;
-        expiry.setTime(time);
-        $.cookie('loft_dev_admin_stuff', "hidden", {"expires": expiry});
+        override = prompt('Hide for how many minutes?', duration / 60);
+        if (override) {
+          var expiry = new Date(),
+              time   = expiry.getTime();
+          if (override) {
+            duration = override * 60;
+          }
+          time += duration * 1000;
+          expiry.setTime(time);
+          console.log(expiry);
+          $.cookie('loft_dev_admin_stuff', "hidden", {"expires": expiry});
+        }
       }
 
       return false;

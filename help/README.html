@@ -96,77 +96,14 @@ ld_gzip='/usr/bin/gzip'
 <pre><code>$conf['loft_dev_drupal_deploy_path'] = realpath(DRUPAL_ROOT . '/../drupal_deploy/user/deploy_2.0');
 </code></pre>
 
-<h2>Sandbox (on <code>?sb</code> or off <code>?sb=0</code>)</h2>
-
-<p>Sandbox mode is activated by appending to the query string.  What you append, depends upon what you've provided in the hook callback.  When you active this mode, the file that is provided in the hook will be called after a full bootstrap; use it to test code without having to change paths.</p>
-
 <h2>Theme Playground Templates (on <code>?pg</code> or off <code>?pg=0</code>)</h2>
 
 <p>For rapid development, a feature exists called the theme playground where you can swap out flat file versions of your tpl files.  This is good when your content is not ready, or you just want to try out a different version of a tpl file.</p>
 
 <ol>
-<li><p>In your active theme, create tpl variations following this pattern <code>{theme}--loft-dev-playground.tpl.php</code>, e.g., <code>html--loft-dev-playground.tpl.php</code>.</p></li>
-<li><p>Activate these templates by either visiting the playground url <code>/loft-dev/theme/playground</code>or by appending <code>?pg</code> to the query string at any path.  When activated, these template files will be used instead of the normal ones.</p></li>
-</ol>
-
-<h2>Hardcoded data/variables</h2>
-
-<p>Normally template variables are provided by the database and other functions.  You can hardcode variable values for your templates using files in a folder called <code>loft_dev_playground</code>.</p>
-
-<ol>
-<li>In your active theme, create a folder called loft_dev_playground.</li>
-<li><p>In this folder place files that contain values, e.g. <code>page.content.php</code>.  The filename is important as it maps to a php array like this:</p>
-
-<p>page.content.php -> $page['content']
-page.foo.bar.baz.php -> $page['foo']['bar']['baz']</p></li>
-<li><p>The value of the variable is whatever is printed by that file, e.g.</p>
-
-<?php
-/**
- * @file
- * Provides a hardcoded variable for $page['content']
- *
- * This file is named page.content.php
- */
-?>
-
-<p>This is the value of the variable</p></li>
-<li><p>Or it could also be something like this:</p>
-
-<p>&lt;?php
-/**</p>
-
-<ul>
-<li>@file</li>
-<li>Provides a hardcoded variable for $page['content']</li>
-<li></li>
-<li>This file is named page.content.php
-*/
-$build['item_list'] = array(
-'#theme' => 'item_list',
-'#items' => array('do', 're', 'mi'),
-'#type' => 'ol',
-);
-print render($build);</li>
-</ul></li>
-<li><p>Append <code>?ldp_data</code> to any url to load content from the theme directory <code>loft_dev_playground</code>.  Alternately, you may set a system var and content will be pulled always, so long as the file contains something; set this var:</p>
-
-<p>$conf['loft_dev_playground_load_data'] = TRUE;</p></li>
-</ol>
-
-<ul>
-<li>You can also disable by adding <code>ldp_data=0</code> to the url.</li>
-<li>See <code>hook_loft_dev_playground_info</code>.</li>
-</ul>
-
-<ol>
-<li><p>You can ignore certain files without having to delete them by using a file <code>loft_dev_playground/config.json</code>, e.g.:</p>
-
-<p>{
-    "ignore": [
-        "page.content.php"
-    ]
-}</p></li>
+<li>In your active theme, create tpl variations following this pattern <code>{theme}--loft-dev-playground.tpl.php</code>, e.g., <code>html--loft-dev-playground.tpl.php</code>.</li>
+<li>Clear cache each time you add or rename a tpl file.</li>
+<li>Activate these templates by either visiting the playground url <code>/loft-dev/theme/playground</code>or by appending <code>?pg</code> to the query string at any path.  When activated, these template files will be used instead of the normal ones.</li>
 </ol>
 
 <h2>Contact</h2>

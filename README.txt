@@ -91,14 +91,6 @@ Integration with drupal_deploy
 $conf['loft_dev_drupal_deploy_path'] = realpath(DRUPAL_ROOT . '/../drupal_deploy
 /user/deploy_2.0');
 
-Sandbox (on ?sb or off ?sb=0)
-
-   Sandbox mode is activated by appending to the query string. What you
-   append, depends upon what you've provided in the hook callback. When
-   you active this mode, the file that is provided in the hook will be
-   called after a full bootstrap; use it to test code without having to
-   change paths.
-
 Theme Playground Templates (on ?pg or off ?pg=0)
 
    For rapid development, a feature exists called the theme playground
@@ -108,44 +100,11 @@ Theme Playground Templates (on ?pg or off ?pg=0)
     1. In your active theme, create tpl variations following this pattern
        {theme}--loft-dev-playground.tpl.php, e.g.,
        html--loft-dev-playground.tpl.php.
-    2. Activate these templates by either visiting the playground url
+    2. Clear cache each time you add or rename a tpl file.
+    3. Activate these templates by either visiting the playground url
        /loft-dev/theme/playgroundor by appending ?pg to the query string
        at any path. When activated, these template files will be used
        instead of the normal ones.
-
-Hardcoded data/variables
-
-   Normally template variables are provided by the database and other
-   functions. You can hardcode variable values for your templates using
-   files in a folder called loft_dev_playground.
-    1. In your active theme, create a folder called loft_dev_playground.
-    2. In this folder place files that contain values, e.g.
-       page.content.php. The filename is important as it maps to a php
-       array like this:
-       page.content.php -> $page['content'] page.foo.bar.baz.php ->
-       $page['foo']['bar']['baz']
-    3. The value of the variable is whatever is printed by that file, e.g.
-       This is the value of the variable
-    4. Or it could also be something like this:
-       <?php /**
-          + @file
-          + Provides a hardcoded variable for $page['content']
-          +
-          + This file is named page.content.php */ $build['item_list'] =
-            array( '#theme' => 'item_list', '#items' => array('do', 're',
-            'mi'), '#type' => 'ol', ); print render($build);
-    5. Append ?ldp_data to any url to load content from the theme
-       directory loft_dev_playground. Alternately, you may set a system
-       var and content will be pulled always, so long as the file contains
-       something; set this var:
-       $conf['loft_dev_playground_load_data'] = TRUE;
-
-     * You can also disable by adding ldp_data=0 to the url.
-     * See hook_loft_dev_playground_info.
-
-    1. You can ignore certain files without having to delete them by using
-       a file loft_dev_playground/config.json, e.g.:
-       { "ignore": [ "page.content.php" ] }
 
 Contact
 
