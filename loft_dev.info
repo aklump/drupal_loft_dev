@@ -1,14 +1,10 @@
 name = Loft Dev Tools
 description = Used by ITLS during development of a website.
 homepage = https://github.com/aklump/drupal_loft_dev
-package = In the Loft Studios
-core = 7.x
-version = "7.x-2.2-rc24"
-
 package = Development
+core = 7.x
+version = 7.x-2.2-rc25
 dependencies[] = simpletest
-;dependencies[] = devel
-;dependencies[] = devel_node_access
 dependencies[] = reroute_email
 dependencies[] = link_css
 dependencies[] = schema
@@ -17,3 +13,6 @@ dependencies[] = coder_review
 dependencies[] = xml_field
 dependencies[] = loft_testing
 dependencies[] = data_api
+
+;dependencies[] = devel
+;dependencies[] = devel_node_access
