@@ -10,6 +10,7 @@ dependencies[] = simpletest
 ;dependencies[] = devel
 ;dependencies[] = devel_node_access
 dependencies[] = reroute_email
+dependencies[] = link_css
 dependencies[] = schema
 dependencies[] = coder
 dependencies[] = coder_review

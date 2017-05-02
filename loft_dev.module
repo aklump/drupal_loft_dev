@@ -3,12 +3,23 @@
  * @file
  * Base module file for loft_dev
  */
+use Drupal\loft_dev\ButtonCatalog;
+
 /**
  * The default interval for ld export
  *
  * 0 = disabled
  */
 define('LOFT_DEV_LOFT_DEPLOY_EXPORT_PERIOD_MIN', 5);
+
+/**
+ * Implements hook_boot().
+ */
+function loft_dev_boot()
+{
+    // You must load the composer autoload in this fashion.
+    include_once dirname(__FILE__) . '/vendor/autoload.php';
+}
 
 /**
  * Tests for a GET var
@@ -241,7 +252,7 @@ function loft_dev_menu()
         'file'            => loft_dev_include('pages', 2),
     );
     $items['admin/loft-dev/theme/admin'] = array(
-        'title'           => 'Admin Theme Tester',
+        'title'           => 'Admin theme test page',
         'page callback'   => 'loft_dev_theme_test_page',
         'page arguments'  => array(3),
         'access callback' => '_loft_dev_access',
@@ -249,21 +260,21 @@ function loft_dev_menu()
         'file'            => loft_dev_include('pages', 2),
     );
     $items['admin/loft-dev/theme/403'] = array(
-        'title'           => '403 Theme Tester',
+        'title'           => '403 page',
         'page callback'   => 'drupal_goto',
         'page arguments'  => array('loft-dev/theme/403'),
         'access callback' => '_loft_dev_access',
         'type'            => MENU_LOCAL_TASK,
     );
     $items['admin/loft-dev/theme/404'] = array(
-        'title'           => '404 Theme Tester',
+        'title'           => '404 page',
         'page callback'   => 'drupal_goto',
         'page arguments'  => array('loft-dev/theme/404'),
         'access callback' => '_loft_dev_access',
         'type'            => MENU_LOCAL_TASK,
     );
     $items['admin/loft-dev/theme/offline'] = array(
-        'title'           => 'Offline Theme Tester',
+        'title'           => 'Maintenance page',
         'page callback'   => 'drupal_goto',
         'page arguments'  => array('loft-dev/theme/offline'),
         'access callback' => '_loft_dev_access',
@@ -271,7 +282,7 @@ function loft_dev_menu()
     );
 
     $items['loft-dev/theme'] = array(
-        'title'           => 'Default Theme Tester',
+        'title'           => 'Default theme test page',
         'page callback'   => 'loft_dev_theme_test_page',
         'access callback' => '_loft_dev_access',
         'type'            => MENU_CALLBACK,
@@ -299,13 +310,13 @@ function loft_dev_menu()
         'type'            => MENU_LOCAL_ACTION,
     );
     $items['loft-dev/theme/403'] = array(
-        'title'           => '403 Page Tester',
+        'title'           => '403 page',
         'page callback'   => 'drupal_access_denied',
         'access callback' => '_loft_dev_access',
         'type'            => MENU_CALLBACK,
     );
     $items['loft-dev/theme/404'] = array(
-        'title'           => '404 Page Tester',
+        'title'           => '404 page',
         'page callback'   => 'drupal_not_found_page',
         'access callback' => '_loft_dev_access',
         'type'            => MENU_CALLBACK,
@@ -325,6 +336,21 @@ function loft_dev_menu()
     );
     $items['loft-dev/theme/teasers'] = array(
         'page callback'   => 'loft_dev_teasers_page',
+        'access callback' => '_loft_dev_access',
+        'type'            => MENU_CALLBACK,
+        'file'            => loft_dev_include('pages', 2),
+    );
+
+    $url = 'loft-dev/theme/button-catalog';
+    $items['admin/' . $url] = array(
+        'title'           => 'Button catalog',
+        'page callback'   => 'drupal_goto',
+        'page arguments'  => [$url],
+        'access callback' => '_loft_dev_access',
+        'type'            => MENU_LOCAL_TASK,
+    );
+    $items[$url] = array(
+        'page callback'   => 'loft_dev_button_catalog_page',
         'access callback' => '_loft_dev_access',
         'type'            => MENU_CALLBACK,
         'file'            => loft_dev_include('pages', 2),
@@ -1191,6 +1217,9 @@ function loft_dev_loft_dev_admin_stuff()
             ".block-masquerade",
             ".loft-deploy",
             ".loft-dev-closure",
+            ".menu.devel",
+            "#loft-dev-update-rewind-form",
+            ".block-loft-dev",
             "#admin-menu",
             "#toolbar",
             ".dev-query",
@@ -1969,4 +1998,57 @@ function loft_dev_get_path_title(&$path)
     $item = menu_get_item($path);
 
     return isset($item['title']) ? $item['title'] : $path;
+}
+
+/**
+ * Form builder for the loft_dev_button_catalog_form form.
+ *
+ * Populate the button catalog settings.
+ *
+ * @param array $form
+ * @param array &$form_state
+ *
+ * @see     loft_dev_button_catalog_form_validate()
+ * @see     loft_dev_button_catalog_form_submit()
+ * @ingroup forms
+ */
+function loft_dev_button_catalog_form($form, &$form_state, ButtonCatalog $catalog)
+{
+
+    $form['advanced'] = array(
+        '#type'        => 'container',
+        '#title'       => t('Advanced'),
+        '#collapsible' => true,
+        '#collapsed'   => true,
+    );
+    $form['advanced']['title'] = array(
+        '#type'          => 'textfield',
+        '#title'         => t('Title'),
+        '#default_value' => $catalog->getTitle(),
+        '#required' => TRUE,
+    );
+    $form['advanced']['class'] = array(
+        '#type'          => 'textfield',
+        '#title'         => t('CSS class .button'),
+        '#default_value' => '',
+        '#required' => TRUE,
+    );
+    $form['advanced']['state'] = array(
+        '#type'          => 'select',
+        '#title'         => t('State'),
+        '#default_value' => '',
+        '#options'       => [null => ''] + drupal_map_assoc($catalog->getStates()),
+    );
+    $form['advanced']['layout'] = array(
+        '#type'          => 'select',
+        '#title'         => t('Layout'),
+        '#default_value' => '',
+        '#options'       => [null => ''] + drupal_map_assoc($catalog->getLayouts()),
+    );
+//    $form['advanced']['actions']['update'] = array(
+//        '#type'  => 'submit',
+//        '#value' => t('Update'),
+//    );
+
+    return $form;
 }

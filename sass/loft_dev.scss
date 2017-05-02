@@ -1,4 +1,4 @@
-$green: #66FF66;
+$green: #6f6;
 
 body.page-loft-dev-theme-playground {
   #admin-menu {
@@ -6,9 +6,8 @@ body.page-loft-dev-theme-playground {
   }
 }
 
-
 .block-loft-dev {
-  
+
   // Typography
   font-size: 14px !important;
   h2, h3, legend {
@@ -21,9 +20,7 @@ body.page-loft-dev-theme-playground {
     margin-top: 0;
   }
 
-
-  
-  background-color: #000000;
+  background-color: #000;
   margin-top: 100px;
   position: relative;
   text-align: left;
@@ -59,17 +56,21 @@ body.page-loft-dev-theme-playground {
   table {
     width: 100%;
   }
-  a {
-    color: #fff;
-    text-decoration: none;
+  a,
+  a:link,
+  a:visited,
+  a:hover,
+  a:active {
+    color: $green;
+    text-decoration: underline;
     font-weight: normal;
   }
-  a.active {
-    color: $green;
-  }
   a:hover {
-    color: #fff;
-    text-decoration: underline;
+    color: $white;
+  }
+
+  .links  li {
+    list-style: none;
   }
 }
 
@@ -81,21 +82,27 @@ body.page-loft-dev-theme-playground {
 span.alt {
   color: red;
 }
+
 span.tri {
   color: green;
 }
+
 span.tetra {
   color: blue;
 }
+
 span.alpha {
   color: orange;
 }
+
 span.beta {
   color: purple;
 }
+
 span.gamma {
   color: pink;
 }
+
 span.delta {
   color: grey;
 }
@@ -104,6 +111,7 @@ span.delta {
 #loft-dev-node-access-form td {
   text-align: center;
 }
+
 #loft-dev-node-access-form {
   margin: 20px 0;
 }
@@ -133,5 +141,60 @@ li .element-details {
   }
   a:hover {
     text-decoration: underline;
+  }
+}
+
+.button-catalog {
+  padding: 20px 0;
+  &__components {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+  }
+  &__attributes {
+    margin-bottom: 10px;
+    opacity: .3;
+    &:hover {
+      opacity: 1;
+    }
+  }
+  &--single {
+    .form-item-state {
+      display: none;
+    }
+  }
+  &--single &__components {
+    display: block;
+    .button {
+      display: block;
+    }
+    .form-item-state {
+      display: none;
+    }
+  }
+  &__form {
+    .form-item label {
+      display: none;
+    }
+    .form-wrapper {
+      display: flex;
+      justify-content: space-between;
+    }
+    .form-item {
+      margin: 0 10px 0 0;
+    }
+    .form-type-textfield {
+      width: 50%;
+    }
+    .form-text {
+      width: 100%;
+    }
+    .form-submit {
+      display: none;
+    }
+  }
+
+  .button {
+    margin-bottom: 20px;
   }
 }

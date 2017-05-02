@@ -3,11 +3,11 @@ body.page-loft-dev-theme-playground #admin-menu {
 
 .block-loft-dev {
   font-size: 14px !important;
-  background-color: #000000;
+  background-color: #000;
   margin-top: 100px;
   position: relative;
   text-align: left;
-  color: #66FF66;
+  color: #6f6;
   font-family: "Panic Sans", monospace !important; }
   .block-loft-dev h2, .block-loft-dev h3, .block-loft-dev legend {
     font-size: 18px !important; }
@@ -37,14 +37,15 @@ body.page-loft-dev-theme-playground #admin-menu {
     color: #000; }
   .block-loft-dev table {
     width: 100%; }
-  .block-loft-dev a {
-    color: #fff;
+  .block-loft-dev a,
+  .block-loft-dev a:link,
+  .block-loft-dev a:visited,
+  .block-loft-dev a:hover,
+  .block-loft-dev a:active {
+    color: #6f6;
     text-decoration: none;
     font-weight: normal; }
-  .block-loft-dev a.active {
-    color: #66FF66; }
   .block-loft-dev a:hover {
-    color: #fff;
     text-decoration: underline; }
 
 #loft-dev-update-rewind-form .form-item,
@@ -101,3 +102,38 @@ li .element-details {
     font-family: Arial, sans-serif; }
   #page-review-checklist-form a:hover {
     text-decoration: underline; }
+
+.button-catalog {
+  padding: 20px 0; }
+  .button-catalog__components {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between; }
+  .button-catalog__attributes {
+    margin-bottom: 10px;
+    opacity: .3; }
+    .button-catalog__attributes:hover {
+      opacity: 1; }
+  .button-catalog--single .form-item-state {
+    display: none; }
+  .button-catalog--single .button-catalog__components {
+    display: block; }
+    .button-catalog--single .button-catalog__components .button {
+      display: block; }
+    .button-catalog--single .button-catalog__components .form-item-state {
+      display: none; }
+  .button-catalog__form .form-item label {
+    display: none; }
+  .button-catalog__form .form-wrapper {
+    display: flex;
+    justify-content: space-between; }
+  .button-catalog__form .form-item {
+    margin: 0 10px 0 0; }
+  .button-catalog__form .form-type-textfield {
+    width: 50%; }
+  .button-catalog__form .form-text {
+    width: 100%; }
+  .button-catalog__form .form-submit {
+    display: none; }
+  .button-catalog .button {
+    margin-bottom: 20px; }
