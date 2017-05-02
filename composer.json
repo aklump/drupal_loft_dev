@@ -1,5 +1,15 @@
 {
-    "require": {
-        "symfony/yaml": "^2.7"
+    "name": "aklump/loft_dev",
+    "authors": [
+        {
+            "name": "Aaron Klump",
+            "email": "sourcecode@intheloftstudios.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Drupal\\loft_dev\\": "src/Drupal/loft_dev/",
+            "AKlump\\LoftLib\\": "lib/loft_php_lib/dist/src/AKlump/LoftLib/"
+        }
     }
 }
