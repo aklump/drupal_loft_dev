@@ -131,6 +131,9 @@ function HOOK_loft_dev_button_catalog()
     return [
         'sass_dir' => drupal_get_path('theme', 'gop5_theme') . '/sass/drupal/',
         'sass_file' => '_button--catalog.scss',
+
+        // Themes are one or many per button.
+        // e.g. .button.theme--*
         'themes'  => [
             'add',
             'admin',
@@ -163,7 +166,7 @@ function HOOK_loft_dev_button_catalog()
             'pill-blue',
             'pinterest',
             'plus',
-            'primary-blue',
+            'primary',
             'primary-red',
             'primary-white',
             'red',

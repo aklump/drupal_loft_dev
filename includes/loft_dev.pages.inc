@@ -91,8 +91,8 @@ function loft_dev_playground_page()
     $_loft_dev_playground = true;
     $args = array(
         '%theme' => $theme,
-        '%path'  => path_to_theme(),
-        '!list'  => array(
+        '%path' => path_to_theme(),
+        '!list' => array(
             '#theme' => 'item_list',
             '#items' => array(
                 '<em>html--loft-dev-playground.tpl.php</em>',
@@ -109,7 +109,7 @@ function loft_dev_playground_page()
 
     $build['content'] = array(
         '#theme' => 'item_list',
-        '#type'  => 'ol',
+        '#type' => 'ol',
         '#items' => array(
             t('Make sure your theme implements <em>page.tpl.php</em>.'),
             t('Create this file <em>%path/tpl/page--loft-dev-playground.tpl.php</em> and then <strong>flush caches</strong>.  Treat this like a vanilla html page and just add html markup to see how the theme affects it.', $args),
@@ -120,9 +120,9 @@ function loft_dev_playground_page()
 
     $css_js = array();
     $css_js['#attached']['css'][] = array(
-        'type'   => 'file',
-        'data'   => $args['%path'] . '/css/loft_dev_playground.css',
-        'group'  => CSS_THEME,
+        'type' => 'file',
+        'data' => $args['%path'] . '/css/loft_dev_playground.css',
+        'group' => CSS_THEME,
         'weight' => 1000,
     );
     // This does NOT work for library_load()
@@ -132,9 +132,9 @@ function loft_dev_playground_page()
         'data' => drupal_get_path('module', 'loft_dev') . '/loft_dev.js',
     );
     $css_js['#attached']['js'][] = array(
-        'type'  => 'file',
+        'type' => 'file',
         'group' => JS_THEME,
-        'data'  => drupal_get_path('module', 'loft_dev') . '/js/playground.js',
+        'data' => drupal_get_path('module', 'loft_dev') . '/js/playground.js',
     );
     drupal_render($css_js);
 
@@ -193,14 +193,14 @@ function loft_dev_theme_test_page()
     $output .= theme('item_list', array(
             'items' => _loft_dev_dummy_array(5, null, 20),
             'title' => '&lt;ol> ' . _loft_dev_dummy_string(4),
-            'type'  => 'ol',
+            'type' => 'ol',
         )) . "\n";
 
     //unordered list
     $output .= theme('item_list', array(
             'items' => _loft_dev_dummy_array(5, null, 20),
             'title' => '&lt;ul> ' . _loft_dev_dummy_string(4),
-            'type'  => 'ul',
+            'type' => 'ul',
         )) . "\n";
 
     //p tags
@@ -224,7 +224,7 @@ function loft_dev_theme_test_page()
     }
     $output .= theme('table', array(
             'header' => _loft_dev_dummy_array(10),
-            'rows'   => $rows,
+            'rows' => $rows,
         )) . "\n";
 
 
@@ -380,72 +380,72 @@ function test_form_form($form_state)
     $form['#attributes']['onsubmit'] = 'return false;';
 
     $form['fieldset'] = array(
-        '#type'        => 'fieldset',
-        '#title'       => _loft_dev_dummy_string(3),
+        '#type' => 'fieldset',
+        '#title' => _loft_dev_dummy_string(3),
         '#collapsible' => true,
-        '#collapsed'   => false,
+        '#collapsed' => false,
     );
 
     $form['fieldset']['text'] = array(
-        '#type'              => 'textfield',
-        '#description'       => _loft_dev_dummy_string(10),
-        '#title'             => _loft_dev_dummy_string(3),
-        '#required'          => true,
-        '#size'              => 60,
+        '#type' => 'textfield',
+        '#description' => _loft_dev_dummy_string(10),
+        '#title' => _loft_dev_dummy_string(3),
+        '#required' => true,
+        '#size' => 60,
         '#autocomplete_path' => 'user/autocomplete',
     );
 
     $form['fieldset']['text2'] = array(
-        '#type'        => 'textfield',
+        '#type' => 'textfield',
         '#description' => _loft_dev_dummy_string(10),
-        '#title'       => _loft_dev_dummy_string(3),
-        '#required'    => true,
-        '#size'        => 60,
+        '#title' => _loft_dev_dummy_string(3),
+        '#required' => true,
+        '#size' => 60,
     );
     $form['fieldset']['checkboxes'] = array(
-        '#type'        => 'checkboxes',
-        '#title'       => _loft_dev_dummy_string(4),
-        '#options'     => _loft_dev_dummy_array(3),
+        '#type' => 'checkboxes',
+        '#title' => _loft_dev_dummy_string(4),
+        '#options' => _loft_dev_dummy_array(3),
         '#description' => _loft_dev_dummy_string(8),
     );
 
     $form['fieldset']['date'] = array(
-        '#type'        => 'date',
-        '#title'       => _loft_dev_dummy_string(3),
+        '#type' => 'date',
+        '#title' => _loft_dev_dummy_string(3),
         '#description' => _loft_dev_dummy_string(8),
-        '#required'    => true,
+        '#required' => true,
     );
 
     $form['fieldset']['comment_preview'] = array(
-        '#type'          => 'radios',
-        '#title'         => _loft_dev_dummy_string(3),
+        '#type' => 'radios',
+        '#title' => _loft_dev_dummy_string(3),
         '#default_value' => 0,
-        '#options'       => _loft_dev_dummy_array(3),
-        '#description'   => _loft_dev_dummy_string(8),
+        '#options' => _loft_dev_dummy_array(3),
+        '#description' => _loft_dev_dummy_string(8),
     );
 
     $form['fieldset']['body_req'] = array(
-        '#required'    => true,
-        '#type'        => 'textarea',
-        '#title'       => _loft_dev_dummy_string(3),
+        '#required' => true,
+        '#type' => 'textarea',
+        '#title' => _loft_dev_dummy_string(3),
         '#description' => _loft_dev_dummy_string(8),
     );
 
     $form['fieldset']['body'] = array(
-        '#type'        => 'textarea',
-        '#title'       => _loft_dev_dummy_string(3),
+        '#type' => 'textarea',
+        '#title' => _loft_dev_dummy_string(3),
         '#description' => _loft_dev_dummy_string(8),
     );
 
     $form['fieldset']['upload'] = array(
-        '#type'        => 'file',
-        '#title'       => _loft_dev_dummy_string(4),
+        '#type' => 'file',
+        '#title' => _loft_dev_dummy_string(4),
         '#description' => _loft_dev_dummy_string(8),
     );
 
     $form['fieldset']['submit'] = array(
-        '#type'   => 'submit',
-        '#value'  => _loft_dev_dummy_string(3),
+        '#type' => 'submit',
+        '#value' => _loft_dev_dummy_string(3),
         '#weight' => 40,
     );
 
@@ -534,8 +534,8 @@ function loft_dev_list_libraries_page()
     ksort($rows);
     $build = array();
     $build[] = array(
-        '#theme'  => 'table',
-        '#rows'   => $rows,
+        '#theme' => 'table',
+        '#rows' => $rows,
         '#header' => array(t('Library'), t('Machine'), t('Module')),
     );
 
@@ -578,15 +578,15 @@ function loft_dev_list_fapi_elements_page()
 
     // Create a textbox for jquery to user for filtering
     $build['filter'] = array(
-        '#attributes'    => array(
+        '#attributes' => array(
             'id' => 'loft-dev-elements-filter',
         ),
-        '#type'          => 'textfield',
-        '#description'   => t('Use this box to filter the list below'),
-        '#title'         => t('Filter'),
+        '#type' => 'textfield',
+        '#description' => t('Use this box to filter the list below'),
+        '#title' => t('Filter'),
         '#default_value' => '',
-        '#attached'      => array(
-            'js'      => array(
+        '#attached' => array(
+            'js' => array(
                 drupal_get_path('module', 'loft_dev') . '/loft_dev.js',
             ),
             'library' => array(
@@ -599,8 +599,8 @@ function loft_dev_list_fapi_elements_page()
     $build['#attached']['library'][] = array('system', 'cookie');
 
     $build[] = array(
-        '#theme'      => 'item_list',
-        '#items'      => $items,
+        '#theme' => 'item_list',
+        '#items' => $items,
         '#attributes' => array(
             'id' => 'loft-dev-elements-list',
         ),
@@ -666,7 +666,7 @@ function loft_dev_zebra_striping_page($max = 100)
     $build[] = array(
         '#theme' => 'item_list',
         '#items' => $items,
-        '#type'  => 'ol',
+        '#type' => 'ol',
     );
 
     return $build;
@@ -922,15 +922,15 @@ function loft_dev_list_functions_page($op)
 
     // Create a textbox for jquery to user for filtering
     $form['filter'] = array(
-        '#attributes'    => array(
+        '#attributes' => array(
             'id' => 'loft-dev-functions-filter',
         ),
-        '#type'          => 'textfield',
-        '#description'   => t('Use this box to filter the list below'),
-        '#title'         => t('Filter'),
+        '#type' => 'textfield',
+        '#description' => t('Use this box to filter the list below'),
+        '#title' => t('Filter'),
         '#default_value' => '',
-        '#attached'      => array(
-            'js'      => array(
+        '#attached' => array(
+            'js' => array(
                 drupal_get_path('module', 'loft_dev') . '/loft_dev.js',
             ),
             'library' => array(
@@ -1001,8 +1001,8 @@ function loft_dev_rem_page($base = 16)
         $sizes[] = array($rem, $i);
     }
     $build[] = array(
-        '#theme'  => 'table',
-        '#rows'   => $sizes,
+        '#theme' => 'table',
+        '#rows' => $sizes,
         '#header' => array('rem', 'px'),
     );
     drupal_add_http_header('Content-Type', 'text/html; charset=utf-8');
@@ -1038,32 +1038,32 @@ function loft_dev_parse_time_form($form, &$form_state)
     }
 
     $form['input'] = array(
-        '#type'          => 'textarea',
-        '#description'   => t('Paste a string containing english time here'),
-        '#title'         => t('Input String'),
+        '#type' => 'textarea',
+        '#description' => t('Paste a string containing english time here'),
+        '#title' => t('Input String'),
         '#default_value' => '',
-        '#required'      => true,
-        '#rows'          => 20,
+        '#required' => true,
+        '#rows' => 20,
     );
 
     $form['time_out'] = array(
-        '#type'          => 'select',
-        '#title'         => t('Time Output Format'),
+        '#type' => 'select',
+        '#title' => t('Time Output Format'),
         '#default_value' => 'unix',
-        '#options'       => array(
+        '#options' => array(
             'unix' => 'Unix Timestamp',
         ),
     );
 
     $form['append_to_line'] = array(
-        '#type'          => 'checkbox',
-        '#title'         => t('Append to the end of the line'),
+        '#type' => 'checkbox',
+        '#title' => t('Append to the end of the line'),
         '#default_value' => variable_get('loft_dev_parse_time:append_to_line', true),
     );
 
     //http://api.drupal.org/api/drupal/includes%21common.inc/function/drupal_process_states/7
     $form['append_options'] = array(
-        '#type'   => 'container',
+        '#type' => 'container',
         '#states' => array(
             'visible' => array(
                 ':input[name=append_to_line]' => array('value' => 1),
@@ -1073,15 +1073,15 @@ function loft_dev_parse_time_form($form, &$form_state)
 
     //@todo fix; not hiding
     $form['append_options']['append_prefix'] = array(
-        '#type'          => 'textfield',
-        '#description'   => t('When appending the output time, place this string between the line and the output.'),
-        '#title'         => t('Append Prefix'),
+        '#type' => 'textfield',
+        '#description' => t('When appending the output time, place this string between the line and the output.'),
+        '#title' => t('Append Prefix'),
         '#default_value' => variable_get('loft_dev_parse_time:append_prefix', '|'),
-        '#size'          => 10,
+        '#size' => 10,
     );
 
     $form['submit'] = array(
-        '#type'  => 'submit',
+        '#type' => 'submit',
         '#value' => t('Parse Now'),
     );
 
@@ -1139,8 +1139,8 @@ function loft_dev_migration_page()
     $default = variable_get('loft_dev_migration_urls', array());
     if ($default) {
         $build['current_status'] = array(
-            '#theme'   => 'loft_dev_migration',
-            '#urls'    => $default,
+            '#theme' => 'loft_dev_migration',
+            '#urls' => $default,
             '#results' => variable_get('loft_dev_migration_urls_results', array()),
         );
     }
@@ -1165,24 +1165,24 @@ function loft_dev_migration_page()
 function loft_dev_migration_urls_form($form, &$form_state, $default)
 {
     $form['loft_dev_migration_canonical'] = array(
-        '#type'          => 'textfield',
-        '#description'   => t('Enter the base url of the current production site.'),
-        '#title'         => t('Canonical URL'),
+        '#type' => 'textfield',
+        '#description' => t('Enter the base url of the current production site.'),
+        '#title' => t('Canonical URL'),
         '#default_value' => variable_get('loft_dev_migration_canonical', ''),
-        '#required'      => true,
+        '#required' => true,
     );
 
     $form['loft_dev_migration_urls'] = array(
-        '#type'          => 'textarea',
-        '#title'         => t('Expected URLs from previous website'),
-        '#description'   => t('Enter all relative urls from the old website that you wish to assert exist in this, one per line.'),
-        '#rows'          => 20,
-        '#resizable'     => true,
+        '#type' => 'textarea',
+        '#title' => t('Expected URLs from previous website'),
+        '#description' => t('Enter all relative urls from the old website that you wish to assert exist in this, one per line.'),
+        '#rows' => 20,
+        '#resizable' => true,
         '#default_value' => implode(PHP_EOL, $default),
     );
 
     $form['submit'] = array(
-        '#type'  => 'submit',
+        '#type' => 'submit',
         '#value' => t('Save/Check Status'),
     );
 
@@ -1229,10 +1229,10 @@ function loft_dev_css_aggregation_form($form, &$form_state)
     $default_value = variable_get('loft_dev_css_files_omit', array());
     $options = variable_get('loft_dev_css_files_options', array());
     $form['loft_dev_css_files_omit'] = array(
-        '#type'          => 'checkboxes',
-        '#title'         => t('Omit these files from aggregation'),
+        '#type' => 'checkboxes',
+        '#title' => t('Omit these files from aggregation'),
         '#default_value' => $default_value,
-        '#options'       => $options,
+        '#options' => $options,
     );
 
     return system_settings_form($form);
@@ -1266,10 +1266,10 @@ function loft_dev_css_aggregation_form_validate($form, &$form_state)
 function page_review_checklist_form($form, &$form_state)
 {
     $form['fieldset'] = array(
-        '#type'        => 'fieldset',
-        '#title'       => t('Design files and notes'),
+        '#type' => 'fieldset',
+        '#title' => t('Design files and notes'),
         '#collapsible' => false,
-        '#collapsed'   => false,
+        '#collapsed' => false,
     );
 
     if (!($storage = loft_dev_private_storage('page_review'))) {
@@ -1333,7 +1333,7 @@ function page_review_checklist_form($form, &$form_state)
             $status = xml_field($value->status, null, null, 0);
             $weight = xml_field($value, 'weight', null, $status_weights[$status]);
             $pages[] = array(
-                '#value'  => $value,
+                '#value' => $value,
                 '#weight' => $weight,
                 '#status' => $status,
             );
@@ -1430,11 +1430,11 @@ function page_review_checklist_form($form, &$form_state)
             $status = $page['#status'];
             $icons = array();
             $icons[] = array(
-                '#theme'      => 'loft_dev_css_circle',
-                '#tag'        => 'a',
+                '#theme' => 'loft_dev_css_circle',
+                '#tag' => 'a',
                 '#attributes' => array('title' => $statuses[$status]),
-                '#width'      => '25px',
-                '#color'      => isset($colors[$status]) ? $colors[$status] : $colors[0],
+                '#width' => '25px',
+                '#color' => isset($colors[$status]) ? $colors[$status] : $colors[0],
             );
             $icons = drupal_render($icons);
             $status = $statuses[$status];
@@ -1450,7 +1450,7 @@ function page_review_checklist_form($form, &$form_state)
                 '#suffix' => t(implode('', $comps) . implode('', $guides), $args) . '</p>',
                 // '#suffix' => '</p>',
                 '#markup' => l($title, $page_url, array(
-                    'html'  => true,
+                    'html' => true,
                     'query' => $query,
                 )),
             );
@@ -1518,10 +1518,10 @@ function page_review_checklist_form($form, &$form_state)
 
     $format = 'ex_' . (isset($json->export_format) ? $json->export_format : 'markdown');
     $form['fieldset']['export'] = array(
-        '#type'          => 'textarea',
-        '#title'         => t('Export'),
+        '#type' => 'textarea',
+        '#title' => t('Export'),
         '#default_value' => implode(PHP_EOL, ${$format}),
-        '#rows'          => 10,
+        '#rows' => 10,
     );
 
     return $form;
@@ -1564,10 +1564,15 @@ function loft_dev_button_catalog_page($theme = null)
     }
     if (empty($data)) {
 
+        try {
+
         // Calculate the value of $data now...
         $config = module_invoke_all('loft_dev_button_catalog');
         $obj = new \Drupal\loft_dev\ButtonCatalog($config);
         $data = $obj->setTheme($theme)->writeSass()->build();
+        } catch (\Exception $exception) {
+            drupal_set_message($exception->getMessage(), 'error', false);
+        }
         $data = drupal_render($data);
 
         if ($caching) {
