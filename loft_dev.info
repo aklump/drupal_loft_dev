@@ -13,6 +13,7 @@ dependencies[] = coder_review
 dependencies[] = xml_field
 dependencies[] = loft_testing
 dependencies[] = data_api
+dependencies[] = loft_core
 
 
 ;dependencies[] = devel

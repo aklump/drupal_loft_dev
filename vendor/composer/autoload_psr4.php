@@ -6,7 +6,5 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'Symfony\\Component\\Yaml\\' => array($vendorDir . '/symfony/yaml'),
     'Drupal\\loft_dev\\' => array($baseDir . '/src/Drupal/loft_dev'),
-    'AKlump\\LoftLib\\' => array($baseDir . '/lib/loft_php_lib/dist/src/AKlump/LoftLib'),
 );

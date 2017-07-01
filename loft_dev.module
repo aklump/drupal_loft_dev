@@ -345,7 +345,7 @@ function loft_dev_menu()
     $items['admin/' . $url] = array(
         'title'           => 'Button catalog',
         'page callback'   => 'drupal_goto',
-        'page arguments'  => [$url],
+        'page arguments'  => array($url),
         'access callback' => '_loft_dev_access',
         'type'            => MENU_LOCAL_TASK,
     );
@@ -2037,13 +2037,13 @@ function loft_dev_button_catalog_form($form, &$form_state, ButtonCatalog $catalo
         '#type'          => 'select',
         '#title'         => t('State'),
         '#default_value' => '',
-        '#options'       => [null => ''] + drupal_map_assoc($catalog->getStates()),
+        '#options'       => array(null => '') + drupal_map_assoc($catalog->getStates()),
     );
     $form['advanced']['layout'] = array(
         '#type'          => 'select',
         '#title'         => t('Layout'),
         '#default_value' => '',
-        '#options'       => [null => ''] + drupal_map_assoc($catalog->getLayouts()),
+        '#options'       => array(null => '') + drupal_map_assoc($catalog->getLayouts()),
     );
 //    $form['advanced']['actions']['update'] = array(
 //        '#type'  => 'submit',
