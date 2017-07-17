@@ -15,6 +15,7 @@
   Drupal.loftDev.hideAdminStuff = function () {
     // List of classes that are "admin stuff"--to hide.
     $(Drupal.settings.loftDev.adminStuff).addClass('hidden-by-loft-dev').hide();
+    $('html').addClass('loft-dev--admin-is-hidden');
     $("body.toolbar").css("padding-top", 0);
   };
 
