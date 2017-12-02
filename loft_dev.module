@@ -638,6 +638,10 @@ function loft_dev_block_view_alter(&$data, $block) {
   if (($disk = loft_dev_drupal_deploy_get_block($block->module, $block->delta))) {
     $data = $disk;
   }
+  global $_design_guide;
+  if ($_design_guide && $block->module == 'loft_dev') {
+    $data = NULL;
+  }
 }
 
 /**
