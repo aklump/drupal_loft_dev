@@ -132,8 +132,37 @@ function HOOK_loft_dev_button_catalog()
         'sass_dir' => drupal_get_path('theme', 'gop5_theme') . '/sass/drupal/',
         'sass_file' => '_button--catalog.scss',
 
-        // Themes are one or many per button.
-        // e.g. .button.theme--*
+        // A function that generates the build array for each button.
+        'button_callback' => function ($title, $href, $theme, $state, $layout) {
+          return array(
+            '#theme' => 'g5_button',
+            '#title' => $title,
+            '#href' => $href,
+            '#button_type' => 'link',
+            '#attributes' => new Attribute([
+              'class' => [
+                $theme ? 'theme--' . $theme : '',
+                $state ? 'is-' . $state : '',
+                $layout ? 'layout--' . $layout : '',
+              ],
+            ]),
+          );
+        },
+
+        // Modules are special themes which also generate classnames like .button--primary
+        // They should are meant to wrap up several themes to ease reuse.
+        // You must also list your module in the themes array.
+        'modules' => [
+          'primary',
+          'secondary',
+          'tertiary',
+          'token',
+          'primary--facebook',
+          'user-action',
+        ],
+
+        // Themes generate classnames like .button.theme--primary.
+        // Themes are classes that can be applies as many as you want to a single .button.
         'themes'  => [
             'add',
             'admin',
