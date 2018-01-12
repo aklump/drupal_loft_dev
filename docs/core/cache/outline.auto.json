@@ -33,10 +33,12 @@
         },
         {
             "id": "_tasklist",
-            "title": " Tasklist",
+            "title": "Tasklist",
             "file": "_tasklist.md",
             "sort": 5
         }
     ],
-    "settings": []
+    "settings": {
+        "search": "tipuesearch"
+    }
 }

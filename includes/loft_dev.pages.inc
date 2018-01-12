@@ -20,12 +20,12 @@ function loft_dev_loft_deploy_export($filename)
     }
 
     $web_root = DRUPAL_ROOT;
-    $cmd = "cd {$web_root}; {$cmd} export -f {$filename}";
+    $cmd = "cd {$web_root}; {$cmd} export {$filename} -f";
 
     // Check the mtime of the last one
     $old_mtime = 0;
     if (($path = variable_get('loft_dev_loft_deploy_export_path', ''))) {
-        $old_mtime = filemtime($path);
+        $old_mtime = @filemtime($path);
 
         $date = new \DateTime();
         $date
@@ -37,7 +37,7 @@ function loft_dev_loft_deploy_export($filename)
         $archive = dirname($path) . '/loft_dev_auto/';
         file_prepare_directory($archive, FILE_CREATE_DIRECTORY);
         $to = $archive . "/{$prefix}_" . basename($path);
-        file_unmanaged_copy($path, $to);
+        file_exists($path) && file_unmanaged_copy($path, $to);
     }
 
     // Can't get this to work it just hangs on exec

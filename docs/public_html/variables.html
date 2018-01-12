@@ -12,10 +12,15 @@
   <div class="pager">
   <a href="sandbox.html" class="prev sandbox">&laquo;Sandbox (on `?sb` or off `?sb=0`)</a>
   <a href="index.html" class="index">Index</a>
-  <a href="_tasklist.html" class="next _tasklist"> Tasklist&raquo;</a>
+  <a href="_tasklist.html" class="next _tasklist">Tasklist&raquo;</a>
 </div>
 </header>
 
+  <div class="search__wrapper">
+  <form action="search--results.html">
+    <input type="text" class="search-input" name="q" id="tipue_search_input" autocomplete="off" required>
+  </form>
+</div>
 
   <h1>Hardcoded data/variables</h1>
   <div class="breadcrumb"><a href="index.html">Index</a></div>
@@ -90,15 +95,23 @@ print render($build);
   <div class="pager">
   <a href="sandbox.html" class="prev sandbox">&laquo;Sandbox (on `?sb` or off `?sb=0`)</a>
   <a href="index.html" class="index">Index</a>
-  <a href="_tasklist.html" class="next _tasklist"> Tasklist&raquo;</a>
+  <a href="_tasklist.html" class="next _tasklist">Tasklist&raquo;</a>
 </div>
   
   <div id="footer-legaleeze">
-    <p class="legaleeze center">Version: 7.x-2.2-rc33 &bull; Last Updated: Wed, 20 Dec 2017 18:13:18 -0800</p>
+    <p class="legaleeze center">Version: 7.x-2.2-rc33 &bull; Last Updated: Fri, 12 Jan 2018 12:55:26 -0800</p>
   </div>
 </footer>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="search/tipuesearch_content.js"></script>
+  <script src="search/tipuesearch_set.js"></script>
+  <script src="search/tipuesearch.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      $('#tipue_search_input').tipuesearch();
+    });
+  </script>
 <script src="js/core.js"></script>
 </body>
 </html>

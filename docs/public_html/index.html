@@ -10,12 +10,17 @@
 <body class="page--index">
 <header>
   <div class="pager">
-  <a href="_tasklist.html" class="prev _tasklist">&laquo; Tasklist</a>
+  <a href="_tasklist.html" class="prev _tasklist">&laquo;Tasklist</a>
   <a href="index.html" class="index">Index</a>
   <a href="README.html" class="next readme">Drupal Module: Loft Dev&raquo;</a>
 </div>
 </header>
 
+  <div class="search__wrapper">
+  <form action="search--results.html">
+    <input type="text" class="search-input" name="q" id="tipue_search_input" autocomplete="off" required>
+  </form>
+</div>
 
   <h1>Index</h1>
 
@@ -25,7 +30,7 @@
       <li><a href="page_review.html">Page Review</a></li>
       <li><a href="sandbox.html">Sandbox (on `?sb` or off `?sb=0`)</a></li>
       <li><a href="variables.html">Hardcoded data/variables</a></li>
-      <li><a href="_tasklist.html"> Tasklist</a></li>
+      <li><a href="_tasklist.html">Tasklist</a></li>
   </ul>
 </section>
 
@@ -35,17 +40,25 @@
 
 <footer>
   <div class="pager">
-  <a href="_tasklist.html" class="prev _tasklist">&laquo; Tasklist</a>
+  <a href="_tasklist.html" class="prev _tasklist">&laquo;Tasklist</a>
   <a href="index.html" class="index">Index</a>
   <a href="README.html" class="next readme">Drupal Module: Loft Dev&raquo;</a>
 </div>
   
   <div id="footer-legaleeze">
-    <p class="legaleeze center">Version: 7.x-2.2-rc33 &bull; Last Updated: Wed, 20 Dec 2017 18:13:18 -0800</p>
+    <p class="legaleeze center">Version: 7.x-2.2-rc33 &bull; Last Updated: Fri, 12 Jan 2018 12:55:26 -0800</p>
   </div>
 </footer>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="search/tipuesearch_content.js"></script>
+  <script src="search/tipuesearch_set.js"></script>
+  <script src="search/tipuesearch.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      $('#tipue_search_input').tipuesearch();
+    });
+  </script>
 <script src="js/core.js"></script>
 </body>
 </html>

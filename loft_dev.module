@@ -1169,7 +1169,7 @@ function loft_dev_exit() {
   }
 
   // Do an export if needed using loft_deploy shell script.
-  if (0 && _loft_dev_access() &&
+  if (_loft_dev_access() &&
     variable_get('loft_dev_loft_deploy_export_period_mins', LOFT_DEV_LOFT_DEPLOY_EXPORT_PERIOD_MIN)
   ) {
     $now = new \DateTime('now', new \DateTimeZone('America/Los_Angeles'));
