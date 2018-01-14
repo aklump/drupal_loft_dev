@@ -61,29 +61,6 @@ admin/structure/types/manage/video/display/teaser?reset&label=hidden
    rollback to:
 drush vset loft_dev:update_rollback_{module name} {schema version, e.g. 7004}
 
-  Automatic backups using Loft Deploy
-
-   Loft Dev module can automatically call loft_deploy export on regulary
-   intervals of use. This has the effect of automatically backing up the
-   database to the normal output path, for every N minutes of active use.
-   For the most recent backup go there. To see the incremental backups in
-   time, descend into the loft_dev_auto directory.
-
-   This is not based on cron, but rather on elapsed time. If you set this
-   to back up every 15 minutes, it will only do so if you're activaly
-   using the site. It's like poor man's cron, it looks to see if N minutes
-   has elapsed since the last backup, and it does this on a page load.
-   Thus, no use, no page load. The following settings needed to be added
-   to settings.local.php.
-
-   To disable this feature set it to 0.
-$conf['loft_dev_which_ld'] = '/Volumes/Data/Users/aklump/bin/loft_deploy';
-$conf['loft_dev_loft_deploy_export_period_mins'] = 5;
-
-   You may also need to add the following to .loft_deploy/config
-ld_mysqldump='/Applications/MAMP/Library/bin/mysqldump'
-ld_gzip='/usr/bin/gzip'
-
 Integration with drupal_deploy
 
    Add the somthing like the following to your settings file so the

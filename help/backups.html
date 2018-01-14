@@ -1,0 +1,27 @@
+
+<p>Loft Dev module can automatically call <code>loft_deploy export</code> on regulary intervals of use.  This has the effect of automatically backing up the database to the normal output path, for every N minutes of active use.  For the most recent backup go to: <em>{$local_db_dir}/loft_dev_auto.sql.gz</em>. For those before that look inside: <em>{$local_db_dir}/loft_dev_auto/</em>.</p>
+
+<pre><code>.
+├── intheloftstudios_loft-loft_dev_auto.sql.gz
+└── loft_dev_auto
+    └── 2018-01-12_1313_intheloftstudios_loft-loft_dev_auto.sql.gz
+</code></pre>
+
+<p>This is not based on cron, but rather on elapsed time.  If you set this to back up every 15 minutes, it will only do so if you're activaly using the site.  It's like poor man's cron, it looks to see if N minutes has elapsed since the last backup, and it does this on a page load.  Thus, no use, no page load.  The following settings needed to be added to <em>settings.local.php</em>.</p>
+
+<h2>Configuration</h2>
+
+<pre><code>$conf['loft_dev_which_ld'] = '/Users/aklump/bin/loft_deploy';
+$conf['loft_dev_loft_deploy_export_period_mins'] = 5;
+</code></pre>
+
+<p>To disable, set to 0:</p>
+
+<pre><code>$conf['loft_dev_loft_deploy_export_period_mins'] = 0
+</code></pre>
+
+<p>You may also need to add the following to <em>.loft_deploy/config</em></p>
+
+<pre><code>ld_mysqldump='/Applications/MAMP/Library/bin/mysqldump'
+ld_gzip='/usr/bin/gzip'        
+</code></pre>

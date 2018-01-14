@@ -8,34 +8,46 @@
             "sort": 0
         },
         {
+            "id": "backups",
+            "title": "Automatic backups using Loft Deploy",
+            "file": "backups.md",
+            "sort": 1
+        },
+        {
             "id": "checklist",
             "title": "Checklist",
             "file": "checklist.md",
-            "sort": 1
+            "sort": 2
+        },
+        {
+            "id": "image_styles",
+            "title": "Image Styles",
+            "file": "image_styles.md",
+            "sort": 3
         },
         {
             "id": "page_review",
             "title": "Page Review",
             "file": "page_review.md",
-            "sort": 2
+            "sort": 4
         },
         {
             "id": "sandbox",
             "title": "Sandbox (on `?sb` or off `?sb=0`)",
             "file": "sandbox.md",
-            "sort": 3
+            "sort": 5
         },
         {
             "id": "variables",
             "title": "Hardcoded data\/variables",
             "file": "variables.md",
-            "sort": 4
+            "sort": 6
         },
         {
             "id": "_tasklist",
             "title": "Tasklist",
             "file": "_tasklist.md",
-            "sort": 5
+            "sort": 7
         }
     ],
     "settings": {

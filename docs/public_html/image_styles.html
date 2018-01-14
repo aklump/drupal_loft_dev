@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>Image Styles</title>
+  <link href="search/tipuesearch.css" rel="stylesheet">
+  <link href="style.css" rel="stylesheet">
+</head>
+
+<body class="page--image_styles">
+<header>
+  <div class="pager">
+  <a href="checklist.html" class="prev checklist">&laquo;Checklist</a>
+  <a href="index.html" class="index">Index</a>
+  <a href="page_review.html" class="next page_review">Page Review&raquo;</a>
+</div>
+</header>
+
+  <div class="search__wrapper">
+  <form action="search--results.html">
+    <input type="text" class="search-input" name="q" id="tipue_search_input" autocomplete="off" required>
+  </form>
+</div>
+
+  <h1>Image Styles</h1>
+  <div class="breadcrumb"><a href="index.html">Index</a></div>
+
+<section>
+
+<h2>Automatic Image Style Flush During Development</h2>
+
+<p>When developing image styles it can be a pane to flush them, here is a script that you can use to erase all derivatives every <em>period</em> seconds.</p>
+
+<ol>
+<li>Copy  <em>loft_dev/bin/style_flusher.sh</em> to <em>public://files/style_flusher.sh</em></li>
+<li><p>Make sure the file is executable:</p>
+
+<pre><code>$ cd {path to files} &amp; chmod 700 style_flusher.sh
+</code></pre></li>
+<li><p>Start the watcher to delete hero styles...</p>
+
+<pre><code>$ ./style_flusher.sh hero
+</code></pre></li>
+<li><p>Add a second argument to alter the period of deletion to 5 seconds.</p>
+
+<pre><code>$ ./style_flusher.sh hero 5
+</code></pre></li>
+<li><p>Press <em>CTRL-c</em> to stop the watcher.</p></li>
+</ol>
+
+<h3>Gotcha!</h3>
+
+<ol>
+<li>Make sure you have the browser dev tools open with caching turned off to remove the layer of browser image caching.</li>
+</ol>
+</section>
+
+<div class="search__results">
+  <div id="tipue_search_content"></div>
+</div>
+
+<footer>
+  <div class="pager">
+  <a href="checklist.html" class="prev checklist">&laquo;Checklist</a>
+  <a href="index.html" class="index">Index</a>
+  <a href="page_review.html" class="next page_review">Page Review&raquo;</a>
+</div>
+  
+  <div id="footer-legaleeze">
+    <p class="legaleeze center">Version: 7.x-2.2-rc33 &bull; Last Updated: Sun, 14 Jan 2018 08:08:39 -0800</p>
+  </div>
+</footer>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="search/tipuesearch_content.js"></script>
+  <script src="search/tipuesearch_set.js"></script>
+  <script src="search/tipuesearch.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      $('#tipue_search_input').tipuesearch();
+    });
+  </script>
+<script src="js/core.js"></script>
+</body>
+</html>
+
