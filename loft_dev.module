@@ -4,7 +4,9 @@
  * Base module file for loft_dev
  */
 
+use AKlump\LoftLib\Code\Grammar;
 use Drupal\loft_dev\ButtonCatalog;
+use AKlump\LoftLib\Code\Strings;
 
 /**
  * The default interval for ld export
@@ -2025,4 +2027,123 @@ function loft_dev_loft_deploy_border_access_alter(&$access) {
     // Suppress loft_deploy border on design guide page.
     $access = FALSE;
   }
+}
+
+/**
+ * Generate PHPTemplate template file stub.
+ *
+ * Place the following at the top of an empty twig file and load the page.  The content should change and you should
+ * see a file header in it's place.
+ *
+ * The name of the file must be {anything}.tpl.php
+ *
+ * @code
+ * <?php
+ * loft_dev_twig_hook_stub(__FILE__, get_defined_vars());
+ * @endcode
+ *
+ * @param       $template_file
+ * @param array $vars
+ *
+ * @throws \InvalidArgumentException If the filename is misnamed.
+ * @throws \RuntimeException If the file cannot be written.
+ */
+function loft_dev_phptemplate_hook_stub($template_file, array $vars) {
+  if (!preg_match('/\.tpl\.php$/', $template_file)) {
+    throw new \InvalidArgumentException("Filename must end in .tpl.php");
+  }
+  $stub = _loft_dev_file_header(__FUNCTION__, $template_file, $vars);
+  if (!file_put_contents($template_file, $stub)) {
+    throw new \RuntimeException("Could not write file.");
+  }
+}
+
+/**
+ * Generate Twig template file stub.
+ *
+ * Place the following at the top of an empty twig file and load the page.  The content should change and you should
+ * see a file header in it's place.
+ *
+ * The name of the file must be {anything}.html.twig
+ *
+ * @code
+ * {{ loft_dev_hook_stub() }}
+ * @endcode
+ *
+ * @param       $template_file
+ * @param array $vars
+ *
+ * @throws \InvalidArgumentException If the filename is misnamed.
+ * @throws \RuntimeException If the file cannot be written.
+ */
+function loft_dev_twig_hook_stub($template_file, array $vars) {
+  $template_file = preg_replace('/\.php$/', '', $template_file);
+  if (!preg_match('/\.html\.twig$/', $template_file)) {
+    throw new \InvalidArgumentException("Filename must end in .html.twig");
+  }
+
+  // Filter out snake case, duplicated vars
+  $vars = array_diff_key($vars, array_flip(array_filter(array_keys($vars), function ($key) use ($vars) {
+    $cc = Strings::lowerCamel($key);
+    if (strpos($key, '_') !== FALSE && array_key_exists($cc, $vars)) {
+      return TRUE;
+    }
+
+    return FALSE;
+  })));
+
+  // Filter out other vars by key.
+  unset($vars['twig']);
+
+  $stub = _loft_dev_file_header(__FUNCTION__, $template_file, $vars);
+  $stub = str_replace("<?php\n", '', $stub);
+  $stub = "{#\n$stub#}";
+  if (!file_put_contents($template_file, $stub)) {
+    throw new \RuntimeException("Could not write file.");
+  }
+  //  unlink($original);
+}
+
+/**
+ * Helper function to generate a file header.
+ *
+ * @see loft_dev_twig_hook_stub
+ * @see loft_dev_phptemplate_hook_stub
+ */
+function _loft_dev_file_header($parent, $template_file, array $vars) {
+  $filename = preg_replace('/\.(html|tpl)$/', '', pathinfo($template_file, PATHINFO_FILENAME));
+  $filename = Grammar::titleCase(str_replace('--', ', ', $filename));
+  $vars = array_keys($vars);
+  sort($vars);
+  $list = array_reduce(array_filter($vars, function ($var) {
+    return !in_array($var, ['partials']);
+  }), function ($carry, $var) {
+    return $carry . "\n *   - \$$var";
+  });
+
+
+  $stub = <<<EOD
+<?php
+/**
+ * @file Theme implementation for {$filename}
+ *       
+ * Available variables:{$list} 
+ */
+
+EOD;
+  $context = [
+    'template_file' => $template_file,
+    'parent' => $parent,
+  ];
+  drupal_alter('loft_dev_file_header', $stub, $context);
+
+  return $stub;
+}
+
+function loft_dev_twiggy_twig_alter(Twig_Environment $twig) {
+  $twig->addFunction(new \Twig_SimpleFunction('loft_dev_hook_stub', function (Twig_Environment $env, $context) {
+    $name_of_template_file = $env->getCompiler()->getFilename();
+    $path_to_template_file = $env->getLoader()->getCacheKey($name_of_template_file);
+    loft_dev_twig_hook_stub($path_to_template_file, $context);
+  }, ['needs_context' => TRUE, 'needs_environment' => TRUE]));
 }
