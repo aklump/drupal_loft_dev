@@ -2039,7 +2039,7 @@ function loft_dev_loft_deploy_border_access_alter(&$access) {
  *
  * @code
  * <?php
- * loft_dev_twig_hook_stub(__FILE__, get_defined_vars());
+ * loft_dev_phptemplate_hook_stub(__FILE__, get_defined_vars());
  * @endcode
  *
  * @param       $template_file
@@ -2053,6 +2053,7 @@ function loft_dev_phptemplate_hook_stub($template_file, array $vars) {
     throw new \InvalidArgumentException("Filename must end in .tpl.php");
   }
   $stub = _loft_dev_file_header(__FUNCTION__, $template_file, $vars);
+  $stub .= PHP_EOL. PHP_EOL . PHP_EOL . file_get_contents($template_file);
   if (!file_put_contents($template_file, $stub)) {
     throw new \RuntimeException("Could not write file.");
   }
@@ -2098,6 +2099,7 @@ function loft_dev_twig_hook_stub($template_file, array $vars) {
   $stub = _loft_dev_file_header(__FUNCTION__, $template_file, $vars);
   $stub = str_replace("<?php\n", '', $stub);
   $stub = "{#\n$stub#}";
+  $stub .= PHP_EOL. PHP_EOL . PHP_EOL . file_get_contents($template_file);
   if (!file_put_contents($template_file, $stub)) {
     throw new \RuntimeException("Could not write file.");
   }
@@ -2146,4 +2148,12 @@ function loft_dev_twiggy_twig_alter(Twig_Environment $twig) {
     $path_to_template_file = $env->getLoader()->getCacheKey($name_of_template_file);
     loft_dev_twig_hook_stub($path_to_template_file, $context);
   }, ['needs_context' => TRUE, 'needs_environment' => TRUE]));
+}
+
+function loft_dev_loft_core_suppress_messages() {
+  return array(
+    'warning' => array(
+      '/^Internet Explorer <=7 which will not load more than/',
+    ),
+  );
 }
