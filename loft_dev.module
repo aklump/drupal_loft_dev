@@ -5,15 +5,15 @@
  */
 
 use AKlump\LoftLib\Code\Grammar;
-use Drupal\loft_dev\ButtonCatalog;
 use AKlump\LoftLib\Code\Strings;
+use Drupal\loft_dev\ButtonCatalog;
 
 /**
  * The default interval for ld export
  *
  * 0 = disabled
  */
-define('LOFT_DEV_LOFT_DEPLOY_EXPORT_PERIOD_MIN', 5);
+define('LOFT_DEV_LOFT_DEPLOY_EXPORT_PERIOD_MIN', 0);
 
 /**
  * Implements hook_boot().
@@ -27,7 +27,7 @@ function loft_dev_boot() {
  * Tests for a GET var
  *
  * @param  string $key     The $_GET var key.
- * @param  string $default The default when the $GET var is not present
+ * @param bool    $default The default when the $GET var is not present
  *
  * @return bool
  *   TRUE $_GET[$key] is set and not === 0
@@ -1172,11 +1172,11 @@ function loft_dev_exit() {
 
   // Do an export if needed using loft_deploy shell script.
   if (_loft_dev_access() &&
-    variable_get('loft_dev_loft_deploy_export_period_mins', LOFT_DEV_LOFT_DEPLOY_EXPORT_PERIOD_MIN)
+    ($period = variable_get('loft_dev_loft_deploy_export_period_mins', LOFT_DEV_LOFT_DEPLOY_EXPORT_PERIOD_MIN))
   ) {
     $now = new \DateTime('now', new \DateTimeZone('America/Los_Angeles'));
     $now = $now->format('U');
-    $rollback = variable_get('loft_dev_loft_deploy_export_last', 0) + (variable_get('loft_dev_loft_deploy_export_period_mins', LOFT_DEV_LOFT_DEPLOY_EXPORT_PERIOD_MIN) * 60);
+    $rollback = variable_get('loft_dev_loft_deploy_export_last', 0) + ($period * 60);
     if ($now >= $rollback) {
       loft_dev_include('pages');
       variable_set('loft_dev_loft_deploy_export_last', $now);
@@ -2053,7 +2053,7 @@ function loft_dev_phptemplate_hook_stub($template_file, array $vars) {
     throw new \InvalidArgumentException("Filename must end in .tpl.php");
   }
   $stub = _loft_dev_file_header(__FUNCTION__, $template_file, $vars);
-  $stub .= PHP_EOL. PHP_EOL . PHP_EOL . file_get_contents($template_file);
+  $stub .= PHP_EOL . PHP_EOL . PHP_EOL . file_get_contents($template_file);
   if (!file_put_contents($template_file, $stub)) {
     throw new \RuntimeException("Could not write file.");
   }
@@ -2099,7 +2099,7 @@ function loft_dev_twig_hook_stub($template_file, array $vars) {
   $stub = _loft_dev_file_header(__FUNCTION__, $template_file, $vars);
   $stub = str_replace("<?php\n", '', $stub);
   $stub = "{#\n$stub#}";
-  $stub .= PHP_EOL. PHP_EOL . PHP_EOL . file_get_contents($template_file);
+  $stub .= PHP_EOL . PHP_EOL . PHP_EOL . file_get_contents($template_file);
   if (!file_put_contents($template_file, $stub)) {
     throw new \RuntimeException("Could not write file.");
   }
