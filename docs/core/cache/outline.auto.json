@@ -38,16 +38,22 @@
             "sort": 5
         },
         {
+            "id": "twiggy",
+            "title": "Twiggy Module Support (Twig)",
+            "file": "twiggy.md",
+            "sort": 6
+        },
+        {
             "id": "variables",
             "title": "Hardcoded data\/variables",
             "file": "variables.md",
-            "sort": 6
+            "sort": 7
         },
         {
             "id": "_tasklist",
             "title": "Tasklist",
             "file": "_tasklist.md",
-            "sort": 7
+            "sort": 8
         }
     ],
     "settings": {
