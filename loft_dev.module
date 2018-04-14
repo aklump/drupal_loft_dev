@@ -26,8 +26,8 @@ function loft_dev_boot() {
 /**
  * Tests for a GET var
  *
- * @param  string $key     The $_GET var key.
- * @param bool    $default The default when the $GET var is not present
+ * @param  string $key The $_GET var key.
+ * @param bool $default The default when the $GET var is not present
  *
  * @return bool
  *   TRUE $_GET[$key] is set and not === 0
@@ -53,7 +53,7 @@ function _loft_dev_check_get_var($key, $default = FALSE) {
  *   pages would have $path equal to 'node/%' or 'node/%/view'. Your hook
  *   implementation may also be called with special descriptors after a "#"
  *   sign.
- * @param array  $arg
+ * @param array $arg
  *   An array that corresponds to the return value of the arg() function, for
  *   modules that want to provide help that is specific to certain values of
  *   wildcards in $path. For example, you could provide help for the path
@@ -130,229 +130,229 @@ function loft_dev_include() {
  * Implements hook_menu()
  */
 function loft_dev_menu() {
-  $items = array();
+  $items = [];
 
-  $items['admin/loft-dev'] = array(
+  $items['admin/loft-dev'] = [
     'title' => 'Loft Dev',
     'page callback' => 'loft_dev_page',
     'access callback' => '_loft_dev_access',
     'type' => MENU_NORMAL_ITEM,
     'file' => loft_dev_include('pages', 2),
-  );
-  $items['admin/loft-dev/migration'] = array(
+  ];
+  $items['admin/loft-dev/migration'] = [
     'title' => 'Migration',
     'page callback' => 'loft_dev_migration_page',
     'access callback' => '_loft_dev_access',
     'type' => MENU_NORMAL_ITEM,
     'file' => loft_dev_include('pages', 2),
-  );
-  $items['admin/loft-dev/parse-time'] = array(
+  ];
+  $items['admin/loft-dev/parse-time'] = [
     'title' => 'Pull Timestamps',
     'description' => 'Parse English Time from a string and convert to Unix',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('loft_dev_parse_time_form'),
+    'page arguments' => ['loft_dev_parse_time_form'],
     'access callback' => '_loft_dev_access',
     'type' => MENU_NORMAL_ITEM,
     'file' => loft_dev_include('pages', 2),
-  );
-  $items['admin/loft-dev/css-aggregation'] = array(
+  ];
+  $items['admin/loft-dev/css-aggregation'] = [
     'title' => 'CSS Aggregation',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('loft_dev_css_aggregation_form'),
+    'page arguments' => ['loft_dev_css_aggregation_form'],
     'access callback' => '_loft_dev_access',
     'type' => MENU_NORMAL_ITEM,
     'file' => loft_dev_include('pages', 2),
-  );
-  $items['admin/loft-dev/overview'] = array(
+  ];
+  $items['admin/loft-dev/overview'] = [
     'title' => 'Overview',
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => -10,
-  );
-  $items['admin/loft-dev/zebra'] = array(
+  ];
+  $items['admin/loft-dev/zebra'] = [
     'title' => 'Zebra Striping',
     'page callback' => 'loft_dev_zebra_striping_page',
     'access callback' => '_loft_dev_access',
     'type' => MENU_LOCAL_TASK,
     'file' => loft_dev_include('pages', 2),
-  );
-  $items['admin/loft-dev/fpo-image'] = array(
+  ];
+  $items['admin/loft-dev/fpo-image'] = [
     'title' => 'FPO Image',
     'page callback' => 'loft_dev_fpo_image_page',
     'access callback' => '_loft_dev_access',
     'type' => MENU_LOCAL_TASK,
     'file' => loft_dev_include('pages', 2),
-  );
-  $items['admin/loft-dev/rem'] = array(
+  ];
+  $items['admin/loft-dev/rem'] = [
     'title' => 'REM Font Sizing',
     'page callback' => 'loft_dev_rem_page',
     'access callback' => '_loft_dev_access',
     'type' => MENU_LOCAL_TASK,
     'file' => loft_dev_include('pages', 2),
-  );
-  $items['admin/loft-dev/server'] = array(
+  ];
+  $items['admin/loft-dev/server'] = [
     'title' => 'Server Vars',
     'page callback' => 'loft_dev_server_vars_page',
     'access callback' => TRUE,
     'access callback' => '_loft_dev_access',
     'type' => MENU_LOCAL_TASK,
     'file' => loft_dev_include('pages', 2),
-  );
+  ];
 
-  $items['admin/loft-dev/list'] = array(
+  $items['admin/loft-dev/list'] = [
     'title' => 'Functions Lists',
     'page callback' => 'loft_dev_list_functions_page',
-    'page arguments' => array('functions'),
+    'page arguments' => ['functions'],
     'access callback' => '_loft_dev_access',
     'type' => MENU_NORMAL_ITEM,
     'file' => loft_dev_include('pages', 2),
-  );
-  $items['admin/loft-dev/list/functions'] = array(
+  ];
+  $items['admin/loft-dev/list/functions'] = [
     'title' => 'PHP Functions',
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => -10,
-  );
-  $items['admin/loft-dev/list/constants'] = array(
+  ];
+  $items['admin/loft-dev/list/constants'] = [
     'title' => 'PHP Constants',
     'page callback' => 'loft_dev_list_functions_page',
-    'page arguments' => array(3),
+    'page arguments' => [3],
     'access callback' => '_loft_dev_access',
     'type' => MENU_LOCAL_TASK,
     'file' => loft_dev_include('pages', 2),
-  );
-  $items['admin/loft-dev/list/classes'] = array(
+  ];
+  $items['admin/loft-dev/list/classes'] = [
     'title' => 'PHP Classes',
     'page callback' => 'loft_dev_list_functions_page',
-    'page arguments' => array(3),
+    'page arguments' => [3],
     'access callback' => '_loft_dev_access',
     'type' => MENU_LOCAL_TASK,
     'file' => loft_dev_include('pages', 2),
-  );
-  $items['admin/loft-dev/list/libraries'] = array(
+  ];
+  $items['admin/loft-dev/list/libraries'] = [
     'title' => 'Drupal Libraries',
     'page callback' => 'loft_dev_list_libraries_page',
     'access callback' => '_loft_dev_access',
     'type' => MENU_LOCAL_TASK,
     'file' => loft_dev_include('pages', 2),
-  );
-  $items['admin/loft-dev/list/fapi'] = array(
+  ];
+  $items['admin/loft-dev/list/fapi'] = [
     'title' => 'FAPI Elements',
     'page callback' => 'loft_dev_list_fapi_elements_page',
     'access callback' => '_loft_dev_access',
     'type' => MENU_LOCAL_TASK,
     'file' => loft_dev_include('pages', 2),
-  );
-  $items['admin/loft-dev/theme'] = array(
+  ];
+  $items['admin/loft-dev/theme'] = [
     'title' => 'Default Theme Tester',
     'page callback' => 'drupal_goto',
-    'page arguments' => array('loft-dev/theme'),
+    'page arguments' => ['loft-dev/theme'],
     'access callback' => '_loft_dev_access',
     'type' => MENU_LOCAL_TASK,
     'file' => loft_dev_include('pages', 2),
-  );
-  $items['admin/loft-dev/theme/admin'] = array(
+  ];
+  $items['admin/loft-dev/theme/admin'] = [
     'title' => 'Admin theme test page',
     'page callback' => 'loft_dev_theme_test_page',
-    'page arguments' => array(3),
+    'page arguments' => [3],
     'access callback' => '_loft_dev_access',
     'type' => MENU_LOCAL_TASK,
     'file' => loft_dev_include('pages', 2),
-  );
-  $items['admin/loft-dev/theme/403'] = array(
+  ];
+  $items['admin/loft-dev/theme/403'] = [
     'title' => '403 page',
     'page callback' => 'drupal_goto',
-    'page arguments' => array('loft-dev/theme/403'),
+    'page arguments' => ['loft-dev/theme/403'],
     'access callback' => '_loft_dev_access',
     'type' => MENU_LOCAL_TASK,
-  );
-  $items['admin/loft-dev/theme/404'] = array(
+  ];
+  $items['admin/loft-dev/theme/404'] = [
     'title' => '404 page',
     'page callback' => 'drupal_goto',
-    'page arguments' => array('loft-dev/theme/404'),
+    'page arguments' => ['loft-dev/theme/404'],
     'access callback' => '_loft_dev_access',
     'type' => MENU_LOCAL_TASK,
-  );
-  $items['admin/loft-dev/theme/offline'] = array(
+  ];
+  $items['admin/loft-dev/theme/offline'] = [
     'title' => 'Maintenance page',
     'page callback' => 'drupal_goto',
-    'page arguments' => array('loft-dev/theme/offline'),
+    'page arguments' => ['loft-dev/theme/offline'],
     'access callback' => '_loft_dev_access',
     'type' => MENU_LOCAL_TASK,
-  );
+  ];
 
-  $items['loft-dev/theme'] = array(
+  $items['loft-dev/theme'] = [
     'title' => 'Default theme test page',
     'page callback' => 'loft_dev_theme_test_page',
     'access callback' => '_loft_dev_access',
     'type' => MENU_CALLBACK,
     'file' => loft_dev_include('pages', 2),
-  );
-  $items['loft-dev/theme/action1'] = array(
+  ];
+  $items['loft-dev/theme/action1'] = [
     'title' => 'Action Link #1',
     'description' => 'Some description is helpful for UX',
     'page callback' => 'drupal_goto',
     'access callback' => '_loft_dev_access',
     'type' => MENU_LOCAL_ACTION,
-  );
-  $items['loft-dev/theme/action2'] = array(
+  ];
+  $items['loft-dev/theme/action2'] = [
     'title' => 'Action Link #2',
     'description' => 'Some description is helpful for UX',
     'page callback' => 'drupal_goto',
     'access callback' => '_loft_dev_access',
     'type' => MENU_LOCAL_ACTION,
-  );
-  $items['loft-dev/theme/action3'] = array(
+  ];
+  $items['loft-dev/theme/action3'] = [
     'title' => 'Action Link #3',
     'description' => 'Some description is helpful for UX',
     'page callback' => 'drupal_goto',
     'access callback' => '_loft_dev_access',
     'type' => MENU_LOCAL_ACTION,
-  );
-  $items['loft-dev/theme/403'] = array(
+  ];
+  $items['loft-dev/theme/403'] = [
     'title' => '403 page',
     'page callback' => 'drupal_access_denied',
     'access callback' => '_loft_dev_access',
     'type' => MENU_CALLBACK,
-  );
-  $items['loft-dev/theme/404'] = array(
+  ];
+  $items['loft-dev/theme/404'] = [
     'title' => '404 page',
     'page callback' => 'drupal_not_found_page',
     'access callback' => '_loft_dev_access',
     'type' => MENU_CALLBACK,
     'file' => loft_dev_include('pages', 2),
-  );
-  $items['loft-dev/theme/offline'] = array(
+  ];
+  $items['loft-dev/theme/offline'] = [
     'page callback' => 'drupal_site_offline',
     'access callback' => '_loft_dev_access',
     'type' => MENU_CALLBACK,
-  );
-  $items['loft-dev/theme/playground'] = array(
+  ];
+  $items['loft-dev/theme/playground'] = [
     'title' => 'Loft Dev Theme Playground',
     'page callback' => 'loft_dev_playground_page',
     'access callback' => '_loft_dev_access',
     'type' => MENU_CALLBACK,
     'file' => loft_dev_include('pages', 2),
-  );
-  $items['loft-dev/theme/teasers'] = array(
+  ];
+  $items['loft-dev/theme/teasers'] = [
     'page callback' => 'loft_dev_teasers_page',
     'access callback' => '_loft_dev_access',
     'type' => MENU_CALLBACK,
     'file' => loft_dev_include('pages', 2),
-  );
+  ];
 
   $url = 'loft-dev/theme/button-catalog';
-  $items['admin/' . $url] = array(
+  $items['admin/' . $url] = [
     'title' => 'Button catalog',
     'page callback' => 'drupal_goto',
-    'page arguments' => array($url),
+    'page arguments' => [$url],
     'access callback' => '_loft_dev_access',
     'type' => MENU_LOCAL_TASK,
-  );
-  $items[$url] = array(
+  ];
+  $items[$url] = [
     'page callback' => 'loft_dev_button_catalog_page',
     'access callback' => '_loft_dev_access',
     'type' => MENU_CALLBACK,
     'file' => loft_dev_include('pages', 2),
-  );
+  ];
 
   return $items;
 }
@@ -435,13 +435,13 @@ function loft_dev_form_alter(&$form, $form_state, $form_id) {
  * Implements hook_permission().
  */
 function loft_dev_permission() {
-  return array(
-    'loft_dev:use tools' => array(
+  return [
+    'loft_dev:use tools' => [
       'title' => t('Use Loft Dev Tools'),
       'description' => t('Use Loft Dev tools; see also $conf["loft_dev_free_access"].'),
       'restrict access' => TRUE,
-    ),
-  );
+    ],
+  ];
 }
 
 /**
@@ -486,7 +486,7 @@ function loft_dev_preprocess_html(&$vars) {
   }
 
   // Append the loft dev tools to page_bottom
-  $build = array();
+  $build = [];
   $build['loft_dev']['block'] = module_invoke('loft_dev', 'block_view', 'dev_tools');
   $build['loft_dev']['#prefix'] = '<div class="block-loft-dev">';
   $build['loft_dev']['#suffix'] = '</div>';
@@ -532,9 +532,9 @@ function loft_dev_preprocess_page(&$vars) {
  * The end result is $vars['some']['string']['of']['keys'] = 'final value';
  *
  * @param  array &$array The base array.
- * @param  array &$keys  An array of keys, each successive a child of the
+ * @param  array &$keys An array of keys, each successive a child of the
  *                       former.
- * @param  mixed $value  The final value to set on the last child key.
+ * @param  mixed $value The final value to set on the last child key.
  */
 function loft_dev_array_set_nested_element(&$array, &$keys, $value) {
   if (!($key = array_shift($keys))) {
@@ -543,7 +543,7 @@ function loft_dev_array_set_nested_element(&$array, &$keys, $value) {
     return;
   }
   if (!isset($array[$key])) {
-    $array[$key] = array();
+    $array[$key] = [];
   }
   $self = __FUNCTION__;
 
@@ -554,7 +554,7 @@ function loft_dev_array_set_nested_element(&$array, &$keys, $value) {
  * Loads data from flatfiles for a given scope, e.g., html, page.
  *
  * @param  string $scope Expecting html, page, etc.
- * @param  array  &$vars The vars for that scope.
+ * @param  array &$vars The vars for that scope.
  */
 function _loft_dev_playground_data($scope, &$vars) {
   global $_loft_dev_ignored_url;
@@ -568,7 +568,7 @@ function _loft_dev_playground_data($scope, &$vars) {
     return;
   }
   $info = module_invoke_all('loft_dev_playground_info');
-  $data = array();
+  $data = [];
   foreach (module_implements('loft_dev_playground_info') as $module) {
     if (($info = module_invoke($module, 'loft_dev_playground_info'))
       && file_exists($info['data_path'])
@@ -576,12 +576,12 @@ function _loft_dev_playground_data($scope, &$vars) {
       $regex = '/' . preg_quote($scope) . "\.(.+)\.php$/";
 
       $config_file = $info['data_path'] . '/config.json';
-      $config = is_readable($config_file) && ($config = json_decode(file_get_contents($config_file), TRUE)) ? $config : array();
+      $config = is_readable($config_file) && ($config = json_decode(file_get_contents($config_file), TRUE)) ? $config : [];
 
-      file_scan_directory($info['data_path'], $regex, array(
+      file_scan_directory($info['data_path'], $regex, [
         'callback' => function ($uri) use ($scope, $regex, &$vars, $config, $g) {
 
-          if (in_array(pathinfo($uri, PATHINFO_BASENAME), $g->get($config, 'ignore', array()))) {
+          if (in_array(pathinfo($uri, PATHINFO_BASENAME), $g->get($config, 'ignore', []))) {
             return;
           }
 
@@ -592,13 +592,13 @@ function _loft_dev_playground_data($scope, &$vars) {
           ob_end_clean();
 
           if (trim($content)) {
-            $content = array('#markup' => $content);
+            $content = ['#markup' => $content];
             $tree = explode('.', $matches[1]);
             array_unshift($tree, $scope);
             loft_dev_array_set_nested_element($vars, $tree, $content);
           }
         },
-      ), $depth = 0);
+      ], $depth = 0);
     }
   }
 }
@@ -610,24 +610,24 @@ function _loft_dev_playground_data($scope, &$vars) {
  * Registers the active theme
  */
 function loft_dev_loft_dev_playground_info() {
-  return array(
+  return [
     'data_path' => path_to_theme() . '/loft_dev_playground',
-  );
+  ];
 }
 
 /**
  * Implements hook_block_info().
  */
 function loft_dev_block_info() {
-  $blocks['dev_tools'] = array(
+  $blocks['dev_tools'] = [
     'info' => t('LOFT DEV: Tools'),
     'cache' => DRUPAL_NO_CACHE,
-  );
+  ];
 
-  $blocks['page_review_checklist'] = array(
+  $blocks['page_review_checklist'] = [
     'info' => t('LOFT DEV: Development Progress List'),
     'cache' => DRUPAL_NO_CACHE,
-  );
+  ];
 
   return $blocks;
 }
@@ -650,10 +650,10 @@ function loft_dev_block_view_alter(&$data, $block) {
  * Implements hook_block_view().
  */
 function loft_dev_block_view($delta = '') {
-  $block = array(
+  $block = [
     'subject' => NULL,
     'content' => NULL,
-  );
+  ];
   switch ($delta) {
     case 'page_review_checklist';
       loft_dev_include('pages');
@@ -665,106 +665,106 @@ function loft_dev_block_view($delta = '') {
     case 'dev_tools':
 
       if (!_loft_dev_access()) {
-        return array();
+        return [];
       }
 
-      $build = array();
-      $build['#attached']['js'][] = array(
+      $build = [];
+      $build['#attached']['js'][] = [
         'type' => 'file',
         'data' => 'misc/collapse.js',
-      );
-      $build['#attached']['css'][] = array(
+      ];
+      $build['#attached']['css'][] = [
         'type' => 'file',
         'data' => drupal_get_path('module', 'loft_dev') . '/loft_dev.css',
-      );
+      ];
 
       // The links for example pages
-      $links = array();
-      $links['theme'] = array(
+      $links = [];
+      $links['theme'] = [
         'title' => 'Elements',
         'href' => 'loft-dev/theme',
-        'attributes' => array(),
-      );
-      $links['access-denied'] = array(
+        'attributes' => [],
+      ];
+      $links['access-denied'] = [
         'title' => '403',
         'href' => 'loft-dev/theme/403',
-        'attributes' => array(),
-      );
-      $links['not-found'] = array(
+        'attributes' => [],
+      ];
+      $links['not-found'] = [
         'title' => '404',
         'href' => 'loft-dev/theme/404',
-        'attributes' => array(),
-      );
-      $links['maintenance'] = array(
+        'attributes' => [],
+      ];
+      $links['maintenance'] = [
         'title' => 'Offline',
         'href' => 'loft-dev/theme/offline',
-        'attributes' => array(),
-      );
-      $links['playground'] = array(
+        'attributes' => [],
+      ];
+      $links['playground'] = [
         'title' => 'Theme Playground',
         'href' => 'loft-dev/theme/playground',
-        'attributes' => array(),
-      );
-      $links['teasers'] = array(
+        'attributes' => [],
+      ];
+      $links['teasers'] = [
         'title' => 'Teasers',
         'href' => 'loft-dev/theme/teasers',
-        'attributes' => array(),
-      );
-      $links['font-sizing'] = array(
+        'attributes' => [],
+      ];
+      $links['font-sizing'] = [
         'title' => t('Font Size'),
         'href' => 'admin/loft-dev/rem',
-        'attributes' => array(
+        'attributes' => [
           'onclick' => 'window.open(this.href, "REM Sizing", "status=0,toolbar=0,location=0,menubar=0,directories=0,resizable=1,scrollbars=0,height=650,width=120"); return false;',
-        ),
-      );
-      $build['theming-pages'] = array(
+        ],
+      ];
+      $build['theming-pages'] = [
         '#theme' => 'links',
         '#links' => $links,
-        '#heading' => array(
+        '#heading' => [
           'text' => 'Theming Pages',
           'level' => 'h2',
-          'class' => array(),
-        ),
-        '#attributes' => array(
-          'class' => array('links', 'inline'),
-        ),
-      );
+          'class' => [],
+        ],
+        '#attributes' => [
+          'class' => ['links', 'inline'],
+        ],
+      ];
 
       // Node suite
-      $links = array();
+      $links = [];
       foreach (loft_dev_node_suite() as $type => $nid) {
-        $links['node-' . $type] = array(
+        $links['node-' . $type] = [
           'title' => $type,
           'href' => 'node/' . $nid,
-        );
+        ];
       }
-      $build['node_suite'] = array(
+      $build['node_suite'] = [
         '#theme' => 'links',
         '#links' => $links,
-        '#heading' => array(
+        '#heading' => [
           'text' => 'Node Suite',
           'level' => 'h2',
-          'class' => array(),
-        ),
-        '#attributes' => array(
-          'class' => array('links', 'inline'),
-        ),
-      );
+          'class' => [],
+        ],
+        '#attributes' => [
+          'class' => ['links', 'inline'],
+        ],
+      ];
 
       // Links from other modules
       $links = module_invoke_all('loft_dev_menu');
-      $build['loft_menu'] = array(
+      $build['loft_menu'] = [
         '#theme' => 'links',
         '#links' => $links,
-        '#heading' => array(
+        '#heading' => [
           'text' => 'Loft Menu',
           'level' => 'h2',
-          'class' => array(),
-        ),
-        '#attributes' => array(
-          'class' => array('links', 'inline'),
-        ),
-      );
+          'class' => [],
+        ],
+        '#attributes' => [
+          'class' => ['links', 'inline'],
+        ],
+      ];
 
       $output = '';
       $output .= drupal_render($build);
@@ -777,7 +777,7 @@ function loft_dev_block_view($delta = '') {
         ($temp = module_invoke('masquerade', 'block_view', 0))
       ) {
         if (is_string($temp['content'])) {
-          $temp['content'] = array('#markup' => $temp['content']);
+          $temp['content'] = ['#markup' => $temp['content']];
         }
         $output .= '<h3>' . $temp['subject'] . '</h3>' . "\n";
         $output .= drupal_render($temp['content']) . "\n";
@@ -788,7 +788,7 @@ function loft_dev_block_view($delta = '') {
 
       if (($temp = module_invoke('devel_node_access', 'block_view', 0))) {
         if (is_string($temp['content'])) {
-          $temp['content'] = array('#markup' => $temp['content']);
+          $temp['content'] = ['#markup' => $temp['content']];
         }
         $output .= '<h3>' . $temp['subject'] . '</h3>' . "\n";
         $output .= drupal_render($temp['content']) . "\n";
@@ -796,7 +796,7 @@ function loft_dev_block_view($delta = '') {
 
       if (($temp = module_invoke('devel_node_access', 'block_view', 1))) {
         if (is_string($temp['content'])) {
-          $temp['content'] = array('#markup' => $temp['content']);
+          $temp['content'] = ['#markup' => $temp['content']];
         }
         $output .= '<h3>' . $temp['subject'] . '</h3>' . "\n";
         $output .= drupal_render($temp['content']) . "\n";
@@ -804,7 +804,7 @@ function loft_dev_block_view($delta = '') {
 
       if (module_exists('func_search') && ($temp = module_invoke('func_search', 'block_view', 0))) {
         if (is_string($temp['content'])) {
-          $temp['content'] = array('#markup' => $temp['content']);
+          $temp['content'] = ['#markup' => $temp['content']];
         }
         $output .= '<h3>' . $temp['subject'] . '</h3>' . "\n";
         $output .= drupal_render($temp['content']) . "\n";
@@ -812,9 +812,9 @@ function loft_dev_block_view($delta = '') {
 
       // Email output
       if (_loft_dev_reroute_email_status()) {
-        $output .= t('<p>Reroute email is enabled and ready: %mail</p>', array(
+        $output .= t('<p>Reroute email is enabled and ready: %mail</p>', [
             '%mail' => variable_get('reroute_email_address', NULL),
-          )) . "\n";
+          ]) . "\n";
       }
       else {
         $output .= t('<p>!!! REROUTE EMAIL IS NOT READY !!!</p>') . "\n";
@@ -827,10 +827,10 @@ function loft_dev_block_view($delta = '') {
         $date
           ->setTimestamp($last)
           ->setTimezone(new \DateTimeZone('America/Los_Angeles'));
-        $output .= t('Database last backed at %time to %path', array(
+        $output .= t('Database last backed at %time to %path', [
           '%time' => $date->format('r'),
           '%path' => $path,
-        ));
+        ]);
       }
 
       // Rewind form
@@ -839,23 +839,23 @@ function loft_dev_block_view($delta = '') {
 
       // No more changes/additions
       $output = '<div id="loft-dev-tools" class="loft-dev-closure">' . $output . '</div> <!-- /loft-dev-closure -->' . "\n";
-      $block = array(
+      $block = [
         //'subject' =>  t('Loft Dev Tools'),
-        'content' => array(
-          '#attached' => array(
-            'library' => array(
-              array('system', 'cookie'),
-            ),
-          ),
+        'content' => [
+          '#attached' => [
+            'library' => [
+              ['system', 'cookie'],
+            ],
+          ],
           '#markup' => $output,
-        ),
-      );
+        ],
+      ];
 
-      $block['content']['#attached']['js'][] = array(
+      $block['content']['#attached']['js'][] = [
         'type' => 'file',
         'data' => drupal_get_path('module', 'loft_dev') . '/loft_dev.js',
         'scope' => 'footer',
-      );
+      ];
 
       break;
   }
@@ -867,7 +867,7 @@ function loft_dev_block_view($delta = '') {
  * Implements hook_block_configure().
  */
 function loft_dev_block_configure($delta = '') {
-  $form = array();
+  $form = [];
   if ($delta = 'page_review_checklist') {
     $default = '<config>
   <page weight="0">
@@ -885,35 +885,35 @@ function loft_dev_block_configure($delta = '') {
     $json = json_decode($storage['settings.json']);
     $default = isset($storage['checklist.xml']) ? $storage['checklist.xml'] : $default;
     // $default = variable_get('loft_dev_block_page_review_checklist', $default);
-    $form['page_review_checklist'] = array(
+    $form['page_review_checklist'] = [
       '#type' => 'xml_codemirror',
       '#title' => t('Checklist config'),
       '#description' => t('Enter a list of urls to review, one per line.'),
       '#default_value' => $default,
       '#xml_example' => $default,
       '#rows' => 10,
-    );
+    ];
 
-    $default = isset($json->domain) ? $json->domain : url('', array('absolute' => TRUE));
-    $form['page_review_domain'] = array(
+    $default = isset($json->domain) ? $json->domain : url('', ['absolute' => TRUE]);
+    $form['page_review_domain'] = [
       '#type' => 'textfield',
       '#title' => t('Export base domain'),
       '#description' => t('This will be used to build the export URLs.'),
       '#default_value' => $default,
       '#required' => TRUE,
-    );
+    ];
 
     $default = isset($json->export_format) ? $json->export_format : 'markdown';
-    $form['page_review_export_format'] = array(
+    $form['page_review_export_format'] = [
       '#type' => 'select',
       '#title' => t('Export format'),
       '#default_value' => $default,
-      '#options' => array(
+      '#options' => [
         'markdown' => 'Markdown',
         'basecamp' => 'Basecamp',
         'todos' => 'Todo list',
-      ),
-    );
+      ],
+    ];
   }
 
   return $form;
@@ -922,13 +922,13 @@ function loft_dev_block_configure($delta = '') {
 /**
  * Implements hook_block_save().
  */
-function loft_dev_block_save($delta = '', $edit = array()) {
+function loft_dev_block_save($delta = '', $edit = []) {
   if ($delta === 'page_review_checklist') {
 
-    $data['settings.json'] = json_encode(array(
+    $data['settings.json'] = json_encode([
       'export_format' => $edit['page_review_export_format'],
       'domain' => $edit['page_review_domain'],
-    ));
+    ]);
 
     // Process pages.
     $config = xml_field_xml($edit['page_review_checklist']);
@@ -957,7 +957,7 @@ function loft_dev_block_save($delta = '', $edit = array()) {
  * essence its a supersceding storage mechanism.
  *
  * @param  string $group A key to group related data.
- * @param  array  $data  Keyed by filename, the values will become the file
+ * @param  array $data Keyed by filename, the values will become the file
  *                       contents.
  *
  * @return array  The currently stored values.
@@ -971,11 +971,12 @@ function loft_dev_private_storage($group, $data = NULL) {
         file_unmanaged_save_data($value, $dir . '/' . $filename, FILE_EXISTS_REPLACE);
       }
     }
-    $data = file_scan_directory($dir, '/.+/', array('key' => 'filename'));
+    $data = file_scan_directory($dir, '/.+/', ['key' => 'filename']);
     foreach (array_keys($data) as $filename) {
       $data[$filename] = file_get_contents($dir . '/' . $filename);
     }
-  } catch (Exception $e) {
+  }
+  catch (Exception $e) {
     watchdog_exception('loft_dev', $e);
   }
 
@@ -1023,23 +1024,23 @@ function loft_dev_init() {
   if (!_loft_dev_reroute_email_status()
     && current_path() != 'admin/config/development/reroute_email'
   ) {
-    drupal_set_message(t('Reroute email is not properly enabled/configured. <a href="@url">Fix immediately</a>.', array(
+    drupal_set_message(t('Reroute email is not properly enabled/configured. <a href="@url">Fix immediately</a>.', [
       '@url' => url('admin/config/development/reroute_email'),
-    )), 'error', FALSE);
+    ]), 'error', FALSE);
   }
 
   $admin_stuff = module_invoke_all('loft_dev_admin_stuff');
-  $build['#attached']['js'][] = array(
+  $build['#attached']['js'][] = [
     'type' => 'setting',
-    'data' => array(
-      'loftDev' => array('adminStuff' => implode(', ', $admin_stuff['selectors'])),
-    ),
-  );
-  $build['#attached']['js'][] = array(
+    'data' => [
+      'loftDev' => ['adminStuff' => implode(', ', $admin_stuff['selectors'])],
+    ],
+  ];
+  $build['#attached']['js'][] = [
     'type' => 'file',
     'data' => drupal_get_path('module', 'loft_dev') . '/loft_dev.js',
-  );
-  $build['#attached']['library'][] = array('system', 'cookie');
+  ];
+  $build['#attached']['library'][] = ['system', 'cookie'];
   drupal_render($build);
 
   // Suppress admin menu if admin stuff hidden
@@ -1081,14 +1082,14 @@ function loft_dev_mail_alter($message) {
 
     // Stashes and sets to the testing mail system.
     $_loft_dev_mail_system_stashed_ = variable_get('mail_system');
-    variable_set('mail_system', array('default-system' => 'TestingMailSystem'));
+    variable_set('mail_system', ['default-system' => 'TestingMailSystem']);
 
     // Saves a copy of the message in the private files
     $_loft_dev_mail_filename_ = 'private://loft-dev/mail/' . time();
     $url = $_loft_dev_mail_filename_ . '.mail_alter.txt';
     file_prepare_directory(dirname($url), FILE_CREATE_DIRECTORY);
     file_unmanaged_save_data(var_export($message, TRUE), $url);
-    variable_set('mail_system', array('default-system' => 'TestingMailSystem'));
+    variable_set('mail_system', ['default-system' => 'TestingMailSystem']);
   }
 }
 
@@ -1111,7 +1112,7 @@ function _loft_dev_compose_php_mail($message) {
       unset($message['headers']['Return-Path']);
     }
   }
-  $mimeheaders = array();
+  $mimeheaders = [];
   foreach ($message['headers'] as $name => $value) {
     $mimeheaders[] = $name . ': ' . mime_header_encode($value);
   }
@@ -1183,7 +1184,7 @@ function loft_dev_exit() {
       if (!loft_dev_loft_deploy_export('loft_dev_auto')) {
         variable_set('loft_dev_loft_deploy_export_last', $rollback);
         if (_loft_dev_access()) {
-          drupal_set_message(t("Loft Dev was unabled to export the database using <code>ld export</code>; review <a href='!uri'>reports</a> for more info.", array('!uri' => url('admin/reports/dblog'))), 'error');
+          drupal_set_message(t("Loft Dev was unabled to export the database using <code>ld export</code>; review <a href='!uri'>reports</a> for more info.", ['!uri' => url('admin/reports/dblog')]), 'error');
         }
       }
     }
@@ -1194,8 +1195,8 @@ function loft_dev_exit() {
  * Implements hook_loft_dev_admin_stuff().
  */
 function loft_dev_loft_dev_admin_stuff() {
-  return array(
-    'selectors' => array(
+  return [
+    'selectors' => [
       ".block-alter-partials-dev",
       ".contextual-links-trigger",
       ".contextual-links-wrapper",
@@ -1211,8 +1212,8 @@ function loft_dev_loft_dev_admin_stuff() {
       "ul.tabs.primary",
       ".views-field-edit-node",
       ".block-loft-dev-page-review-checklist",
-    ),
-  );
+    ],
+  ];
 }
 
 /**
@@ -1229,36 +1230,36 @@ function loft_dev_loft_dev_admin_stuff() {
  * @see theme_links()
  */
 function loft_dev_loft_dev_menu() {
-  $links = array(
-    array(
+  $links = [
+    [
       'title' => t('Hide Admin Stuff'),
       'href' => '#',
-      'attributes' => array(
+      'attributes' => [
         'script' => 'return false;',
-        'class' => array(
+        'class' => [
           'loft-dev-closure-hide',
           'loft-dev-hide-admin-trigger',
-        ),
-      ),
-    ),
-    array(
+        ],
+      ],
+    ],
+    [
       'title' => 'Functions',
       'href' => 'admin/loft-dev/list/functions',
-    ),
-    array(
+    ],
+    [
       'title' => 'Constants',
       'href' => 'admin/loft-dev/list/constants',
-    ),
-    array(
+    ],
+    [
       'title' => 'Classes',
       'href' => 'admin/loft-dev/list/classes',
-    ),
-  );
+    ],
+  ];
 
-  $links[] = array(
+  $links[] = [
     'title' => t('List Libraries'),
     'href' => 'admin/loft-dev/list/libraries',
-  );
+  ];
 
   return $links;
 }
@@ -1283,8 +1284,8 @@ function loft_dev_node_suite() {
   }
   else {
     // Set the default values
-    $suite = array();
-    $cache = (object) array('data' => array());
+    $suite = [];
+    $cache = (object) ['data' => []];
   }
   if (empty($suite)) {
 
@@ -1292,7 +1293,7 @@ function loft_dev_node_suite() {
     foreach ($types as $type) {
       $query = db_select('node', 'n');
       $nid = $query
-        ->fields('n', array('nid',))
+        ->fields('n', ['nid',])
         ->condition('status', 1)
         ->condition('type', $type)
         ->orderRandom()
@@ -1304,7 +1305,7 @@ function loft_dev_node_suite() {
       if (empty($nid)) {
         $query = db_select('node', 'n');
         $nid = $query
-          ->fields('n', array('nid',))
+          ->fields('n', ['nid',])
           ->condition('status', 0)
           ->condition('type', $type)
           ->orderRandom()
@@ -1335,10 +1336,10 @@ function loft_dev_node_suite() {
  * @ingroup forms
  */
 function loft_dev_update_rewind_form($form, &$form_state) {
-  $form = array();
+  $form = [];
 
   $modules = module_list(FALSE, FALSE, TRUE);
-  $form['#rollbacks'] = array();
+  $form['#rollbacks'] = [];
   foreach ($modules as $key => $module_name) {
     $modules[$key] = $module_name;
     if (($form['#rollbacks'][$key] = variable_get('loft_dev:update_rollback_' . $module_name, NULL))) {
@@ -1346,16 +1347,16 @@ function loft_dev_update_rewind_form($form, &$form_state) {
     }
   }
 
-  $form['module'] = array(
+  $form['module'] = [
     '#type' => 'select',
     '#title' => t('Replay Last Module Update'),
     '#default_value' => !empty($_SESSION['loft_dev']['last_rewind']) ? $_SESSION['loft_dev']['last_rewind'] : '',
     '#options' => $modules,
-  );
-  $form['submit'] = array(
+  ];
+  $form['submit'] = [
     '#type' => 'submit',
     '#value' => t('Replay Update'),
-  );
+  ];
 
   return $form;
 }
@@ -1377,21 +1378,21 @@ function loft_dev_update_rewind_form_submit($form, &$form_state) {
 
   if (empty($version)) {
     $version = $query
-      ->fields('s', array('schema_version'))
+      ->fields('s', ['schema_version'])
       ->condition('name', $form_state['values']['module'])
       ->execute()->fetchField();
     --$version;
   }
 
   $count = db_update('system')
-    ->fields(array('schema_version' => $version))
+    ->fields(['schema_version' => $version])
     ->condition('name', $form_state['values']['module'])
     ->execute();
   if ($count) {
-    drupal_set_message(t('%module has been rewound to version %version', array(
+    drupal_set_message(t('%module has been rewound to version %version', [
       '%module' => $form_state['values']['module'],
       '%version' => $version,
-    )));
+    ]));
   }
   $form_state['redirect'] = 'update.php';
 }
@@ -1414,21 +1415,21 @@ function loft_dev_update_rewind_form_submit($form, &$form_state) {
  * @param        array or string $themes
  *                     If empty block will be moved for all themes.
  *                     If one theme you may pass a string.
- * @param int    $new_weight
+ * @param int $new_weight
  *                     Optional, if you want to assign it a new weight.
  */
-function loft_dev_move_block($module, $delta, $new_region, $themes = array(), $new_weight = NULL) {
+function loft_dev_move_block($module, $delta, $new_region, $themes = [], $new_weight = NULL) {
   if (empty($themes)) {
     $themes = array_keys(list_themes(TRUE));
   }
-  else if (is_string($themes)) {
-    $themes = array($themes);
+  elseif (is_string($themes)) {
+    $themes = [$themes];
   }
 
-  $fields = array(
+  $fields = [
     'region' => empty($new_region) ? -1 : $new_region,
     'status' => empty($new_region) ? 0 : 1,
-  );
+  ];
   if ($new_weight) {
     $fields['weight'] = $new_weight;
   }
@@ -1447,7 +1448,7 @@ function loft_dev_move_block($module, $delta, $new_region, $themes = array(), $n
  *
  * @param string $theme
  *   Optional, will use the block placment for current theme if empty
- * @param array  $themes
+ * @param array $themes
  *   An array of themes to match these settings
  *
  * @return string
@@ -1459,16 +1460,16 @@ function loft_dev_move_block($module, $delta, $new_region, $themes = array(), $n
  *  'fh_theme'))"
  * @endcode
  */
-function loft_dev_export_block_regions($theme = NULL, $themes = array()) {
+function loft_dev_export_block_regions($theme = NULL, $themes = []) {
   if (empty($theme)) {
     $theme = variable_get('theme_default', NULL);
   }
   $query = db_select('block', 'b');
   $query
-    ->fields('b', array('module', 'delta', 'region'))
+    ->fields('b', ['module', 'delta', 'region'])
     ->condition('theme', $theme)
     ->orderBy('region');
-  $export = array();
+  $export = [];
   $region = NULL;
   foreach ($query->execute() as $data) {
     if ($region != $data->region) {
@@ -1490,7 +1491,7 @@ function loft_dev_export_block_regions($theme = NULL, $themes = array()) {
  */
 function loft_dev_update_block($delta, $block, $module = 'block') {
   if (!module_exists('loft_updb')) {
-    watchdog('loft_dev', 'Missing module loft_updb', array(), WATCHDOG_ERROR);
+    watchdog('loft_dev', 'Missing module loft_updb', [], WATCHDOG_ERROR);
 
     return;
   }
@@ -1501,14 +1502,14 @@ function loft_dev_update_block($delta, $block, $module = 'block') {
 /**
  * Add a new custom block to the system
  *
- * @param bool   $overwrite
+ * @param bool $overwrite
  *                            Set this to true to delete a block with a
  *                            matching $description.
- * @param array  $body
+ * @param array $body
  *                            - key is the numerical format id
  *                            - value is the body text
  * @param string $description ($block->info)
- * @param array  $placement
+ * @param array $placement
  *                            - each key is a theme_name
  *                            - each value is an array of regions for that
  *                            theme
@@ -1517,13 +1518,13 @@ function loft_dev_update_block($delta, $block, $module = 'block') {
  * @return int
  *   The delta
  */
-function loft_dev_new_block($overwrite, $body, $description, $placement = array(), $title = '') {
+function loft_dev_new_block($overwrite, $body, $description, $placement = [], $title = '') {
   $format = key($body);
   $body = current($body);
 
   if ($overwrite) {
     $old_delta = db_select('block_custom', 'bc')
-      ->fields('bc', array('bid',))
+      ->fields('bc', ['bid',])
       ->condition('info', $description)
       ->execute()
       ->fetchField();
@@ -1540,24 +1541,24 @@ function loft_dev_new_block($overwrite, $body, $description, $placement = array(
     //  ->execute();
   }
   $delta = db_insert('block_custom')
-    ->fields(array(
+    ->fields([
       'body' => $body,
       'info' => $description,
       'format' => $format,
-    ))
+    ])
     ->execute();
 
   // This moves the delta in block_role
   // @todo wonky - aklump 11/07/2012 16:55:06
   if ($overwrite) {
     $count = db_update('block_role')
-      ->fields(array('delta' => $delta))
+      ->fields(['delta' => $delta])
       ->condition('module', 'block')
       ->condition('delta', $old_delta)
       ->execute();
   }
 
-  $query = db_insert('block')->fields(array(
+  $query = db_insert('block')->fields([
     'visibility',
     'pages',
     'custom',
@@ -1568,10 +1569,10 @@ function loft_dev_new_block($overwrite, $body, $description, $placement = array(
     'weight',
     'delta',
     'cache',
-  ));
+  ]);
   $theme_list = array_keys($placement);
   foreach ($theme_list as $theme_name) {
-    $query->values(array(
+    $query->values([
       'visibility' => 0,
       'pages' => '',
       'custom' => 0,
@@ -1582,7 +1583,7 @@ function loft_dev_new_block($overwrite, $body, $description, $placement = array(
       'weight' => 0,
       'delta' => $delta,
       'cache' => DRUPAL_NO_CACHE,
-    ));
+    ]);
   }
   $query->execute();
 
@@ -1598,21 +1599,21 @@ function loft_dev_new_block($overwrite, $body, $description, $placement = array(
 
   // Store regions per theme for this block
   if (is_string($regions)) {
-    $regions = array($regions);
+    $regions = [$regions];
   }
   foreach ($placement as $theme => $regions) {
     foreach ($regions as $region) {
       db_merge('block')
-        ->key(array(
+        ->key([
           'theme' => $theme,
           'delta' => $delta,
           'module' => 'block',
-        ))
-        ->fields(array(
+        ])
+        ->fields([
           'region' => ($region == BLOCK_REGION_NONE ? '' : $region),
           'pages' => '',
           'status' => (int) ($region != BLOCK_REGION_NONE),
-        ))
+        ])
         ->execute();
     }
   }
@@ -1643,7 +1644,7 @@ function loft_dev_update_node($nid, $body) {
  * Update helper function to reorder blocks in a region
  *
  * @param string $region
- * @param array  $blocks
+ * @param array $blocks
  *   Each element is 'module|delta'
  *
  * @return bool
@@ -1655,7 +1656,7 @@ function loft_dev_block_order($region, $blocks, $starting_weight = -20) {
       return FALSE;
     }
     $count = db_update('block')
-      ->fields(array('weight' => $weight))
+      ->fields(['weight' => $weight])
       ->condition('module', $block[0])
       ->condition('delta', $block[1])
       ->execute();
@@ -1686,7 +1687,7 @@ function loft_dev_block_order($region, $blocks, $starting_weight = -20) {
  * Get all the libraries by module
  */
 function loft_dev_get_libraries() {
-  $libraries = &drupal_static(__FUNCTION__, array());
+  $libraries = &drupal_static(__FUNCTION__, []);
   if (empty($libraries)) {
     $modules = module_list();
     foreach ($modules as $module) {
@@ -1711,45 +1712,45 @@ function loft_dev_get_libraries() {
  */
 function loft_dev_node_access_form($form, &$form_state) {
   if (empty($_SESSION['loft_dev']['node_access'])) {
-    $_SESSION['loft_dev']['node_access'] = array();
+    $_SESSION['loft_dev']['node_access'] = [];
   }
   $default = $_SESSION['loft_dev']['node_access'];
   $has_settings = !empty($default);
-  $default += array(
-    'nids' => array(),
-    'uids' => array(),
-  );
+  $default += [
+    'nids' => [],
+    'uids' => [],
+  ];
 
-  $form['settings'] = array(
+  $form['settings'] = [
     '#type' => 'fieldset',
     '#title' => t('Loft Node Access Settings'),
     '#collapsible' => TRUE,
     '#collapsed' => $has_settings,
-  );
-  $form['settings']['nids'] = array(
+  ];
+  $form['settings']['nids'] = [
     '#type' => 'textfield',
     '#description' => t('Comma separated list of nids'),
     '#title' => t('NIDs'),
     '#default_value' => implode(',', $default['nids']),
     '#required' => TRUE,
-  );
-  $form['settings']['uids'] = array(
+  ];
+  $form['settings']['uids'] = [
     '#type' => 'textfield',
     '#description' => t('Comma separated list of uids or usernames'),
     '#title' => t('Users'),
     '#default_value' => implode(',', $default['uids']),
     '#required' => TRUE,
-  );
-  $form['settings']['submit'] = array(
+  ];
+  $form['settings']['submit'] = [
     '#type' => 'submit',
     '#value' => t('Build Table'),
-  );
+  ];
 
   $output = '';
   if ($default['nids'] && $default['uids']) {
 
     $nodes = node_load_multiple($default['nids']);
-    $accounts = array();
+    $accounts = [];
     foreach ($default['uids'] as $uid) {
       if (!is_numeric($uid)) {
         $temp = user_load_by_name($uid);
@@ -1765,37 +1766,37 @@ function loft_dev_node_access_form($form, &$form_state) {
 
     // Build the table
     foreach ($nodes as $node) {
-      $caption = t('nid: @nid (type: @type) title: @title', array(
+      $caption = t('nid: @nid (type: @type) title: @title', [
         '@nid' => $node->nid,
         '@type' => $node->type,
         '@title' => $node->title,
-      ));
-      $rows = array();
+      ]);
+      $rows = [];
       foreach ($accounts as $account) {
-        $rows[] = array(
-          theme("username", array('account' => $account)),
+        $rows[] = [
+          theme("username", ['account' => $account]),
           node_access('create', $node, $account) ? t('Yes') : '&ndash;',
           node_access('view', $node, $account) ? t('Yes') : '&ndash;',
           node_access('update', $node, $account) ? t('Yes') : '&ndash;',
           node_access('delete', $node, $account) ? t('Yes') : '&ndash;',
-        );
+        ];
       }
-      $output .= theme("table", array(
+      $output .= theme("table", [
           'caption' => $caption,
-          'header' => array(
+          'header' => [
             t('User'),
             t('Create'),
             t('View'),
             t('Edit'),
             t('Delete'),
-          ),
+          ],
           'rows' => $rows,
-        )) . "\n";
+        ]) . "\n";
     }
     if ($output) {
-      $form['table'] = array(
+      $form['table'] = [
         '#markup' => $output,
-      );
+      ];
     }
   }
 
@@ -1842,20 +1843,20 @@ function loft_dev_node_access_form_submit($form, &$form_state) {
  *   - file: An include file which contains the authentication callbacks.
  */
 function loft_dev_services_authentication_info() {
-  return array(
+  return [
     'title' => 'Loft Dev Preset User Auth',
     'description' => 'Can be used to pre-authentate a given user for all calls during development.',
     'authenticate_call' => '_loft_dev_services_authenticate_call',
     'security_settings' => '_loft_dev_services_auth_form',
-  );
+  ];
 }
 
 /**
  * Authenticate a services call using the settings user.
  *
- * @param  array  $settings
+ * @param  array $settings
  * @param  string $method
- * @param  array  $args
+ * @param  array $args
  *
  * @return NULL||string
  */
@@ -1865,9 +1866,9 @@ function _loft_dev_services_authenticate_call() {
 
   $user = user_load_by_name($settings['username']);
   if (empty($user->uid)) {
-    return services_error(t("The username @name does not exist. Can't authenticate.", array(
+    return services_error(t("The username @name does not exist. Can't authenticate.", [
       '@name' => $settings['username'],
-    )), 403);
+    ]), 403);
   }
 }
 
@@ -1882,7 +1883,7 @@ function _loft_dev_services_authenticate_call() {
  * @ingroup forms
  */
 function _loft_dev_services_auth_form($settings, &$form_state) {
-  $form['username'] = array(
+  $form['username'] = [
     '#type' => 'textfield',
     '#description' => t('All server calls will authenticate with this user.'),
     '#title' => t('Username'),
@@ -1890,7 +1891,7 @@ function _loft_dev_services_auth_form($settings, &$form_state) {
     '#required' => TRUE,
     '#autocomplete_path' => 'user/autocomplete',
     '#maxlength' => 60,
-  );
+  ];
 
   return $form;
 }
@@ -1899,24 +1900,24 @@ function _loft_dev_services_auth_form($settings, &$form_state) {
  * Implements hook_theme().
  */
 function loft_dev_theme($existing, $type, $theme, $path) {
-  return array(
-    'loft_dev_migration' => array(
-      'variables' => array(
+  return [
+    'loft_dev_migration' => [
+      'variables' => [
         'urls' => NULL,
-        'results' => array(),
-      ),
+        'results' => [],
+      ],
       'file' => loft_dev_include('theme', 2),
-    ),
-    'loft_dev_css_circle' => array(
-      'variables' => array(
+    ],
+    'loft_dev_css_circle' => [
+      'variables' => [
         'width' => '8px',
         'color' => '#ffffff',
         'tag' => 'div',
-        'attributes' => array(),
-      ),
+        'attributes' => [],
+      ],
       'file' => loft_dev_include('theme', 2),
-    ),
-  );
+    ],
+  ];
 }
 
 /**
@@ -1931,8 +1932,8 @@ function loft_dev_theme($existing, $type, $theme, $path) {
  * @endcode
  */
 function loft_dev_css_cache_alter(&$css) {
-  $omit = variable_get('loft_dev_css_files_omit', array());
-  $css_files = variable_get('loft_dev_css_files_options', array());
+  $omit = variable_get('loft_dev_css_files_omit', []);
+  $css_files = variable_get('loft_dev_css_files_options', []);
   foreach ($css as $key => $data) {
     if ($data['type'] === 'file') {
       $css_files[$data['data']] = $data['data'];
@@ -1954,7 +1955,7 @@ function loft_dev_css_cache_alter(&$css) {
  */
 function loft_dev_get_path_title(&$path) {
   if (url_is_external($path)) {
-    $find = url('', array('absolute' => TRUE));
+    $find = url('', ['absolute' => TRUE]);
     list($null, $path) = explode($find, $path);
   }
   $path = trim(trim($path), '/');
@@ -1979,36 +1980,36 @@ function loft_dev_get_path_title(&$path) {
  */
 function loft_dev_button_catalog_form($form, &$form_state, ButtonCatalog $catalog) {
 
-  $form['advanced'] = array(
+  $form['advanced'] = [
     '#type' => 'container',
     '#title' => t('Advanced'),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
-  );
-  $form['advanced']['title'] = array(
+  ];
+  $form['advanced']['title'] = [
     '#type' => 'textfield',
     '#title' => t('Title'),
     '#default_value' => $catalog->getTitle(),
     '#required' => TRUE,
-  );
-  $form['advanced']['class'] = array(
+  ];
+  $form['advanced']['class'] = [
     '#type' => 'textfield',
     '#title' => t('CSS class .button'),
     '#default_value' => '',
     '#required' => TRUE,
-  );
-  $form['advanced']['state'] = array(
+  ];
+  $form['advanced']['state'] = [
     '#type' => 'select',
     '#title' => t('State'),
     '#default_value' => '',
-    '#options' => array(NULL => '') + drupal_map_assoc($catalog->getStates()),
-  );
-  $form['advanced']['layout'] = array(
+    '#options' => [NULL => ''] + drupal_map_assoc($catalog->getStates()),
+  ];
+  $form['advanced']['layout'] = [
     '#type' => 'select',
     '#title' => t('Layout'),
     '#default_value' => '',
-    '#options' => array(NULL => '') + drupal_map_assoc($catalog->getLayouts()),
-  );
+    '#options' => [NULL => ''] + drupal_map_assoc($catalog->getLayouts()),
+  ];
   //    $form['advanced']['actions']['update'] = array(
   //        '#type'  => 'submit',
   //        '#value' => t('Update'),
@@ -2032,8 +2033,8 @@ function loft_dev_loft_deploy_border_access_alter(&$access) {
 /**
  * Generate PHPTemplate template file stub.
  *
- * Place the following at the top of an empty twig file and load the page.  The content should change and you should
- * see a file header in it's place.
+ * Place the following at the top of an empty twig file and load the page.  The
+ * content should change and you should see a file header in it's place.
  *
  * The name of the file must be {anything}.tpl.php
  *
@@ -2062,8 +2063,8 @@ function loft_dev_phptemplate_hook_stub($template_file, array $vars) {
 /**
  * Generate Twig template file stub.
  *
- * Place the following at the top of an empty twig file and load the page.  The content should change and you should
- * see a file header in it's place.
+ * Place the following at the top of an empty twig file and load the page.  The
+ * content should change and you should see a file header in it's place.
  *
  * The name of the file must be {anything}.html.twig
  *
@@ -2083,20 +2084,15 @@ function loft_dev_twig_hook_stub($template_file, array $vars) {
     throw new \InvalidArgumentException("Filename must end in .html.twig");
   }
 
-  // Filter out snake case, duplicated vars
+  //Filter out camel case, duplicated vars
   $vars = array_diff_key($vars, array_flip(array_filter(array_keys($vars), function ($key) use ($vars) {
-    $cc = Strings::lowerCamel($key);
-    if (strpos($key, '_') !== FALSE && array_key_exists($cc, $vars)) {
-      return TRUE;
-    }
-
-    return FALSE;
+    return $key !== strtolower($key);
   })));
 
   // Filter out other vars by key.
   unset($vars['twig']);
 
-  $stub = _loft_dev_file_header(__FUNCTION__, $template_file, $vars);
+  $stub = _loft_dev_file_header(__FUNCTION__, $template_file, $vars, FALSE);
   $stub = str_replace("<?php\n", '', $stub);
   $stub = "{#\n$stub#}";
   $stub .= PHP_EOL . PHP_EOL . PHP_EOL . file_get_contents($template_file);
@@ -2112,22 +2108,23 @@ function loft_dev_twig_hook_stub($template_file, array $vars) {
  * @see loft_dev_twig_hook_stub
  * @see loft_dev_phptemplate_hook_stub
  */
-function _loft_dev_file_header($parent, $template_file, array $vars) {
+function _loft_dev_file_header($parent, $template_file, array $vars, $prepend_dollar_sign = TRUE) {
   $filename = preg_replace('/\.(html|tpl)$/', '', pathinfo($template_file, PATHINFO_FILENAME));
   $filename = Grammar::titleCase(str_replace('--', ', ', $filename));
   $vars = array_keys($vars);
   sort($vars);
   $list = array_reduce(array_filter($vars, function ($var) {
     return !in_array($var, ['partials']);
-  }), function ($carry, $var) {
-    return $carry . "\n *   - \$$var";
+  }), function ($carry, $var) use ($prepend_dollar_sign) {
+    return $carry . "\n *   - " . ($prepend_dollar_sign ? '$' : '') . "$var";
   });
 
 
   $stub = <<<EOD
 <?php
 /**
- * @file Theme implementation for {$filename}
+ * @file
+ * Theme implementation for {$filename}.
  *       
  * Available variables:{$list} 
  */
@@ -2143,17 +2140,18 @@ EOD;
 }
 
 function loft_dev_twiggy_twig_alter(Twig_Environment $twig) {
-  $twig->addFunction(new \Twig_SimpleFunction('loft_dev_hook_stub', function (Twig_Environment $env, $context) {
+  $twig->addFunction(new \Twig_SimpleFunction('file_header', function (Twig_Environment $env, $context) {
     $name_of_template_file = $env->getCompiler()->getFilename();
-    $path_to_template_file = $env->getLoader()->getCacheKey($name_of_template_file);
+    $path_to_template_file = $env->getLoader()
+      ->getCacheKey($name_of_template_file);
     loft_dev_twig_hook_stub($path_to_template_file, $context);
   }, ['needs_context' => TRUE, 'needs_environment' => TRUE]));
 }
 
 function loft_dev_loft_core_suppress_messages() {
-  return array(
-    'warning' => array(
+  return [
+    'warning' => [
       '/^Internet Explorer <=7 which will not load more than/',
-    ),
-  );
+    ],
+  ];
 }
