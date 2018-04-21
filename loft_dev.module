@@ -2033,10 +2033,8 @@ function loft_dev_loft_deploy_border_access_alter(&$access) {
 /**
  * Generate PHPTemplate template file stub.
  *
- * Place the following at the top of an empty twig file and load the page.  The
+ * Place the following at the top of any php file and load the page.  The
  * content should change and you should see a file header in it's place.
- *
- * The name of the file must be {anything}.tpl.php
  *
  * @code
  * <?php
@@ -2050,9 +2048,6 @@ function loft_dev_loft_deploy_border_access_alter(&$access) {
  * @throws \RuntimeException If the file cannot be written.
  */
 function loft_dev_phptemplate_hook_stub($template_file, array $vars) {
-  if (!preg_match('/\.tpl\.php$/', $template_file)) {
-    throw new \InvalidArgumentException("Filename must end in .tpl.php");
-  }
   $stub = _loft_dev_file_header(__FUNCTION__, $template_file, $vars);
   $stub .= PHP_EOL . PHP_EOL . PHP_EOL . file_get_contents($template_file);
   if (!file_put_contents($template_file, $stub)) {
@@ -2122,11 +2117,12 @@ function _loft_dev_file_header($parent, $template_file, array $vars, $prepend_do
 
   $stub = <<<EOD
 <?php
+
 /**
  * @file
  * Theme implementation for {$filename}.
- *       
- * Available variables:{$list} 
+ *
+ * Available variables:{$list}.
  */
 
 EOD;
