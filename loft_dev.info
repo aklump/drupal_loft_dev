@@ -3,7 +3,7 @@ description = Used by ITLS during development of a website.
 homepage = https://github.com/aklump/drupal_loft_dev
 package = Development
 core = 7.x
-version = 7.x-2.2-rc36
+version = 7.x-2.2-rc37
 dependencies[] = simpletest
 dependencies[] = reroute_email
 dependencies[] = link_css
@@ -15,6 +15,7 @@ dependencies[] = loft_testing
 dependencies[] = data_api
 dependencies[] = loft_core
 dependencies[] = loft_lib
+
 
 
 
