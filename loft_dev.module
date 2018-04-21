@@ -5,7 +5,6 @@
  */
 
 use AKlump\LoftLib\Code\Grammar;
-use AKlump\LoftLib\Code\Strings;
 use Drupal\loft_dev\ButtonCatalog;
 
 /**
@@ -2106,6 +2105,16 @@ function loft_dev_twig_hook_stub($template_file, array $vars) {
 function _loft_dev_file_header($parent, $template_file, array $vars, $prepend_dollar_sign = TRUE) {
   $filename = preg_replace('/\.(html|tpl)$/', '', pathinfo($template_file, PATHINFO_FILENAME));
   $filename = Grammar::titleCase(str_replace('--', ', ', $filename));
+  $extension = pathinfo($template_file, PATHINFO_EXTENSION);
+  switch ($extension) {
+    case 'tpl':
+    case 'twig':
+      $implementation = 'Theme Implementation';
+      break;
+    case 'inc':
+      $implementation = 'Alter Partial';
+      break;
+  }
   $vars = array_keys($vars);
   sort($vars);
   $list = array_reduce(array_filter($vars, function ($var) {
@@ -2120,7 +2129,7 @@ function _loft_dev_file_header($parent, $template_file, array $vars, $prepend_do
 
 /**
  * @file
- * Theme implementation for {$filename}.
+ * {$implementation} for {$filename}.
  *
  * Available variables:{$list}.
  */
