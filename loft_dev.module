@@ -2037,16 +2037,16 @@ function loft_dev_loft_deploy_border_access_alter(&$access) {
  *
  * @code
  * <?php
- * loft_dev_phptemplate_hook_stub(__FILE__, get_defined_vars());
+ * loft_dev_file_header(__FILE__, get_defined_vars());
  * @endcode
  *
- * @param       $template_file
+ * @param string $template_file
  * @param array $vars
  *
  * @throws \InvalidArgumentException If the filename is misnamed.
  * @throws \RuntimeException If the file cannot be written.
  */
-function loft_dev_phptemplate_hook_stub($template_file, array $vars) {
+function loft_dev_file_header($template_file, array $vars) {
   $stub = _loft_dev_file_header(__FUNCTION__, $template_file, $vars);
   $stub .= PHP_EOL . PHP_EOL . PHP_EOL . file_get_contents($template_file);
   if (!file_put_contents($template_file, $stub)) {
@@ -2063,7 +2063,7 @@ function loft_dev_phptemplate_hook_stub($template_file, array $vars) {
  * The name of the file must be {anything}.html.twig
  *
  * @code
- * {{ loft_dev_hook_stub() }}
+ * {{ file_header() }}
  * @endcode
  *
  * @param       $template_file
@@ -2100,7 +2100,7 @@ function loft_dev_twig_hook_stub($template_file, array $vars) {
  * Helper function to generate a file header.
  *
  * @see loft_dev_twig_hook_stub
- * @see loft_dev_phptemplate_hook_stub
+ * @see loft_dev_file_header
  */
 function _loft_dev_file_header($parent, $template_file, array $vars, $prepend_dollar_sign = TRUE) {
   $filename = preg_replace('/\.(html|tpl)$/', '', pathinfo($template_file, PATHINFO_FILENAME));
