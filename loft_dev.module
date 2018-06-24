@@ -2096,6 +2096,24 @@ function loft_dev_twig_hook_stub($template_file, array $vars) {
   //  unlink($original);
 }
 
+function _loft_dev_file_header_handle_vars($options, $vars, &$comments, &$level = 0) {
+  $func = __FUNCTION__;
+  ++$level;
+  $prefix = ' *' . str_repeat(' ', $level * $options['tab_spaces']) . '- ';
+  foreach ($vars as $varname => $var) {
+    if (is_numeric($varname)) {
+      continue;
+    }
+    $var_prefix = isset($options['var_prefix'][$level]) ? $options['var_prefix'][$level] : $options['var_prefix'][0];
+    $var_suffix = isset($options['var_suffix'][$level]) ? $options['var_suffix'][$level] : $options['var_suffix'][0];
+    $comments[] = $prefix . $var_prefix . $varname . $var_suffix . ' ' . gettype($var);
+    if ($level < $options['max_depth'] && is_array($var)) {
+      $func($options, $var, $comments, $level);
+    }
+  }
+  --$level;
+}
+
 /**
  * Helper function to generate a file header.
  *
@@ -2115,14 +2133,17 @@ function _loft_dev_file_header($parent, $template_file, array $vars, $prepend_do
       $implementation = 'Alter Partial';
       break;
   }
-  $vars = array_keys($vars);
-  sort($vars);
-  $list = array_reduce(array_filter($vars, function ($var) {
-    return !in_array($var, ['partials']);
-  }), function ($carry, $var) use ($prepend_dollar_sign) {
-    return $carry . "\n *   - " . ($prepend_dollar_sign ? '$' : '') . "$var";
-  });
+  ksort($vars);
 
+  $comments = [];
+  _loft_dev_file_header_handle_vars([
+    'tab_spaces' => 4,
+    'var_prefix' => [0 => '', 1 => ($prepend_dollar_sign ? '$' : '')],
+    'var_suffix' => [0 => '', 1 => ''],
+    'max_depth' => 2,
+  ], $vars, $comments);
+
+  $list = implode(PHP_EOL, $comments);
 
   $stub = <<<EOD
 <?php
@@ -2131,7 +2152,8 @@ function _loft_dev_file_header($parent, $template_file, array $vars, $prepend_do
  * @file
  * {$implementation} for {$filename}.
  *
- * Available variables:{$list}.
+ * Available variables:
+{$list}.
  */
 
 EOD;
