@@ -8,26 +8,11 @@ dependencies[] = simpletest
 dependencies[] = reroute_email
 dependencies[] = link_css
 dependencies[] = schema
-dependencies[] = coder
-dependencies[] = coder_review
 dependencies[] = xml_field
 dependencies[] = loft_testing
 dependencies[] = data_api
 dependencies[] = loft_core
 dependencies[] = loft_lib
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

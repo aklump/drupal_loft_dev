@@ -889,7 +889,6 @@ function loft_dev_list_functions_page($op) {
       'fb_social',
       'imageapi',
       'mailchimp',
-      'coder',
       'comment_notify',
       'link',
       'commerce_product',
