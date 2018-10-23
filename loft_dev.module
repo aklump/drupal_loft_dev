@@ -2123,9 +2123,14 @@ function _loft_dev_file_header_handle_vars($options, $vars, &$comments, &$level 
 function _loft_dev_file_header($parent, $template_file, array $vars, $prepend_dollar_sign = TRUE) {
   $filename = preg_replace('/\.(html|tpl)$/', '', pathinfo($template_file, PATHINFO_FILENAME));
   $filename = Grammar::titleCase(str_replace('--', ', ', $filename));
-  $extension = pathinfo($template_file, PATHINFO_EXTENSION);
+  if (preg_match('/(twig|tpl\.php)$/', $template_file, $matches)) {
+    $extension = $matches[1];
+  }
+  else {
+    $extension = pathinfo($template_file, PATHINFO_EXTENSION);
+  }
   switch ($extension) {
-    case 'tpl':
+    case 'tpl.php':
     case 'twig':
       $implementation = 'Theme Implementation';
       break;
