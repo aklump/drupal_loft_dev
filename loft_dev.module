@@ -2159,8 +2159,9 @@ function _loft_dev_file_header($parent, $template_file, array $vars, $prepend_do
  *
  * Available variables:
 {$list}.
+ *
+ * phpcs:disable Generic.PHP.DisallowShortOpenTag
  */
-
 EOD;
   $context = [
     'template_file' => $template_file,
