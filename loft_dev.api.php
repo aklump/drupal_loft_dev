@@ -8,6 +8,24 @@
  */
 
 /**
+ * Implements hook_loft_dev_js().
+ *
+ * Allow modules to easily disable entire groups of JS.
+ */
+function hook_loft_dev_js_alter(&$switches)
+{
+  $switches['setting'] = 0;
+  $switches['external'] = 0;
+  $switches['core'] = 0;
+  $switches['file.inline'] = 0;
+  $switches['file.core'] = 0;
+  $switches['file.contrib'] = 0;
+  $switches['file.custom'] = 0;
+  $switches['file.theme'] = 0;
+}
+
+
+/**
  * Implements hook_loft_dev_admin_stuff().
  *
  * Allow modules to add jquery selectors to what is considered admin stuff.

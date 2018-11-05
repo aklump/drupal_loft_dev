@@ -2188,3 +2188,42 @@ function loft_dev_loft_core_suppress_messages() {
     ],
   ];
 }
+
+/**
+ * Implements hook_js_alter().
+ */
+function loft_dev_js_alter(&$js) {
+  $switches = array_fill_keys([
+    'external',
+    'file.contrib',
+    'file.core',
+    'file.custom',
+    'file.theme',
+    'inline',
+    'setting',
+  ], TRUE);
+  drupal_alter('loft_dev_js', $switches);
+  $js = array_filter($js, function ($item) use ($switches) {
+    if ($item['type'] !== 'file') {
+      return $switches[$item['type']];
+    }
+
+    $filetype = NULL;
+    if (strpos($item['data'], 'theme') !== FALSE) {
+      $filetype = 'theme';
+    }
+    elseif (strpos($item['data'], '/modules') !== FALSE) {
+      if (strpos($item['data'], '/custom') !== FALSE) {
+        $filetype = 'custom';
+      }
+      else {
+        $filetype = 'contrib';
+      }
+    }
+    elseif (strpos($item['data'], 'misc/') !== FALSE) {
+      $filetype = 'core';
+    }
+
+    return $switches['file.' . $filetype];
+  });
+}
