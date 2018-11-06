@@ -2088,7 +2088,7 @@ function loft_dev_twig_hook_stub($template_file, array $vars) {
 
   $stub = _loft_dev_file_header(__FUNCTION__, $template_file, $vars, FALSE);
   $stub = str_replace("<?php\n", '', $stub);
-  $stub = "{#\n$stub#}";
+  $stub = "{#\n" . trim($stub) . PHP_EOL . '#}';
   $stub .= PHP_EOL . PHP_EOL . PHP_EOL . file_get_contents($template_file);
   if (!file_put_contents($template_file, $stub)) {
     throw new \RuntimeException("Could not write file.");
@@ -2129,12 +2129,17 @@ function _loft_dev_file_header($parent, $template_file, array $vars, $prepend_do
   else {
     $extension = pathinfo($template_file, PATHINFO_EXTENSION);
   }
+  $type = NULL;
   switch ($extension) {
     case 'tpl.php':
+      $type = 'php';
     case 'twig':
+      $type = $type ? $type : 'twig';
       $implementation = 'Theme Implementation';
       break;
+
     case 'inc':
+      $type = 'php';
       $implementation = 'Alter Partial';
       break;
   }
@@ -2149,6 +2154,10 @@ function _loft_dev_file_header($parent, $template_file, array $vars, $prepend_do
   ], $vars, $comments);
 
   $list = implode(PHP_EOL, $comments);
+  $phpcs = '';
+  if ($type === 'php') {
+    $phpcs = PHP_EOL . ' *' . PHP_EOL .' * phpcs:disable Generic.PHP.DisallowShortOpenTag';
+  }
 
   $stub = <<<EOD
 <?php
@@ -2158,9 +2167,7 @@ function _loft_dev_file_header($parent, $template_file, array $vars, $prepend_do
  * {$implementation} for {$filename}.
  *
  * Available variables:
-{$list}.
- *
- * phpcs:disable Generic.PHP.DisallowShortOpenTag
+{$list}.{$phpcs}
  */
 EOD;
   $context = [
