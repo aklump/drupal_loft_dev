@@ -2156,7 +2156,7 @@ function _loft_dev_file_header($parent, $template_file, array $vars, $prepend_do
   $list = implode(PHP_EOL, $comments);
   $phpcs = '';
   if ($type === 'php') {
-    $phpcs = PHP_EOL . ' *' . PHP_EOL .' * phpcs:disable Generic.PHP.DisallowShortOpenTag';
+    $phpcs = PHP_EOL . ' *' . PHP_EOL . ' * phpcs:disable Generic.PHP.DisallowShortOpenTag';
   }
 
   $stub = <<<EOD
@@ -2231,6 +2231,6 @@ function loft_dev_js_alter(&$js) {
       $filetype = 'core';
     }
 
-    return $switches['file.' . $filetype];
+    return isset($switches['file.' . $filetype]) ? $switches['file.' . $filetype] : TRUE;
   });
 }
