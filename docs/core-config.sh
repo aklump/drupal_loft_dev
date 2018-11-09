@@ -39,10 +39,9 @@ drupal_dir = '../help'
  # The file path to an extra README.txt file; when README.md is compiled and
  # this variable is set, the .txt version will be copied to this location.
  #
-#README = '../README.txt'
-
-# This would also copy README.md as well as README.txt
 README = '../README.txt ../README.md'
+
+CHANGELOG = '../CHANGELOG.md'
 
 #
 # web_package support: path to web_package.info file
