@@ -623,11 +623,6 @@ function loft_dev_block_info() {
     'cache' => DRUPAL_NO_CACHE,
   ];
 
-  $blocks['page_review_checklist'] = [
-    'info' => t('LOFT DEV: Development Progress List'),
-    'cache' => DRUPAL_NO_CACHE,
-  ];
-
   return $blocks;
 }
 
@@ -654,13 +649,6 @@ function loft_dev_block_view($delta = '') {
     'content' => NULL,
   ];
   switch ($delta) {
-    case 'page_review_checklist';
-      loft_dev_include('pages');
-      $form = drupal_get_form('page_review_checklist_form');
-      $block['content']['form'] = $form;
-
-      break;
-
     case 'dev_tools':
 
       if (!_loft_dev_access()) {
@@ -860,92 +848,6 @@ function loft_dev_block_view($delta = '') {
   }
 
   return $block;
-}
-
-/**
- * Implements hook_block_configure().
- */
-function loft_dev_block_configure($delta = '') {
-  $form = [];
-  if ($delta = 'page_review_checklist') {
-    $default = '<config>
-  <page weight="0">
-    <status>1</status>
-    <title></title>
-    <uri></uri>
-    <comp></comp>
-    <comp></comp>
-    <notes></notes>
-    <notes></notes>
-  </page>  
-</config>';
-
-    $storage = loft_dev_private_storage('page_review');
-    $json = json_decode($storage['settings.json']);
-    $default = isset($storage['checklist.xml']) ? $storage['checklist.xml'] : $default;
-    // $default = variable_get('loft_dev_block_page_review_checklist', $default);
-    $form['page_review_checklist'] = [
-      '#type' => 'xml_codemirror',
-      '#title' => t('Checklist config'),
-      '#description' => t('Enter a list of urls to review, one per line.'),
-      '#default_value' => $default,
-      '#xml_example' => $default,
-      '#rows' => 10,
-    ];
-
-    $default = isset($json->domain) ? $json->domain : url('', ['absolute' => TRUE]);
-    $form['page_review_domain'] = [
-      '#type' => 'textfield',
-      '#title' => t('Export base domain'),
-      '#description' => t('This will be used to build the export URLs.'),
-      '#default_value' => $default,
-      '#required' => TRUE,
-    ];
-
-    $default = isset($json->export_format) ? $json->export_format : 'markdown';
-    $form['page_review_export_format'] = [
-      '#type' => 'select',
-      '#title' => t('Export format'),
-      '#default_value' => $default,
-      '#options' => [
-        'markdown' => 'Markdown',
-        'basecamp' => 'Basecamp',
-        'todos' => 'Todo list',
-      ],
-    ];
-  }
-
-  return $form;
-}
-
-/**
- * Implements hook_block_save().
- */
-function loft_dev_block_save($delta = '', $edit = []) {
-  if ($delta === 'page_review_checklist') {
-
-    $data['settings.json'] = json_encode([
-      'export_format' => $edit['page_review_export_format'],
-      'domain' => $edit['page_review_domain'],
-    ]);
-
-    // Process pages.
-    $config = xml_field_xml($edit['page_review_checklist']);
-    $config = xml_field_sort($config);
-    foreach ($config->page as $value) {
-      $title = xml_field($value, 'title');
-      if ($uri = xml_field($value, 'uri')) {
-        $value->uri = $uri;
-      }
-      if (empty($title) && $uri) {
-        $value->title = loft_dev_get_path_title($uri);
-      }
-    }
-
-    $config = xml_field_format($config);
-    $data['checklist.xml'] = $config;
-    loft_dev_private_storage('page_review', $data);
-  }
 }
 
 /**
