@@ -1994,24 +1994,28 @@ function loft_dev_twig_hook_stub($template_file, array $vars) {
   $stub = _loft_dev_file_header(__FUNCTION__, $template_file, $vars, FALSE);
   $stub = str_replace("<?php\n", '', $stub);
   $stub = "{#\n" . trim($stub) . PHP_EOL . '#}';
-  $stub .= PHP_EOL . PHP_EOL . PHP_EOL . file_get_contents($template_file);
+
+  $contents = file_get_contents($template_file);
+  $contents = preg_replace('/^\s*{{ file_header\(\) }}\s*/', '', $contents);
+  $stub .= PHP_EOL . PHP_EOL . ltrim($contents);
+
   if (!file_put_contents($template_file, $stub)) {
     throw new \RuntimeException("Could not write file.");
   }
 }
 
 function _loft_dev_file_header_handle_vars($options, $vars, &$comments, &$level = 0) {
-  $vars = json_decode(json_encode($vars), TRUE);
+  $vars_as_array = json_decode(json_encode($vars), TRUE);
   $func = __FUNCTION__;
   ++$level;
   $prefix = ' *' . str_repeat(' ', $level * $options['tab_spaces']) . '- ';
-  foreach ($vars as $varname => $var) {
+  foreach ($vars_as_array as $varname => $var) {
     if (is_numeric($varname)) {
       continue;
     }
     $var_prefix = isset($options['var_prefix'][$level]) ? $options['var_prefix'][$level] : $options['var_prefix'][0];
     $var_suffix = isset($options['var_suffix'][$level]) ? $options['var_suffix'][$level] : $options['var_suffix'][0];
-    $comments[] = $prefix . $var_prefix . $varname . $var_suffix . ' ' . gettype($var);
+    $comments[] = $prefix . $var_prefix . $varname . $var_suffix . ' ' . gettype($vars[$varname]);
     if ($level < $options['max_depth'] && (is_array($var))) {
       $func($options, $var, $comments, $level);
     }
