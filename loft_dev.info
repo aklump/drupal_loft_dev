@@ -9,20 +9,5 @@ dependencies[] = reroute_email
 dependencies[] = link_css
 dependencies[] = schema
 dependencies[] = xml_field
-dependencies[] = loft_testing
 dependencies[] = data_api
 dependencies[] = loft_core
-dependencies[] = loft_lib
-
-
-
-
-
-
-
-
-
-
-
-;dependencies[] = devel
-;dependencies[] = devel_node_access
