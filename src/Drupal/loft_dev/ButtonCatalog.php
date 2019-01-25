@@ -2,9 +2,13 @@
 
 namespace Drupal\loft_dev;
 
-use AKlump\LoftLib\Component\Storage\FilePath;
+use AKlump\Data\DataInterface;
+use AKlump\LoftLib\Storage\FilePath;
+use Drupal\data_api\DataTrait;
 
 class ButtonCatalog {
+
+  use DataTrait;
 
   protected $themes, $states, $layouts, $config, $theme;
 
@@ -13,12 +17,13 @@ class ButtonCatalog {
   /**
    * ButtonCatalog constructor.
    */
-  public function __construct(array $config) {
+  public function __construct(array $config, DataInterface $data) {
     $this->config = $config;
-    $this->themes = $config['themes'];
-    $this->modules = $config['modules'];
-    $this->states = $config['states'];
-    $this->layouts = $config['layouts'];
+    $this->setDataApiData($data);
+    $this->themes = $this->g->get($config, 'themes', []);
+    $this->modules = $this->g->get($config, 'modules', []);
+    $this->states = $this->g->get($config, 'states', []);
+    $this->layouts = $this->g->get($config, 'layouts', []);
   }
 
   /**
@@ -280,7 +285,7 @@ class ButtonCatalog {
    * Return the cached value by key.
    *
    * @param string $key
-   * @param mixed  $default Optional, a default value other than null.
+   * @param mixed $default Optional, a default value other than null.
    *
    * @return array
    */

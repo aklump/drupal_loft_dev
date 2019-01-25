@@ -4,6 +4,8 @@
  * Pages for loft_dev
  */
 
+use Drupal\loft_dev\ButtonCatalog;
+
 /**
  * Apply ld export via shell.
  *
@@ -229,7 +231,6 @@ function loft_dev_theme_test_page() {
   $output .= '<div><div class="ajax-progress">
     <div class="throbber"></div>
   </div></div>' . "\n";
-
 
 
   //confirm form
@@ -745,7 +746,7 @@ function loft_dev_zebra_stripes(&$classes_array, $zebra_group = 'default') {
     if ($increment[$zebra_group]['base_' . $i] == 1) {
       $class .= 'first';
     }
-    else if ($i == $increment[$zebra_group]['base_' . $i]) {
+    elseif ($i == $increment[$zebra_group]['base_' . $i]) {
       $class .= 'last';
     }
     else {
@@ -1253,14 +1254,14 @@ function loft_dev_button_catalog_page($theme = NULL) {
     }
   }
   if (empty($data)) {
-
     try {
 
       // Calculate the value of $data now...
       $config = module_invoke_all('loft_dev_button_catalog');
-      $obj = new \Drupal\loft_dev\ButtonCatalog($config);
+      $obj = new ButtonCatalog($config, data_api());
       $data = $obj->setTheme($theme)->writeSass()->build();
-    } catch (\Exception $exception) {
+    }
+    catch (\Exception $exception) {
       drupal_set_message($exception->getMessage(), 'error', FALSE);
     }
     $data = drupal_render($data);
