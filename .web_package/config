@@ -6,4 +6,6 @@ create_tags = patch
 push_tags = auto
 push_master = auto
 push_develop = no
-micro_prefix = -rc
+patch_prefix = -rc
+preserve_patch_zero = false
+info_file = loft_dev.info
