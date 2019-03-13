@@ -39,7 +39,10 @@ function loft_dev_check_path($path) {
 
   if (!$status) {
     $url = url($uri, array('absolute' => TRUE));
-    $item = drupal_http_request($url, array('max_redirects' => 0, 'timeout' => 10));
+    $item = drupal_http_request($url, array(
+      'max_redirects' => 0,
+      'timeout' => 10,
+    ));
     unset($item->response);
     $status = in_array(substr($item->code, 0, 1), array(2, 3));
   }
@@ -74,12 +77,17 @@ function theme_loft_dev_migration($vars) {
     $row = array(
       $path,
       $result->status ? t('migrated') : t('?'),
-      $result->status ? l($result->path, $result->path) :'?',
-      l(t('Add redirect'), 'admin/config/search/redirect/add', array('query' => drupal_get_destination() + array(
-        'source' => $result->path,
-      ))),
+      $result->status ? l($result->path, $result->path) : '?',
+      l(t('Add redirect'), 'admin/config/search/redirect/add', array(
+        'query' => drupal_get_destination() + array(
+            'source' => $result->path,
+          ),
+      )),
     );
-    $rows[$result->status][] = array('data' => $row, 'class' => array($result->status ? '' :'error'));
+    $rows[$result->status][] = array(
+      'data' => $row,
+      'class' => array($result->status ? '' : 'error'),
+    );
   }
 
   $build['table'] = array(
@@ -126,11 +134,14 @@ function theme_loft_dev_css_circle($vars) {
   $style[] = 'display:inline-block';
   $style[] = 'border:' . $w . ' solid ' . $vars['color'];
   $style = implode(';', $style);
-  $attributes = drupal_array_merge_deep(array('class' => array('circle'), 'style' => $style), $vars['attributes']);
+  $attributes = drupal_array_merge_deep(array(
+    'class' => array('circle'),
+    'style' => $style,
+  ), $vars['attributes']);
 
   $build[] = array(
-    '#theme' => 'html_tag', 
-    '#tag' => $vars['tag'], 
+    '#theme' => 'html_tag',
+    '#tag' => $vars['tag'],
     '#attributes' => $attributes,
     '#value' => '',
   );

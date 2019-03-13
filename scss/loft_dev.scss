@@ -1,0 +1,201 @@
+$white: #fff;
+$green: #6f6;
+
+body.page-loft-dev-theme-playground {
+  #admin-menu {
+    display: none;
+  }
+}
+
+.block-loft-dev {
+
+  // Typography
+  font-size: 14px !important;
+  h2, h3, legend {
+    font-size: 18px !important
+  }
+  legend {
+    border: none !important;
+  }
+  h2:first-child {
+    margin-top: 0;
+  }
+
+  background-color: #000;
+  margin-top: 100px;
+  position: relative;
+  text-align: left;
+  color: $green;
+  font-family: "Panic Sans", monospace !important;
+  .loft-dev-closure {
+    padding: 20px;
+  }
+  .form-submit,
+  .form-text,
+  .form-select option {
+    color: #000 !important;
+    border-color: #333 !important;
+    background-color: #333 !important;
+  }
+  select {
+    width: 100% !important;
+  }
+  .form-text {
+    display: auto !important;
+    width: 100% !important;
+  }
+  tr.odd {
+    background: #000;
+  }
+  tr.even {
+    background: #333;
+  }
+  th {
+    background: #666;
+    color: #000;
+  }
+  table {
+    width: 100%;
+  }
+  a,
+  a:link,
+  a:visited,
+  a:hover,
+  a:active {
+    color: $green;
+    text-decoration: underline;
+    font-weight: normal;
+  }
+  a:hover {
+    color: $white;
+  }
+
+  .links  li {
+    list-style: none;
+  }
+}
+
+#loft-dev-update-rewind-form .form-item,
+#loft-dev-update-rewind-form label {
+  display: inline-block;
+}
+
+span.alt {
+  color: red;
+}
+
+span.tri {
+  color: green;
+}
+
+span.tetra {
+  color: blue;
+}
+
+span.alpha {
+  color: orange;
+}
+
+span.beta {
+  color: purple;
+}
+
+span.gamma {
+  color: pink;
+}
+
+span.delta {
+  color: grey;
+}
+
+#loft-dev-node-access-form th,
+#loft-dev-node-access-form td {
+  text-align: center;
+}
+
+#loft-dev-node-access-form {
+  margin: 20px 0;
+}
+
+/**
+ * drupal elements
+ */
+li .element-details {
+  display: none;
+}
+
+.loft-dev-show-admin-stuff {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  text-decoration: none;
+}
+
+#page-review-checklist-form {
+  margin: 10px;
+  background-color: #fff;
+  &,
+  a {
+    color: #000;
+    text-decoration: none;
+    font-family: Arial, sans-serif;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+}
+
+.button-catalog {
+  padding: 20px 0;
+  &__components {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+  }
+  &__attributes {
+    margin-bottom: 10px;
+    opacity: .3;
+    &:hover {
+      opacity: 1;
+    }
+  }
+  &--single {
+    .form-item-state {
+      display: none;
+    }
+  }
+  &--single &__components {
+    display: block;
+    .button {
+      display: block;
+    }
+    .form-item-state {
+      display: none;
+    }
+  }
+  &__form {
+    .form-item label {
+      display: none;
+    }
+    .form-wrapper {
+      display: flex;
+      justify-content: space-between;
+    }
+    .form-item {
+      margin: 0 10px 0 0;
+    }
+    .form-type-textfield {
+      width: 50%;
+    }
+    .form-text {
+      width: 100%;
+    }
+    .form-submit {
+      display: none;
+    }
+  }
+
+  .button {
+    margin-bottom: 20px;
+  }
+}

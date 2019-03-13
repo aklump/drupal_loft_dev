@@ -126,11 +126,7 @@ function loft_dev_playground_page() {
     'weight' => 1000,
   );
   // This does NOT work for library_load()
-  $css_js['#attached']['library'][] = array('system', 'cookie');
-  $css_js['#attached']['js'][] = array(
-    'type' => 'file',
-    'data' => drupal_get_path('module', 'loft_dev') . '/loft_dev.js',
-  );
+  $css_js['#attached']['library'][] = array('loft_dev', 'loft_dev');
   $css_js['#attached']['js'][] = array(
     'type' => 'file',
     'group' => JS_THEME,
@@ -594,17 +590,14 @@ function loft_dev_list_fapi_elements_page() {
     '#title' => t('Filter'),
     '#default_value' => '',
     '#attached' => array(
-      'js' => array(
-        drupal_get_path('module', 'loft_dev') . '/loft_dev.js',
-      ),
       'library' => array(
-        array('system', 'cookie'),
+        array('loft_dev', 'loft_dev'),
       ),
     ),
   );
 
   // This does NOT work for library_load()
-  $build['#attached']['library'][] = array('system', 'cookie');
+  $build['#attached']['library'][] = array('loft_dev', 'loft_dev');
 
   $build[] = array(
     '#theme' => 'item_list',
@@ -613,9 +606,6 @@ function loft_dev_list_fapi_elements_page() {
       'id' => 'loft-dev-elements-list',
     ),
   );
-
-  drupal_add_css(drupal_get_path('module', 'loft_dev') . '/loft_dev.css');
-  drupal_add_js(drupal_get_path('module', 'loft_dev') . '/loft_dev.js');
 
   return $build;
 }
@@ -652,8 +642,9 @@ function loft_dev_server_vars_page() {
 }
 
 function loft_dev_zebra_striping_page($max = 100) {
-  drupal_add_css(drupal_get_path('module', 'loft_dev') . '/loft_dev.css');
   $build = $items = array();
+  $build['#attached']['library'][] = array('loft_dev', 'loft_dev');
+
   module_load_include('inc', 'loft_dev', 'includes/loft_dev.theme');
   loft_dev_zebra_stripes_reset('loft_dev_zebra_striping_page');
   for ($i = 0; $i < $max; ++$i) {
@@ -674,6 +665,7 @@ function loft_dev_zebra_striping_page($max = 100) {
     '#items' => $items,
     '#type' => 'ol',
   );
+
 
   return $build;
 }
@@ -930,11 +922,8 @@ function loft_dev_list_functions_page($op) {
     '#title' => t('Filter'),
     '#default_value' => '',
     '#attached' => array(
-      'js' => array(
-        drupal_get_path('module', 'loft_dev') . '/loft_dev.js',
-      ),
       'library' => array(
-        array('system', 'cookie'),
+        array('loft_dev', 'loft_dev'),
       ),
     ),
   );

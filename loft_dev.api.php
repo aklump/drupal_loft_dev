@@ -12,8 +12,7 @@
  *
  * Allow modules to easily disable entire groups of JS.
  */
-function hook_loft_dev_js_alter(&$switches)
-{
+function hook_loft_dev_js_alter(&$switches) {
   $switches['setting'] = 0;
   $switches['external'] = 0;
   $switches['core'] = 0;
@@ -31,14 +30,13 @@ function hook_loft_dev_js_alter(&$switches)
  * Allow modules to add jquery selectors to what is considered admin stuff.
  * Such that they can affect the Hide Admin Stuff button.
  */
-function hook_loft_dev_admin_stuff()
-{
-    return array(
-        'selectors' => array(
-            ".links.inline",
-            ".gop-admin-only",
-        ),
-    );
+function hook_loft_dev_admin_stuff() {
+  return array(
+    'selectors' => array(
+      ".links.inline",
+      ".gop-admin-only",
+    ),
+  );
 }
 
 /**
@@ -54,14 +52,13 @@ function hook_loft_dev_admin_stuff()
  *
  * @see theme_links()
  */
-function hook_loft_dev_menu()
-{
-    return array(
-        array(
-            'title' => '',
-            'href'  => '',
-        ),
-    );
+function hook_loft_dev_menu() {
+  return array(
+    array(
+      'title' => '',
+      'href' => '',
+    ),
+  );
 }
 
 /**
@@ -81,16 +78,15 @@ function hook_loft_dev_menu()
  * @endcode
  */
 
-function hook_loft_dev_function_includes()
-{
-    return array(
-        array(
-            'file path' => drupal_get_path('module', 'koiros') . '/includes',
-            'file'      => array(
-                '#mask' => '/\.inc$/',
-            ),
-        ),
-    );
+function hook_loft_dev_function_includes() {
+  return array(
+    array(
+      'file path' => drupal_get_path('module', 'koiros') . '/includes',
+      'file' => array(
+        '#mask' => '/\.inc$/',
+      ),
+    ),
+  );
 }
 
 /**
@@ -103,146 +99,142 @@ function hook_loft_dev_function_includes()
  * @return array
  *   An array of module names that should be enabled when loft_dev is enabled
  */
-function hook_loft_dev_module_dependencies()
-{
-    return array(
-        'ova_dev',
-    );
+function hook_loft_dev_module_dependencies() {
+  return array(
+    'ova_dev',
+  );
 }
 
 /**
  * Implements hook_loft_dev_playground_info().
  */
-function hook_loft_dev_playground_info(&$info)
-{
-    return array(
-        'data_path' => drupal_get_path('theme', 'my_theme') . '/loft_dev_playground',
-    );
+function hook_loft_dev_playground_info(&$info) {
+  return array(
+    'data_path' => drupal_get_path('theme', 'my_theme') . '/loft_dev_playground',
+  );
 }
 
 /**
  * Implements hook_loft_dev_api().
  */
-function hook_loft_dev_sandbox()
-{
-    return array(
-        // You may have more than one trigger...
-        array(
-            // Appending ?sb to the url will cause callback to be executed with
-            // callback arguments.
-            'query'              => 'sb',
-            'callback'           => 'module_load_include',
-            'callback arguments' => array(
-                'inc',
-                'my_module',
-                'includes/my_module.sandbox',
-            ),
-        ),
-    );
+function hook_loft_dev_sandbox() {
+  return array(
+    // You may have more than one trigger...
+    array(
+      // Appending ?sb to the url will cause callback to be executed with
+      // callback arguments.
+      'query' => 'sb',
+      'callback' => 'module_load_include',
+      'callback arguments' => array(
+        'inc',
+        'my_module',
+        'includes/my_module.sandbox',
+      ),
+    ),
+  );
 }
 
 /**
  * Implements hook_loft_dev_button_catalog().
  */
-function HOOK_loft_dev_button_catalog()
-{
-    return [
-        'sass_dir' => drupal_get_path('theme', 'gop5_theme') . '/sass/drupal/',
-        'sass_file' => '_button--catalog.scss',
+function HOOK_loft_dev_button_catalog() {
+  return [
+    'sass_dir' => drupal_get_path('theme', 'gop5_theme') . '/sass/drupal/',
+    'sass_file' => '_button--catalog.scss',
 
-        // A function that generates the build array for each button.
-        'button_callback' => function ($title, $href, $theme, $state, $layout) {
-          return array(
-            '#theme' => 'g5_button',
-            '#title' => $title,
-            '#href' => $href,
-            '#button_type' => 'link',
-            '#attributes' => new Attribute([
-              'class' => [
-                $theme ? 'theme--' . $theme : '',
-                $state ? 'is-' . $state : '',
-                $layout ? 'layout--' . $layout : '',
-              ],
-            ]),
-          );
-        },
+    // A function that generates the build array for each button.
+    'button_callback' => function ($title, $href, $theme, $state, $layout) {
+      return array(
+        '#theme' => 'g5_button',
+        '#title' => $title,
+        '#href' => $href,
+        '#button_type' => 'link',
+        '#attributes' => new Attribute([
+          'class' => [
+            $theme ? 'theme--' . $theme : '',
+            $state ? 'is-' . $state : '',
+            $layout ? 'layout--' . $layout : '',
+          ],
+        ]),
+      );
+    },
 
-        // Modules are special themes which also generate classnames like .button--primary
-        // They should are meant to wrap up several themes to ease reuse.
-        // You must also list your module in the themes array.
-        'modules' => [
-          'primary',
-          'secondary',
-          'tertiary',
-          'token',
-          'primary--facebook',
-          'user-action',
-        ],
+    // Modules are special themes which also generate classnames like .button--primary
+    // They should are meant to wrap up several themes to ease reuse.
+    // You must also list your module in the themes array.
+    'modules' => [
+      'primary',
+      'secondary',
+      'tertiary',
+      'token',
+      'primary--facebook',
+      'user-action',
+    ],
 
-        // Themes generate classnames like .button.theme--primary.
-        // Themes are classes that can be applies as many as you want to a single .button.
-        'themes'  => [
-            'add',
-            'admin',
-            'back',
-            'black',
-            'blue',
-            'caps',
-            'disabled',
-            'facebook',
-            'fadebook_share',
-            'filter',
-            'filters',
-            'forward',
-            'glyph',
-            'goto',
-            'green',
-            'grey',
-            'icon',
-            'larger',
-            'lesson-plan',
-            'link',
-            'mailto',
-            'marked',
-            'no-bg',
-            'notes',
-            'option',
-            'outline',
-            'parent',
-            'pill',
-            'pill-blue',
-            'pinterest',
-            'plus',
-            'primary',
-            'primary-red',
-            'primary-white',
-            'red',
-            'secondary',
-            'sharing',
-            'sharp',
-            'sharp-left',
-            'short',
-            'textfield',
-            'trash',
-            'tumblr',
-            'twitter',
-            'unmarked',
-            'v--right',
-            'white',
-            'words',
-            'words--black',
-            'words--blue',
-            'words--red',
-        ],
-        'states'  => [
-            'disabled',
-            'error',
-            'focus',
-            'hidden',
-            'inert',
-            'selected',
-            'success',
-        ],
-        'layouts' => ['center', 'right'],
-    ];
+    // Themes generate classnames like .button.theme--primary.
+    // Themes are classes that can be applies as many as you want to a single .button.
+    'themes' => [
+      'add',
+      'admin',
+      'back',
+      'black',
+      'blue',
+      'caps',
+      'disabled',
+      'facebook',
+      'fadebook_share',
+      'filter',
+      'filters',
+      'forward',
+      'glyph',
+      'goto',
+      'green',
+      'grey',
+      'icon',
+      'larger',
+      'lesson-plan',
+      'link',
+      'mailto',
+      'marked',
+      'no-bg',
+      'notes',
+      'option',
+      'outline',
+      'parent',
+      'pill',
+      'pill-blue',
+      'pinterest',
+      'plus',
+      'primary',
+      'primary-red',
+      'primary-white',
+      'red',
+      'secondary',
+      'sharing',
+      'sharp',
+      'sharp-left',
+      'short',
+      'textfield',
+      'trash',
+      'tumblr',
+      'twitter',
+      'unmarked',
+      'v--right',
+      'white',
+      'words',
+      'words--black',
+      'words--blue',
+      'words--red',
+    ],
+    'states' => [
+      'disabled',
+      'error',
+      'focus',
+      'hidden',
+      'inert',
+      'selected',
+      'success',
+    ],
+    'layouts' => ['center', 'right'],
+  ];
 }

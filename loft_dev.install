@@ -14,7 +14,7 @@ function loft_dev_uninstall() {
 
   //Clean up our entries in the variables table.
   if ($result = db_query("SELECT name FROM {variable} WHERE `name` LIKE 'loft_dev%'")) {
-    foreach($result as $data) {
+    foreach ($result as $data) {
       variable_del($data->name);
     }
   }
@@ -86,7 +86,7 @@ function loft_dev_enable() {
   //}
 
   // Enable reroute email
-  variable_set('reroute_email_enable',  1);
+  variable_set('reroute_email_enable', 1);
 
   // Change the system weight for the module (in relation to another)...
   db_update('system')
@@ -104,10 +104,10 @@ function loft_dev_disable() {
   foreach ($altered as $module => $permissions) {
     foreach ($permissions as $permission => $rids) {
       db_delete('role_permission')
-      ->condition('module', $module)
-      ->condition('permission', $permission)
-      ->condition('rid', $rids, 'IN')
-      ->execute();
+        ->condition('module', $module)
+        ->condition('permission', $permission)
+        ->condition('rid', $rids, 'IN')
+        ->execute();
     }
   }
   variable_del('loft_dev_altered_perms');

@@ -14,6 +14,31 @@ use Drupal\loft_dev\ButtonCatalog;
  */
 define('LOFT_DEV_LOFT_DEPLOY_EXPORT_PERIOD_MIN', 0);
 
+
+/**
+ * Implements hook_library().
+ */
+function loft_dev_library() {
+  $libraries['loft_dev'] = array(
+    'title' => 'Loft Dev',
+    'version' => '1.0',
+    'js' => array(
+      drupal_get_path('module', 'loft_dev') . '/js/loft_dev.js' => array(),
+    ),
+    'css' => array(
+      drupal_get_path('module', 'loft_dev') . '/dist/loft_dev.css' => array(
+        'type' => 'file',
+        'media' => 'screen',
+      ),
+    ),
+    'dependencies' => array(
+      array('system', 'cookie'),
+    ),
+  );
+
+  return $libraries;
+}
+
 /**
  * Implements hook_boot().
  */
@@ -660,12 +685,8 @@ function loft_dev_block_view($delta = '') {
         'type' => 'file',
         'data' => 'misc/collapse.js',
       ];
-      $build['#attached']['css'][] = [
-        'type' => 'file',
-        'data' => drupal_get_path('module', 'loft_dev') . '/loft_dev.css',
-      ];
 
-      // The links for example pages
+      // The links for example pages.
       $links = [];
       $links['theme'] = [
         'title' => 'Elements',
@@ -825,24 +846,18 @@ function loft_dev_block_view($delta = '') {
       $output .= drupal_render($form);
 
       // No more changes/additions
-      $output = '<div id="loft-dev-tools" class="loft-dev-closure">' . $output . '</div> <!-- /loft-dev-closure -->' . "\n";
       $block = [
-        //'subject' =>  t('Loft Dev Tools'),
         'content' => [
-          '#attached' => [
-            'library' => [
-              ['system', 'cookie'],
-            ],
-          ],
+          '#prefix' => '<div class="loft-dev-closer" id="loft-dev-tools">',
+          '#suffix' => '</div>',
           '#markup' => $output,
         ],
       ];
 
-      $block['content']['#attached']['js'][] = [
-        'type' => 'file',
-        'data' => drupal_get_path('module', 'loft_dev') . '/loft_dev.js',
-        'scope' => 'footer',
-      ];
+      $block['content']['#attached']['library'][] = array(
+        'loft_core',
+        'loft_core',
+      );
 
       break;
   }
@@ -937,11 +952,7 @@ function loft_dev_init() {
       'loftDev' => ['adminStuff' => implode(', ', $admin_stuff['selectors'])],
     ],
   ];
-  $build['#attached']['js'][] = [
-    'type' => 'file',
-    'data' => drupal_get_path('module', 'loft_dev') . '/loft_dev.js',
-  ];
-  $build['#attached']['library'][] = ['system', 'cookie'];
+  $build['#attached']['library'][] = ['loft_dev', 'loft_dev'];
   drupal_render($build);
 
   // Suppress admin menu if admin stuff hidden

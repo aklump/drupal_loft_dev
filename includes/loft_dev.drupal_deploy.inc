@@ -1,5 +1,6 @@
 <?php
 require_once dirname(__FILE__) . '/../vendor/autoload.php';
+
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -9,7 +10,8 @@ use Symfony\Component\Yaml\Yaml;
  * To enable this functionality you need to add something like this to your
  * local settings file:
  *
- * $conf['loft_dev_drupal_deploy_path'] = realpath(DRUPAL_ROOT . '/../drupal_deploy/user/deploy_5.0');
+ * $conf['loft_dev_drupal_deploy_path'] = realpath(DRUPAL_ROOT .
+ *   '/../drupal_deploy/user/deploy_5.0');
  */
 function loft_dev_drupal_deploy_get_block($module, $delta) {
   $key = 'block--' . $module . '-' . $delta;
@@ -17,7 +19,7 @@ function loft_dev_drupal_deploy_get_block($module, $delta) {
     $path = $list['block--' . $module . '-' . $delta]->uri;
     try {
       $data = Yaml::parse(file_get_contents($path));
-      
+
       // First we take from a .html file
       $content = '';
       foreach (array('Body', 'body') as $key) {
@@ -51,7 +53,8 @@ function loft_dev_drupal_deploy_get_block($module, $delta) {
           'content' => $content,
         );
       }
-    } catch (\Exception $e) {
+    }
+    catch (\Exception $e) {
       print $e->getMessage();
     }
 
@@ -81,7 +84,7 @@ function _loft_dev_drupal_deploy_get_filter($item) {
       return $filter;
     }
   }
-  
+
   return filter_default_format();
 }
 
@@ -91,7 +94,7 @@ function _loft_dev_drupal_deploy_get_files($folder) {
   if (!($dir = variable_get('loft_dev_drupal_deploy_path', NULL))) {
     return array();
   }
-  
+
   $caching = TRUE;
 
   if ($caching) {
@@ -104,9 +107,9 @@ function _loft_dev_drupal_deploy_get_files($folder) {
     }
   }
   if (empty($data)) {
-    $mask           = '/.+\.yml$/';
+    $mask = '/.+\.yml$/';
     $data['blocks'] = file_scan_directory($dir . '/blocks', $mask, array('key' => 'name'));
-    $data['nodes']  = file_scan_directory($dir . '/nodes', $mask, array('key' => 'name'));
+    $data['nodes'] = file_scan_directory($dir . '/nodes', $mask, array('key' => 'name'));
 
     if ($caching) {
       cache_set('loft_dev:' . __FUNCTION__, $data, 'cache', CACHE_PERMANENT);
