@@ -4,6 +4,14 @@
 ##Summary
 **Provides a suite of development tools for Drupal.**
 
+## Features
+
+* Alerts you when the [reroute email module]() is not properly configured.
+* Adds the ability to sandbox code using _sandbox.inc_ and `?sb`
+* Adds new Twig function `file_header()` to generate template headers.
+* Adds demo page for _Page Not Found_
+* Adds demo page for _Access Denied_
+
 ##Requirements
 
 ##Installation
