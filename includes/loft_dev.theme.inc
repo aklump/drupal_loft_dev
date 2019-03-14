@@ -20,7 +20,7 @@ function loft_dev_preprocess_loft_dev_migration(&$vars) {
     foreach ($vars['urls'] as $uri) {
       $vars['results'][$uri] = loft_dev_check_path($uri);
     }
-    variable_set('loft_dev_migration_urls_results', $vars['results']);
+    \Drupal::configFactory()->getEditable('loft_dev.settings')->set('loft_dev_migration_urls_results', $vars['results'])->save();
   }
 }
 
@@ -28,21 +28,39 @@ function loft_dev_check_path($path) {
   $parse = parse_url(trim($path));
   $uri = $parse['path'];
   $status = FALSE;
-  if ($item = menu_get_item($uri)) {
-    $status = !empty($item['path']);
-  }
-  elseif (($normal = drupal_get_normal_path($uri))
-    && $normal !== $uri
-    && ($item = menu_get_item($normal))) {
-    $status = !empty($item['path']);
-  }
+  // @FIXME
+// menu_get_item() has been removed. To retrieve route information, use the
+// RouteMatch object, which you can retrieve by calling \Drupal::routeMatch().
+// 
+// 
+// @see https://www.drupal.org/node/2203305
+// if ($item = menu_get_item($uri)) {
+//     $status = !empty($item['path']);
+//   }
+//   elseif (($normal = drupal_get_normal_path($uri))
+//     && $normal !== $uri
+//     && ($item = menu_get_item($normal))) {
+//     $status = !empty($item['path']);
+//   }
+
 
   if (!$status) {
-    $url = url($uri, array('absolute' => TRUE));
-    $item = drupal_http_request($url, array(
-      'max_redirects' => 0,
-      'timeout' => 10,
-    ));
+    // @FIXME
+// url() expects a route name or an external URI.
+// $url = url($uri, array('absolute' => TRUE));
+
+    // @FIXME
+// drupal_http_request() has been replaced by the Guzzle HTTP client, which is bundled
+// with Drupal core.
+// 
+// 
+// @see https://www.drupal.org/node/1862446
+// @see http://docs.guzzlephp.org/en/latest
+// $item = drupal_http_request($url, array(
+//       'max_redirects' => 0,
+//       'timeout' => 10,
+//     ));
+
     unset($item->response);
     $status = in_array(substr($item->code, 0, 1), array(2, 3));
   }
@@ -68,22 +86,28 @@ function theme_loft_dev_migration($vars) {
   $build = array();
 
   $rows = array();
-  $canonical = variable_get('loft_dev_migration_canonical', '');
+  $canonical = \Drupal::config('loft_dev.settings')->get('loft_dev_migration_canonical');
   foreach ($vars['results'] as $result) {
     $path = $result->path;
     if ($canonical) {
-      $path = l($path, $canonical . '/' . $path);
+      // @FIXME
+// l() expects a Url object, created from a route name or external URI.
+// $path = l($path, $canonical . '/' . $path);
+
     }
-    $row = array(
-      $path,
-      $result->status ? t('migrated') : t('?'),
-      $result->status ? l($result->path, $result->path) : '?',
-      l(t('Add redirect'), 'admin/config/search/redirect/add', array(
-        'query' => drupal_get_destination() + array(
-            'source' => $result->path,
-          ),
-      )),
-    );
+    // @FIXME
+// l() expects a Url object, created from a route name or external URI.
+// $row = array(
+//       $path,
+//       $result->status ? t('migrated') : t('?'),
+//       $result->status ? l($result->path, $result->path) : '?',
+//       l(t('Add redirect'), 'admin/config/search/redirect/add', array(
+//         'query' => drupal_get_destination() + array(
+//             'source' => $result->path,
+//           ),
+//       )),
+//     );
+
     $rows[$result->status][] = array(
       'data' => $row,
       'class' => array($result->status ? '' : 'error'),
@@ -103,7 +127,7 @@ function theme_loft_dev_migration($vars) {
 
   // Wrap it all up
   $vars['attributes']['class'][] = 'loft-dev-migration';
-  $output = '<div' . drupal_attributes($vars['attributes']) . '><div class="border"><div class="padding">' . drupal_render($build) . '</div></div></div>';
+  $output = '<div' . drupal_attributes($vars['attributes']) . '><div class="border"><div class="padding">' . \Drupal::service("renderer")->render($build) . '</div></div></div>';
 
   return $output;
 }
@@ -134,7 +158,7 @@ function theme_loft_dev_css_circle($vars) {
   $style[] = 'display:inline-block';
   $style[] = 'border:' . $w . ' solid ' . $vars['color'];
   $style = implode(';', $style);
-  $attributes = drupal_array_merge_deep(array(
+  $attributes = \Drupal\Component\Utility\NestedArray::mergeDeep(array(
     'class' => array('circle'),
     'style' => $style,
   ), $vars['attributes']);
@@ -146,7 +170,7 @@ function theme_loft_dev_css_circle($vars) {
     '#value' => '',
   );
 
-  $output = drupal_render($build);
+  $output = \Drupal::service("renderer")->render($build);
 
   return $output;
 }

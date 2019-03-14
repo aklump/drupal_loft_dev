@@ -1,0 +1,4 @@
+'loft_dev:use tools':
+  title: 'Use Loft Dev Tools'
+  description: 'Use Loft Dev tools; see also $conf["loft_dev_free_access"].'
+  'restrict access': true

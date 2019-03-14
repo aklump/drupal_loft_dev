@@ -8,4 +8,4 @@ push_master = auto
 push_develop = no
 patch_prefix = -rc
 preserve_patch_zero = false
-info_file = loft_dev.info
+info_file = loft_dev.info.yml

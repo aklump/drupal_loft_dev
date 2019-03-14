@@ -1,0 +1,11 @@
+loft_dev:
+  title: 'Loft Dev'
+  version: '1.0'
+  js:
+    /js/loft_dev.js: {  }
+  css:
+    /dist/loft_dev.css:
+      type: file
+      media: screen
+  dependencies:
+    - system/cookie

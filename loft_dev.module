@@ -14,39 +14,6 @@ use Drupal\loft_dev\ButtonCatalog;
  */
 define('LOFT_DEV_LOFT_DEPLOY_EXPORT_PERIOD_MIN', 0);
 
-
-/**
- * Implements hook_library().
- */
-function loft_dev_library() {
-  $libraries['loft_dev'] = array(
-    'title' => 'Loft Dev',
-    'version' => '1.0',
-    'js' => array(
-      drupal_get_path('module', 'loft_dev') . '/js/loft_dev.js' => array(),
-    ),
-    'css' => array(
-      drupal_get_path('module', 'loft_dev') . '/dist/loft_dev.css' => array(
-        'type' => 'file',
-        'media' => 'screen',
-      ),
-    ),
-    'dependencies' => array(
-      array('system', 'cookie'),
-    ),
-  );
-
-  return $libraries;
-}
-
-/**
- * Implements hook_boot().
- */
-function loft_dev_boot() {
-  // You must load the composer autoload in this fashion.
-  include_once dirname(__FILE__) . '/vendor/autoload.php';
-}
-
 /**
  * Tests for a GET var
  *
@@ -151,8 +118,17 @@ function loft_dev_include() {
 }
 
 /**
- * Implements hook_menu()
+ * @FIXME
+ * This implementation of hook_menu() cannot be automatically converted because
+ * it contains logic (i.e., branching statements, function calls, object
+ * instantiation, etc.) You will need to convert it manually. Sorry!
+ *
+ * For more information on how to convert hook_menu() to Drupal 8's new routing
+ * and linking systems, see
+ *   https://api.drupal.org/api/drupal/core%21includes%21menu.inc/group/menu/8
  */
+
+
 function loft_dev_menu() {
   $items = [];
 
@@ -433,7 +409,7 @@ function loft_dev_form_field_ui_display_overview_form_alter(&$form, &$form_state
 /**
  * Implements hook_form_alter
  */
-function loft_dev_form_alter(&$form, $form_state, $form_id) {
+function loft_dev_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
 
   $is_new = (empty($form['old_type']['#value']));
 
@@ -456,25 +432,14 @@ function loft_dev_form_alter(&$form, $form_state, $form_id) {
 }
 
 /**
- * Implements hook_permission().
- */
-function loft_dev_permission() {
-  return [
-    'loft_dev:use tools' => [
-      'title' => t('Use Loft Dev Tools'),
-      'description' => t('Use Loft Dev tools; see also $conf["loft_dev_free_access"].'),
-      'restrict access' => TRUE,
-    ],
-  ];
-}
-
-/**
  * Determine if the current user has access to the dev tools
  *
  * @return bool
  */
 function _loft_dev_access() {
-  return user_access('loft_dev:use tools') || variable_get('loft_dev_free_access', FALSE);
+  return \Drupal::currentUser()
+      ->hasPermission('loft_dev:use tools') || \Drupal::config('loft_dev.settings')
+      ->get('loft_dev_free_access');
 }
 
 /**
@@ -496,6 +461,7 @@ function loft_dev_preprocess_block(&$vars) {
  * Implements hook_preprocess_html().
  */
 function loft_dev_preprocess_html(&$vars) {
+  return;
   global $_design_guide;
 
   if (!_loft_dev_access()) {
@@ -511,7 +477,8 @@ function loft_dev_preprocess_html(&$vars) {
 
   // Append the loft dev tools to page_bottom
   $build = [];
-  $build['loft_dev']['block'] = module_invoke('loft_dev', 'block_view', 'dev_tools');
+  $build['loft_dev']['block'] = \Drupal::moduleHandler()
+    ->invoke('loft_dev', 'block_view', ['dev_tools']);
   $build['loft_dev']['#prefix'] = '<div class="block-loft-dev">';
   $build['loft_dev']['#suffix'] = '</div>';
 
@@ -587,14 +554,17 @@ function _loft_dev_playground_data($scope, &$vars) {
   }
 
   $g = data_api();
-  $default = variable_get('loft_dev_playground_load_data', FALSE);
+  $default = \Drupal::config('loft_dev.settings')
+    ->get('loft_dev_playground_load_data');
   if (!_loft_dev_check_get_var('ldp_data', $default)) {
     return;
   }
-  $info = module_invoke_all('loft_dev_playground_info');
+  $info = \Drupal::moduleHandler()->invokeAll('loft_dev_playground_info');
   $data = [];
-  foreach (module_implements('loft_dev_playground_info') as $module) {
-    if (($info = module_invoke($module, 'loft_dev_playground_info'))
+  foreach (\Drupal::moduleHandler()
+             ->getImplementations('loft_dev_playground_info') as $module) {
+    if (($info = \Drupal::moduleHandler()
+        ->invoke($module, 'loft_dev_playground_info'))
       && file_exists($info['data_path'])
     ) {
       $regex = '/' . preg_quote($scope) . "\.(.+)\.php$/";
@@ -611,7 +581,7 @@ function _loft_dev_playground_data($scope, &$vars) {
 
           preg_match($regex, $uri, $matches);
           ob_start();
-          require_once DRUPAL_ROOT . '/' . $uri;
+          require_once \Drupal::root() . '/' . $uri;
           $content = ob_get_contents();
           ob_end_clean();
 
@@ -635,7 +605,9 @@ function _loft_dev_playground_data($scope, &$vars) {
  */
 function loft_dev_loft_dev_playground_info() {
   return [
-    'data_path' => path_to_theme() . '/loft_dev_playground',
+    'data_path' => \Drupal::theme()
+        ->getActiveTheme()
+        ->getPath() . '/loft_dev_playground',
   ];
 }
 
@@ -655,6 +627,8 @@ function loft_dev_block_info() {
  * Implements hook_block_view_alter().
  */
 function loft_dev_block_view_alter(&$data, $block) {
+
+  return ;
   loft_dev_include('drupal_deploy');
   if (($disk = loft_dev_drupal_deploy_get_block($block->module, $block->delta))) {
     $data = $disk;
@@ -669,6 +643,7 @@ function loft_dev_block_view_alter(&$data, $block) {
  * Implements hook_block_view().
  */
 function loft_dev_block_view($delta = '') {
+  return [];
   $block = [
     'subject' => NULL,
     'content' => NULL,
@@ -760,7 +735,7 @@ function loft_dev_block_view($delta = '') {
       ];
 
       // Links from other modules
-      $links = module_invoke_all('loft_dev_menu');
+      $links = \Drupal::moduleHandler()->invokeAll('loft_dev_menu');
       $build['loft_menu'] = [
         '#theme' => 'links',
         '#links' => $links,
@@ -775,61 +750,74 @@ function loft_dev_block_view($delta = '') {
       ];
 
       $output = '';
-      $output .= drupal_render($build);
+      $output .= \Drupal::service("renderer")->render($build);
       $output = str_replace('href="/%23"', 'href="#"', $output);
 
-      $form = drupal_get_form('loft_dev_node_access_form');
-      $output .= drupal_render($form) . "\n";
+      $form = \Drupal::formBuilder()->getForm('loft_dev_node_access_form');
+      $output .= \Drupal::service("renderer")->render($form) . "\n";
 
-      if (module_exists('masquerade') &&
-        ($temp = module_invoke('masquerade', 'block_view', 0))
+      if (\Drupal::moduleHandler()->moduleExists('masquerade') &&
+        ($temp = \Drupal::moduleHandler()
+          ->invoke('masquerade', 'block_view', [0]))
       ) {
         if (is_string($temp['content'])) {
           $temp['content'] = ['#markup' => $temp['content']];
         }
         $output .= '<h3>' . $temp['subject'] . '</h3>' . "\n";
-        $output .= drupal_render($temp['content']) . "\n";
+        $output .= \Drupal::service("renderer")
+            ->render($temp['content']) . "\n";
       }
 
-      $tree = menu_tree('devel');
+      // @FIXME
+      // menu_tree() is gone in Drupal 8. To generate or work with menu trees, you'll need to
+      // use the menu.link_tree service.
+      //
+      //
+      // @see https://www.drupal.org/node/2226481
+      // @see https://api.drupal.org/api/drupal/core%21lib%21Drupal%21Core%21Menu%21MenuLinkTree.php/class/MenuLinkTree/8
+      // $tree = menu_tree('devel');
+
       $output .= render($tree);
 
-      if (($temp = module_invoke('devel_node_access', 'block_view', 0))) {
+      if (($temp = \Drupal::moduleHandler()
+        ->invoke('devel_node_access', 'block_view', [0]))) {
         if (is_string($temp['content'])) {
           $temp['content'] = ['#markup' => $temp['content']];
         }
         $output .= '<h3>' . $temp['subject'] . '</h3>' . "\n";
-        $output .= drupal_render($temp['content']) . "\n";
+        $output .= \Drupal::service("renderer")
+            ->render($temp['content']) . "\n";
       }
 
-      if (($temp = module_invoke('devel_node_access', 'block_view', 1))) {
+      if (($temp = \Drupal::moduleHandler()
+        ->invoke('devel_node_access', 'block_view', [1]))) {
         if (is_string($temp['content'])) {
           $temp['content'] = ['#markup' => $temp['content']];
         }
         $output .= '<h3>' . $temp['subject'] . '</h3>' . "\n";
-        $output .= drupal_render($temp['content']) . "\n";
+        $output .= \Drupal::service("renderer")
+            ->render($temp['content']) . "\n";
       }
 
-      if (module_exists('func_search') && ($temp = module_invoke('func_search', 'block_view', 0))) {
+      if (\Drupal::moduleHandler()
+          ->moduleExists('func_search') && ($temp = \Drupal::moduleHandler()
+          ->invoke('func_search', 'block_view', [0]))) {
         if (is_string($temp['content'])) {
           $temp['content'] = ['#markup' => $temp['content']];
         }
         $output .= '<h3>' . $temp['subject'] . '</h3>' . "\n";
-        $output .= drupal_render($temp['content']) . "\n";
+        $output .= \Drupal::service("renderer")
+            ->render($temp['content']) . "\n";
       }
 
-      // Email output
-      if (_loft_dev_reroute_email_status()) {
-        $output .= t('<p>Reroute email is enabled and ready: %mail</p>', [
-            '%mail' => variable_get('reroute_email_address', NULL),
-          ]) . "\n";
-      }
-      else {
-        $output .= t('<p>!!! REROUTE EMAIL IS NOT READY !!!</p>') . "\n";
+      if (!\Drupal::service('loft_dev')->rerouteEmailIsConfigured()) {
+        $output .= t('<p>!!! REROUTE EMAIL IS PROPERLY CONFIGURED !!!</p>') . "\n";
       }
 
-      if (($path = variable_get('loft_dev_loft_deploy_export_path', ''))
-        && ($last = variable_get('loft_dev_loft_deploy_export_last', 0))
+      if (($path = \Drupal::config('loft_dev.settings')
+          ->get('loft_dev_loft_deploy_export_path'))
+        && ($last = \Drupal::config('loft_dev.settings')
+          ->get('loft_dev_loft_deploy_export_last'))
       ) {
         $date = new \DateTime();
         $date
@@ -842,8 +830,8 @@ function loft_dev_block_view($delta = '') {
       }
 
       // Rewind form
-      $form = drupal_get_form('loft_dev_update_rewind_form');
-      $output .= drupal_render($form);
+      $form = \Drupal::formBuilder()->getForm('loft_dev_update_rewind_form');
+      $output .= \Drupal::service("renderer")->render($form);
 
       // No more changes/additions
       $block = [
@@ -854,10 +842,10 @@ function loft_dev_block_view($delta = '') {
         ],
       ];
 
-      $block['content']['#attached']['library'][] = array(
+      $block['content']['#attached']['library'][] = [
         'loft_core',
         'loft_core',
-      );
+      ];
 
       break;
   }
@@ -900,24 +888,6 @@ function loft_dev_private_storage($group, $data = NULL) {
 }
 
 /**
- * Return the current status of reroute email
- *
- * @return bool
- *   FALSE: module is enabled, turned on, but config is not complete. FALSE
- *   means there needs to be a warning sent.
- */
-function _loft_dev_reroute_email_status() {
-  if (module_exists('reroute_email') &&
-    (!variable_get('reroute_email_enable', NULL) ||
-      !variable_get('reroute_email_address', NULL))
-  ) {
-    return FALSE;
-  }
-
-  return TRUE;
-}
-
-/**
  * Implements hook_init().
  */
 function loft_dev_init() {
@@ -925,8 +895,10 @@ function loft_dev_init() {
 
   // Figure out some urls that need to be ignored, like image styles, etc.
   $_loft_dev_ignored_url = FALSE;
-  if (strpos(current_path(), 'sites/default/files') === 0
-    || strpos(current_path(), 'system/ajax') === 0
+  if (strpos(\Drupal\Core\Url::fromRoute("<current>")
+      ->toString(), 'sites/default/files') === 0
+    || strpos(\Drupal\Core\Url::fromRoute("<current>")
+      ->toString(), 'system/ajax') === 0
   ) {
     $_loft_dev_ignored_url = TRUE;
   }
@@ -938,14 +910,18 @@ function loft_dev_init() {
   $_loft_dev_playground = _loft_dev_check_get_var('pg');
 
   if (!_loft_dev_reroute_email_status()
-    && current_path() != 'admin/config/development/reroute_email'
+    && \Drupal\Core\Url::fromRoute("<current>")
+      ->toString() != 'admin/config/development/reroute_email'
   ) {
-    drupal_set_message(t('Reroute email is not properly enabled/configured. <a href="@url">Fix immediately</a>.', [
-      '@url' => url('admin/config/development/reroute_email'),
-    ]), 'error', FALSE);
+    // @FIXME
+    // url() expects a route name or an external URI.
+    // drupal_set_message(t('Reroute email is not properly enabled/configured. <a href="@url">Fix immediately</a>.', [
+    //       '@url' => url('admin/config/development/reroute_email'),
+    //     ]), 'error', FALSE);
+
   }
 
-  $admin_stuff = module_invoke_all('loft_dev_admin_stuff');
+  $admin_stuff = \Drupal::moduleHandler()->invokeAll('loft_dev_admin_stuff');
   $build['#attached']['js'][] = [
     'type' => 'setting',
     'data' => [
@@ -953,7 +929,7 @@ function loft_dev_init() {
     ],
   ];
   $build['#attached']['library'][] = ['loft_dev', 'loft_dev'];
-  drupal_render($build);
+  \Drupal::service("renderer")->render($build);
 
   // Suppress admin menu if admin stuff hidden
   if (isset($_COOKIE['loft_dev_admin_stuff'])
@@ -975,12 +951,12 @@ function _loft_dev_process_sandboxes() {
   if ($_loft_dev_ignored_url) {
     return;
   }
-  $sandboxes = module_invoke_all('loft_dev_sandbox');
+  $sandboxes = \Drupal::moduleHandler()->invokeAll('loft_dev_sandbox');
   foreach ($sandboxes as $sandbox) {
     if (_loft_dev_check_get_var($sandbox['query'])) {
       $function = $sandbox['callback'];
       call_user_func_array($function, $sandbox['callback arguments']);
-      drupal_exit();
+      exit(0);
     }
   }
 }
@@ -990,18 +966,33 @@ function _loft_dev_process_sandboxes() {
  */
 function loft_dev_mail_alter($message) {
   global $_loft_dev_mail_system_stashed_, $_loft_dev_mail_filename_;
-  if (variable_get('loft_dev_mail_capture', FALSE)) {
+  if (\Drupal::config('loft_dev.settings')->get('loft_dev_mail_capture')) {
 
     // Stashes and sets to the testing mail system.
-    $_loft_dev_mail_system_stashed_ = variable_get('mail_system');
-    variable_set('mail_system', ['default-system' => 'TestingMailSystem']);
+    // @FIXME
+    // // @FIXME
+    // // This looks like another module's variable. You'll need to rewrite this call
+    // // to ensure that it uses the correct configuration object.
+    // $_loft_dev_mail_system_stashed_ = variable_get('mail_system');
+
+    // @FIXME
+    // // @FIXME
+    // // This looks like another module's variable. You'll need to rewrite this call
+    // // to ensure that it uses the correct configuration object.
+    // variable_set('mail_system', ['default-system' => 'TestingMailSystem']);
+
 
     // Saves a copy of the message in the private files
     $_loft_dev_mail_filename_ = 'private://loft-dev/mail/' . time();
     $url = $_loft_dev_mail_filename_ . '.mail_alter.txt';
     file_prepare_directory(dirname($url), FILE_CREATE_DIRECTORY);
     file_unmanaged_save_data(var_export($message, TRUE), $url);
-    variable_set('mail_system', ['default-system' => 'TestingMailSystem']);
+    // @FIXME
+    // // @FIXME
+    // // This looks like another module's variable. You'll need to rewrite this call
+    // // to ensure that it uses the correct configuration object.
+    // variable_set('mail_system', ['default-system' => 'TestingMailSystem']);
+
   }
 }
 
@@ -1026,11 +1017,16 @@ function _loft_dev_compose_php_mail($message) {
   }
   $mimeheaders = [];
   foreach ($message['headers'] as $name => $value) {
-    $mimeheaders[] = $name . ': ' . mime_header_encode($value);
+    $mimeheaders[] = $name . ': ' . \Drupal\Component\Utility\Unicode::mimeHeaderEncode($value);
   }
-  $line_endings = variable_get('mail_line_endings', MAIL_LINE_ENDINGS);
+  // @FIXME
+  // // @FIXME
+  // // This looks like another module's variable. You'll need to rewrite this call
+  // // to ensure that it uses the correct configuration object.
+  // $line_endings = variable_get('mail_line_endings', MAIL_LINE_ENDINGS);
+
   // Prepare mail commands.
-  $mail_subject = mime_header_encode($message['subject']);
+  $mail_subject = \Drupal\Component\Utility\Unicode::mimeHeaderEncode($message['subject']);
   // Note: e-mail uses CRLF for line-endings. PHP's API requires LF
   // on Unix and CRLF on Windows. Drupal automatically guesses the
   // line-ending format appropriate for your system. If you need to
@@ -1067,14 +1063,29 @@ function loft_dev_exit() {
   if (!empty($_loft_dev_mail_system_stashed_)) {
 
     // Pop off our collected email.
-    $captured_emails = variable_get('drupal_test_email_collector');
+    // @FIXME
+    // // @FIXME
+    // // This looks like another module's variable. You'll need to rewrite this call
+    // // to ensure that it uses the correct configuration object.
+    // $captured_emails = variable_get('drupal_test_email_collector');
+
     $message = array_pop($captured_emails);
-    variable_set('drupal_test_email_collector', $captured_emails);
+    // @FIXME
+    // // @FIXME
+    // // This looks like another module's variable. You'll need to rewrite this call
+    // // to ensure that it uses the correct configuration object.
+    // variable_set('drupal_test_email_collector', $captured_emails);
+
 
     // Saves a copy of the message in the private files
     $url = $_loft_dev_mail_filename_ . '.exit.txt';
     file_unmanaged_save_data(var_export($message, TRUE), $url);
-    variable_set('mail_system', $_loft_dev_mail_system_stashed_);
+    // @FIXME
+    // // @FIXME
+    // // This looks like another module's variable. You'll need to rewrite this call
+    // // to ensure that it uses the correct configuration object.
+    // variable_set('mail_system', $_loft_dev_mail_system_stashed_);
+
 
     // Save a php version of this for export testing.
     if (($code = _loft_dev_compose_php_mail($message))) {
@@ -1084,19 +1095,31 @@ function loft_dev_exit() {
   }
 
   // Do an export if needed using loft_deploy shell script.
+  // @FIXME
+  // Could not extract the default value because it is either indeterminate, or
+  // not scalar. You'll need to provide a default value in
+  // config/install/loft_dev.settings.yml and config/schema/loft_dev.schema.yml.
   if (_loft_dev_access() &&
-    ($period = variable_get('loft_dev_loft_deploy_export_period_mins', LOFT_DEV_LOFT_DEPLOY_EXPORT_PERIOD_MIN))
+    ($period = \Drupal::config('loft_dev.settings')
+      ->get('loft_dev_loft_deploy_export_period_mins'))
   ) {
     $now = new \DateTime('now', new \DateTimeZone('America/Los_Angeles'));
     $now = $now->format('U');
-    $rollback = variable_get('loft_dev_loft_deploy_export_last', 0) + ($period * 60);
+    $rollback = \Drupal::config('loft_dev.settings')
+        ->get('loft_dev_loft_deploy_export_last') + ($period * 60);
     if ($now >= $rollback) {
       loft_dev_include('pages');
-      variable_set('loft_dev_loft_deploy_export_last', $now);
+      \Drupal::configFactory()
+        ->getEditable('loft_dev.settings')
+        ->set('loft_dev_loft_deploy_export_last', $now)
+        ->save();
       if (!loft_dev_loft_deploy_export('loft_dev_auto')) {
-        variable_set('loft_dev_loft_deploy_export_last', $rollback);
+        \Drupal::configFactory()
+          ->getEditable('loft_dev.settings')
+          ->set('loft_dev_loft_deploy_export_last', $rollback)
+          ->save();
         if (_loft_dev_access()) {
-          drupal_set_message(t("Loft Dev was unabled to export the database using <code>ld export</code>; review <a href='!uri'>reports</a> for more info.", ['!uri' => url('admin/reports/dblog')]), 'error');
+          drupal_set_message(t("Loft Dev was unabled to export the database using <code>ld export</code>; review <a href='!uri'>reports</a> for more info.", ['!uri' => \Drupal\Core\Url::fromRoute('dblog.overview')]), 'error');
         }
       }
     }
@@ -1191,7 +1214,7 @@ function loft_dev_flush_caches() {
  * Return an array of nids, random, one of each node type
  */
 function loft_dev_node_suite() {
-  if ($cache = cache_get('loft_dev:node_suite', 'cache')) {
+  if ($cache = \Drupal::cache('cache')->get('loft_dev:node_suite')) {
     $suite = empty($cache->data) ? NULL : $cache->data;
   }
   else {
@@ -1229,7 +1252,8 @@ function loft_dev_node_suite() {
     }
     ksort($suite);
 
-    cache_set('loft_dev:node_suite', $suite, 'cache', CACHE_PERMANENT);
+    \Drupal::cache('cache')
+      ->set('loft_dev:node_suite', $suite, \Drupal\Core\Cache\Cache::PERMANENT);
   }
 
   return $suite;
@@ -1254,9 +1278,14 @@ function loft_dev_update_rewind_form($form, &$form_state) {
   $form['#rollbacks'] = [];
   foreach ($modules as $key => $module_name) {
     $modules[$key] = $module_name;
-    if (($form['#rollbacks'][$key] = variable_get('loft_dev:update_rollback_' . $module_name, NULL))) {
-      $modules[$key] .= ':' . $form['#rollbacks'][$key];
-    }
+    // @FIXME
+    // // @FIXME
+    // // The correct configuration object could not be determined. You'll need to
+    // // rewrite this call manually.
+    // if (($form['#rollbacks'][$key] = variable_get('loft_dev:update_rollback_' . $module_name, NULL))) {
+    //       $modules[$key] .= ':' . $form['#rollbacks'][$key];
+    //     }
+
   }
 
   $form['module'] = [
@@ -1284,7 +1313,9 @@ function loft_dev_update_rewind_form_submit($form, &$form_state) {
   $version = $form['#rollbacks'][$module];
   $_SESSION['loft_dev']['last_rewind'] = $module;
 
-  $query = db_select('system', 's');
+  // @FIXME
+  // $query = db_select('system', 's');
+
 
   // If not submitted then we use one before the current.
 
@@ -1296,10 +1327,12 @@ function loft_dev_update_rewind_form_submit($form, &$form_state) {
     --$version;
   }
 
-  $count = db_update('system')
-    ->fields(['schema_version' => $version])
-    ->condition('name', $form_state['values']['module'])
-    ->execute();
+  // @FIXME
+  // $count = db_update('system')
+  //     ->fields(['schema_version' => $version])
+  //     ->condition('name', $form_state['values']['module'])
+  //     ->execute();
+
   if ($count) {
     drupal_set_message(t('%module has been rewound to version %version', [
       '%module' => $form_state['values']['module'],
@@ -1374,7 +1407,12 @@ function loft_dev_move_block($module, $delta, $new_region, $themes = [], $new_we
  */
 function loft_dev_export_block_regions($theme = NULL, $themes = []) {
   if (empty($theme)) {
-    $theme = variable_get('theme_default', NULL);
+    // @FIXME
+    // // @FIXME
+    // // This looks like another module's variable. You'll need to rewrite this call
+    // // to ensure that it uses the correct configuration object.
+    // $theme = variable_get('theme_default', NULL);
+
   }
   $query = db_select('block', 'b');
   $query
@@ -1402,8 +1440,8 @@ function loft_dev_export_block_regions($theme = NULL, $themes = []) {
  * @see loft_db_update_block().
  */
 function loft_dev_update_block($delta, $block, $module = 'block') {
-  if (!module_exists('loft_updb')) {
-    watchdog('loft_dev', 'Missing module loft_updb', [], WATCHDOG_ERROR);
+  if (!\Drupal::moduleHandler()->moduleExists('loft_updb')) {
+    \Drupal::logger('loft_dev')->error('Missing module loft_updb', []);
 
     return;
   }
@@ -1549,7 +1587,7 @@ function loft_dev_update_node($nid, $body) {
   if (empty($node->nid)) {
     return FALSE;
   }
-  node_save($node);
+  $node->save();
 }
 
 /**
@@ -1661,14 +1699,16 @@ function loft_dev_node_access_form($form, &$form_state) {
   $output = '';
   if ($default['nids'] && $default['uids']) {
 
-    $nodes = node_load_multiple($default['nids']);
+    $nodes = \Drupal::entityManager()
+      ->getStorage('node')
+      ->loadMultiple($default['nids']);
     $accounts = [];
     foreach ($default['uids'] as $uid) {
       if (!is_numeric($uid)) {
         $temp = user_load_by_name($uid);
       }
       else {
-        $temp = user_load($uid);
+        $temp = \Drupal::entityManager()->getStorage('user')->load($uid);
       }
       if ($temp) {
         $accounts[] = $temp;
@@ -1685,25 +1725,43 @@ function loft_dev_node_access_form($form, &$form_state) {
       ]);
       $rows = [];
       foreach ($accounts as $account) {
-        $rows[] = [
-          theme("username", ['account' => $account]),
-          node_access('create', $node, $account) ? t('Yes') : '&ndash;',
-          node_access('view', $node, $account) ? t('Yes') : '&ndash;',
-          node_access('update', $node, $account) ? t('Yes') : '&ndash;',
-          node_access('delete', $node, $account) ? t('Yes') : '&ndash;',
-        ];
+        // @FIXME
+        // theme() has been renamed to _theme() and should NEVER be called directly.
+        // Calling _theme() directly can alter the expected output and potentially
+        // introduce security issues (see https://www.drupal.org/node/2195739). You
+        // should use renderable arrays instead.
+        //
+        //
+        // @see https://www.drupal.org/node/2195739
+        // $rows[] = [
+        //           theme("username", ['account' => $account]),
+        //           node_access('create', $node, $account) ? t('Yes') : '&ndash;',
+        //           node_access('view', $node, $account) ? t('Yes') : '&ndash;',
+        //           node_access('update', $node, $account) ? t('Yes') : '&ndash;',
+        //           node_access('delete', $node, $account) ? t('Yes') : '&ndash;',
+        //         ];
+
       }
-      $output .= theme("table", [
-          'caption' => $caption,
-          'header' => [
-            t('User'),
-            t('Create'),
-            t('View'),
-            t('Edit'),
-            t('Delete'),
-          ],
-          'rows' => $rows,
-        ]) . "\n";
+      // @FIXME
+      // theme() has been renamed to _theme() and should NEVER be called directly.
+      // Calling _theme() directly can alter the expected output and potentially
+      // introduce security issues (see https://www.drupal.org/node/2195739). You
+      // should use renderable arrays instead.
+      //
+      //
+      // @see https://www.drupal.org/node/2195739
+      // $output .= theme("table", [
+      //           'caption' => $caption,
+      //           'header' => [
+      //             t('User'),
+      //             t('Create'),
+      //             t('View'),
+      //             t('Edit'),
+      //             t('Delete'),
+      //           ],
+      //           'rows' => $rows,
+      //         ]) . "\n";
+
     }
     if ($output) {
       $form['table'] = [
@@ -1773,7 +1831,7 @@ function loft_dev_services_authentication_info() {
  * @return NULL||string
  */
 function _loft_dev_services_authenticate_call() {
-  global $user;
+  $user = \Drupal::currentUser();
   list($settings) = func_get_args();
 
   $user = user_load_by_name($settings['username']);
@@ -1844,8 +1902,17 @@ function loft_dev_theme($existing, $type, $theme, $path) {
  * @endcode
  */
 function loft_dev_css_cache_alter(&$css) {
-  $omit = variable_get('loft_dev_css_files_omit', []);
-  $css_files = variable_get('loft_dev_css_files_options', []);
+  // @FIXME
+  // Could not extract the default value because it is either indeterminate, or
+  // not scalar. You'll need to provide a default value in
+  // config/install/loft_dev.settings.yml and config/schema/loft_dev.schema.yml.
+  $omit = \Drupal::config('loft_dev.settings')->get('loft_dev_css_files_omit');
+  // @FIXME
+  // Could not extract the default value because it is either indeterminate, or
+  // not scalar. You'll need to provide a default value in
+  // config/install/loft_dev.settings.yml and config/schema/loft_dev.schema.yml.
+  $css_files = \Drupal::config('loft_dev.settings')
+    ->get('loft_dev_css_files_options');
   foreach ($css as $key => $data) {
     if ($data['type'] === 'file') {
       $css_files[$data['data']] = $data['data'];
@@ -1854,7 +1921,10 @@ function loft_dev_css_cache_alter(&$css) {
       }
     }
   }
-  variable_set('loft_dev_css_files_options', $css_files);
+  \Drupal::configFactory()
+    ->getEditable('loft_dev.settings')
+    ->set('loft_dev_css_files_options', $css_files)
+    ->save();
 }
 
 /**
@@ -1866,14 +1936,24 @@ function loft_dev_css_cache_alter(&$css) {
  * @return string  If title can't be determined, $path is returned.
  */
 function loft_dev_get_path_title(&$path) {
-  if (url_is_external($path)) {
-    $find = url('', ['absolute' => TRUE]);
+  if (\Drupal\Component\Utility\UrlHelper::isExternal($path)) {
+    // @FIXME
+    // url() expects a route name or an external URI.
+    // $find = url('', ['absolute' => TRUE]);
+
     list($null, $path) = explode($find, $path);
   }
   $path = trim(trim($path), '/');
   $path = drupal_get_normal_path($path);
 
-  $item = menu_get_item($path);
+  // @FIXME
+  // menu_get_item() has been removed. To retrieve route information, use the
+  // RouteMatch object, which you can retrieve by calling \Drupal::routeMatch().
+  //
+  //
+  // @see https://www.drupal.org/node/2203305
+  // $item = menu_get_item($path);
+
 
   return isset($item['title']) ? $item['title'] : $path;
 }
@@ -1914,13 +1994,13 @@ function loft_dev_button_catalog_form($form, &$form_state, ButtonCatalog $catalo
     '#type' => 'select',
     '#title' => t('State'),
     '#default_value' => '',
-    '#options' => [NULL => ''] + drupal_map_assoc($catalog->getStates()),
+    '#options' => [NULL => ''] + array_combine($catalog->getStates(), $catalog->getStates()),
   ];
   $form['advanced']['layout'] = [
     '#type' => 'select',
     '#title' => t('Layout'),
     '#default_value' => '',
-    '#options' => [NULL => ''] + drupal_map_assoc($catalog->getLayouts()),
+    '#options' => [NULL => ''] + array_combine($catalog->getLayouts(), $catalog->getLayouts()),
   ];
   //    $form['advanced']['actions']['update'] = array(
   //        '#type'  => 'submit',
@@ -1970,50 +2050,7 @@ function loft_dev_file_header($template_file, array $vars) {
   }
 }
 
-/**
- * Generate Twig template file stub.
- *
- * Place the following at the top of an empty twig file and load the page.  The
- * content should change and you should see a file header in it's place.
- *
- * The name of the file must be {anything}.html.twig
- *
- * @code
- * {{ file_header() }}
- * @endcode
- *
- * @param       $template_file
- * @param array $vars
- *
- * @throws \InvalidArgumentException If the filename is misnamed.
- * @throws \RuntimeException If the file cannot be written.
- */
-function loft_dev_twig_hook_stub($template_file, array $vars) {
-  $template_file = preg_replace('/\.php$/', '', $template_file);
-  if (!preg_match('/\.html\.twig$/', $template_file)) {
-    throw new \InvalidArgumentException("Filename must end in .html.twig");
-  }
 
-  //Filter out camel case, duplicated vars
-  $vars = array_diff_key($vars, array_flip(array_filter(array_keys($vars), function ($key) use ($vars) {
-    return $key !== strtolower($key);
-  })));
-
-  // Filter out other vars by key.
-  unset($vars['twig']);
-
-  $stub = _loft_dev_file_header(__FUNCTION__, $template_file, $vars, FALSE);
-  $stub = str_replace("<?php\n", '', $stub);
-  $stub = "{#\n" . trim($stub) . PHP_EOL . '#}';
-
-  $contents = file_get_contents($template_file);
-  $contents = preg_replace('/^\s*{{ file_header\(\) }}\s*/', '', $contents);
-  $stub .= PHP_EOL . PHP_EOL . ltrim($contents);
-
-  if (!file_put_contents($template_file, $stub)) {
-    throw new \RuntimeException("Could not write file.");
-  }
-}
 
 function _loft_dev_file_header_handle_vars($options, $vars, &$comments, &$level = 0) {
   $vars_as_array = json_decode(json_encode($vars), TRUE);
@@ -2042,7 +2079,9 @@ function _loft_dev_file_header_handle_vars($options, $vars, &$comments, &$level 
  */
 function _loft_dev_file_header($parent, $template_file, array $vars, $prepend_dollar_sign = TRUE) {
   $filename = preg_replace('/\.(html|tpl)$/', '', pathinfo($template_file, PATHINFO_FILENAME));
-  $filename = Grammar::titleCase(str_replace('--', ', ', $filename));
+
+  // TODO Add this back when we have access to this class.
+//  $filename = Grammar::titleCase(str_replace('--', ', ', $filename));
   if (preg_match('/(twig|tpl\.php)$/', $template_file, $matches)) {
     $extension = $matches[1];
   }
@@ -2094,18 +2133,13 @@ EOD;
     'template_file' => $template_file,
     'parent' => $parent,
   ];
-  drupal_alter('loft_dev_file_header', $stub, $context);
+  \Drupal::moduleHandler()->alter('loft_dev_file_header', $stub, $context);
 
   return $stub;
 }
 
 function loft_dev_twiggy_twig_alter(Twig_Environment $twig) {
-  $twig->addFunction(new \Twig_SimpleFunction('file_header', function (Twig_Environment $env, $context) {
-    $name_of_template_file = $env->getCompiler()->getFilename();
-    $path_to_template_file = $env->getLoader()
-      ->getCacheKey($name_of_template_file);
-    loft_dev_twig_hook_stub($path_to_template_file, $context);
-  }, ['needs_context' => TRUE, 'needs_environment' => TRUE]));
+  $twig->addFunction();
 }
 
 function loft_dev_loft_core_suppress_messages() {
@@ -2129,7 +2163,7 @@ function loft_dev_js_alter(&$js) {
     'inline',
     'setting',
   ], TRUE);
-  drupal_alter('loft_dev_js', $switches);
+  \Drupal::moduleHandler()->alter('loft_dev_js', $switches);
   $js = array_filter($js, function ($item) use ($switches) {
     if ($item['type'] !== 'file') {
       return $switches[$item['type']];

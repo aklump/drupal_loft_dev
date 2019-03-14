@@ -1,0 +1,10 @@
+loft_dev_which_ld: ''
+loft_dev_loft_deploy_export_path: ''
+'loft_dev_parse_time:append_to_line': true
+'loft_dev_parse_time:append_prefix': '|'
+loft_dev_migration_canonical: ''
+loft_dev_drupal_deploy_path: null
+loft_dev_free_access: false
+loft_dev_playground_load_data: false
+loft_dev_loft_deploy_export_last: 0
+loft_dev_mail_capture: false

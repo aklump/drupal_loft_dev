@@ -1,0 +1,9 @@
+name: 'Loft Dev Tools'
+description: 'Used by ITLS during development of a website.'
+homepage: 'https://github.com/aklump/drupal_loft_dev'
+package: Development
+core: 8.x
+version: 8.x-2.2-rc1
+dependencies:
+  reroute_email: 'reroute_email:reroute_email'
+type: module

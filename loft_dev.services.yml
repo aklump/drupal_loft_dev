@@ -1,0 +1,18 @@
+services:
+  loft_dev:
+    class: Drupal\loft_dev\Service\LoftDev
+    arguments: ['@config.factory']
+  loft_dev.twig_extension:
+    arguments: ['@renderer']
+    class: Drupal\loft_dev\TwigExtension\FileHeader
+    tags:
+      - { name: twig.extension }
+
+  init_subscriber:
+    class: Drupal\loft_dev\EventSubscriber\InitSubscriber
+    tags:
+      - name: event_subscriber
+  exit_subscriber:
+    class: Drupal\loft_dev\EventSubscriber\ExitSubscriber
+    tags:
+      - name: event_subscriber

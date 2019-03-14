@@ -149,22 +149,25 @@ class ButtonCatalog {
       '#prefix' => '<div class="' . $cl('components') . '">',
       '#suffix' => '</div>',
     );
-    $build[] = drupal_get_form('loft_dev_button_catalog_form', $this) + [
+    $build[] = \Drupal::formBuilder()->getForm('loft_dev_button_catalog_form', $this) + [
         '#prefix' => '<div class="' . $cl('form') . '">',
         '#suffix' => '</div>',
       ];
-    $path = current_path();
+    $path = \Drupal\Core\Url::fromRoute("<current>")->toString();
     $parent = explode('/', $path);
     array_pop($parent);
 
     if (($theme = $this->getTheme())) {
       $wrapper_class[] = $cl('single', '-');
       $build[] = ['#markup' => '<h2>' . $theme . '</h2>'];
-      $build[] = [
-        '#markup' => t('<a href="!url">&#8592; Return to all buttons</a>', [
-          '!url' => url(implode('/', $parent)),
-        ]),
-      ];
+      // @FIXME
+// url() expects a route name or an external URI.
+// $build[] = [
+//         '#markup' => t('<a href="!url">&#8592; Return to all buttons</a>', [
+//           '!url' => url(implode('/', $parent)),
+//         ]),
+//       ];
+
       $layouts = [NULL => ''] + $this->layouts;
       foreach ($this->states as $state) {
         foreach ($layouts as $layout) {
@@ -184,7 +187,10 @@ class ButtonCatalog {
 
       $title = $this->getTitle();
       foreach ($this->themes as $theme) {
-        $href = url($path . "/$theme");
+        // @FIXME
+// url() expects a route name or an external URI.
+// $href = url($path . "/$theme");
+
         $build['buttons'][] = $this->config['button_callback']($title, $href, $theme, NULL, NULL);
       }
     }

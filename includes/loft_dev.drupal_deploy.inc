@@ -1,5 +1,4 @@
 <?php
-require_once dirname(__FILE__) . '/../vendor/autoload.php';
 
 use Symfony\Component\Yaml\Yaml;
 
@@ -10,7 +9,7 @@ use Symfony\Component\Yaml\Yaml;
  * To enable this functionality you need to add something like this to your
  * local settings file:
  *
- * $conf['loft_dev_drupal_deploy_path'] = realpath(DRUPAL_ROOT .
+ * $conf['loft_dev_drupal_deploy_path'] = realpath(\Drupal::root() .
  *   '/../drupal_deploy/user/deploy_5.0');
  */
 function loft_dev_drupal_deploy_get_block($module, $delta) {
@@ -22,7 +21,7 @@ function loft_dev_drupal_deploy_get_block($module, $delta) {
 
       // First we take from a .html file
       $content = '';
-      foreach (array('Body', 'body') as $key) {
+      foreach (['Body', 'body'] as $key) {
         if (isset($data[$key])) {
           $content = isset($data[$key]['content']) ? $data[$key]['content'] : '';
           $filter = _loft_dev_drupal_deploy_get_filter($data[$key]);
@@ -39,19 +38,19 @@ function loft_dev_drupal_deploy_get_block($module, $delta) {
       // $content = $content ? token_replace($content) : '';
 
       $subject = '';
-      foreach (array('Title', 'title', 'Subject', 'subject') as $key) {
+      foreach (['Title', 'title', 'Subject', 'subject'] as $key) {
         if (isset($data[$key])) {
           $subject = $data[$key];
           break;
         }
       }
 
-      $block = array();
+      $block = [];
       if ($content) {
-        $block = array(
+        $block = [
           'subject' => $subject,
           'content' => $content,
-        );
+        ];
       }
     }
     catch (\Exception $e) {
@@ -71,7 +70,7 @@ function loft_dev_drupal_deploy_get_block($module, $delta) {
  * @return array
  */
 function _loft_dev_drupal_deploy_get_filter($item) {
-  foreach (array('format') as $key) {
+  foreach (['format'] as $key) {
     if (isset($item[$key])) {
       $filter_code = $item[$key];
       break;
@@ -91,30 +90,32 @@ function _loft_dev_drupal_deploy_get_filter($item) {
 function _loft_dev_drupal_deploy_get_files($folder) {
   global $_loft_dev_drupal_deploy_caching;
 
-  if (!($dir = variable_get('loft_dev_drupal_deploy_path', NULL))) {
-    return array();
+  if (!($dir = \Drupal::config('loft_dev.settings')
+    ->get('loft_dev_drupal_deploy_path'))) {
+    return [];
   }
 
   $caching = TRUE;
 
   if ($caching) {
-    if ($cache = cache_get('loft_dev:' . __FUNCTION__, 'cache')) {
+    if ($cache = \Drupal::cache('cache')->get('loft_dev:' . __FUNCTION__)) {
       $data = empty($cache->data) ? NULL : $cache->data;
     }
     else {
       // Set the default values
-      $data = array();
+      $data = [];
     }
   }
   if (empty($data)) {
     $mask = '/.+\.yml$/';
-    $data['blocks'] = file_scan_directory($dir . '/blocks', $mask, array('key' => 'name'));
-    $data['nodes'] = file_scan_directory($dir . '/nodes', $mask, array('key' => 'name'));
+    $data['blocks'] = file_scan_directory($dir . '/blocks', $mask, ['key' => 'name']);
+    $data['nodes'] = file_scan_directory($dir . '/nodes', $mask, ['key' => 'name']);
 
     if ($caching) {
-      cache_set('loft_dev:' . __FUNCTION__, $data, 'cache', CACHE_PERMANENT);
+      \Drupal::cache('cache')
+        ->set('loft_dev:' . __FUNCTION__, $data, \Drupal\Core\Cache\Cache::PERMANENT);
     }
   }
 
-  return isset($data[$folder]) ? $data[$folder] : array();
+  return isset($data[$folder]) ? $data[$folder] : [];
 }
