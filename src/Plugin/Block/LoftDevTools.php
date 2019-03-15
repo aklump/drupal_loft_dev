@@ -204,7 +204,7 @@ class LoftDevTools extends BlockBase {
       '#markup' => $output,
     ];
 
-    $block['#attached']['library'][] = 'loft_core/loft_core';
+//    $block['#attached']['library'][] = 'loft_core/loft_core';
 
     return $block;
   }
