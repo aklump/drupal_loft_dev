@@ -18,7 +18,29 @@ class InitSubscriber implements EventSubscriberInterface {
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
-    return [KernelEvents::REQUEST => ['onInit', 0]];
+    return [
+      KernelEvents::REQUEST => [
+        ['onInit', 0],
+      ],
+      KernelEvents::VIEW => [
+        ['handleSandbox', 100],
+      ],
+    ];
+  }
+
+  public function handleSandbox() {
+    global $_loft_dev_ignored_url;
+    if ($_loft_dev_ignored_url) {
+      return;
+    }
+    $sandboxes = \Drupal::moduleHandler()->invokeAll('loft_dev_sandbox');
+    foreach ($sandboxes as $sandbox) {
+      if (_loft_dev_check_get_var($sandbox['query'])) {
+        $function = $sandbox['callback'];
+        call_user_func_array($function, $sandbox['callback arguments']);
+        exit(0);
+      }
+    }
   }
 
   public function onInit() {
@@ -38,10 +60,6 @@ class InitSubscriber implements EventSubscriberInterface {
 ', [
       ]), 'error', FALSE);
     }
-
-
-    // Process the sandbox stuff.
-    _loft_dev_process_sandboxes();
 
     return;
 

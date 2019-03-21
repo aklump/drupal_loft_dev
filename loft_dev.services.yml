@@ -16,3 +16,11 @@ services:
     class: Drupal\loft_dev\EventSubscriber\ExitSubscriber
     tags:
       - name: event_subscriber
+  exit_subscriber:
+    class: Drupal\loft_dev\EventSubscriber\ExitSubscriber
+    tags:
+      - name: event_subscriber
+  loft_dev.exception.final:
+    class: Drupal\loft_dev\EventSubscriber\FinalExceptionSubscriber
+    tags:
+      - { name: event_subscriber }
