@@ -14,7 +14,7 @@
    */
   Drupal.loftDev.hideAdminStuff = function() {
     // List of classes that are "admin stuff"--to hide.
-    $(Drupal.settings.loftDev.adminStuff)
+    $(drupalSettings.loftDev.adminStuff)
       .addClass('hidden-by-loft-dev')
       .hide();
     $('html').addClass('loft-dev--admin-is-hidden');
@@ -27,7 +27,7 @@
    * @return {[type]} [description]
    */
   Drupal.loftDev.showAdminStuff = function() {
-    $(Drupal.settings.loftDev.adminStuff)
+    $(drupalSettings.loftDev.adminStuff)
       .removeClass('hidden-by-loft-dev')
       .show();
     $.cookie('loft_dev_admin_stuff', 'visible');
