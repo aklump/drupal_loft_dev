@@ -8,7 +8,9 @@ namespace Drupal\loft_dev\EventSubscriber;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Yaml\Yaml;
 
 class InitSubscriber implements EventSubscriberInterface {
 
@@ -28,12 +30,33 @@ class InitSubscriber implements EventSubscriberInterface {
     ];
   }
 
-  public function handleSandbox() {
+  public function handleSandbox(GetResponseForControllerResultEvent $event) {
+    // TODO 'sb' is supposed to be configurable.
+    // TODO This doesn't work to just pass 'sb', have to pass 'sb=1'; the former should work, so fix.
+    $sandbox_is_enabled = $event->getRequest()->get('sb');
+    if (!$sandbox_is_enabled) {
+      return;
+    }
     global $_loft_dev_ignored_url;
     if ($_loft_dev_ignored_url) {
       return;
     }
     $sandboxes = \Drupal::moduleHandler()->invokeAll('loft_dev_sandbox');
+
+    // Frontmatter to help developer know where he is.
+    if ($sandboxes) {
+      $frontmatter = [
+        'activeTheme' => \Drupal::service('theme.manager')
+          ->getActiveTheme()
+          ->getName(),
+      ];
+      $header = [];
+      $header[] = '---';
+      $header[] = trim(Yaml::dump($frontmatter));
+      $header[] = '---';
+      print '<pre><code>' . implode(PHP_EOL, $header) . '</code></pre>';
+    }
+
     foreach ($sandboxes as $sandbox) {
       if (_loft_dev_check_get_var($sandbox['query'])) {
         $function = $sandbox['callback'];
