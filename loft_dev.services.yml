@@ -7,17 +7,8 @@ services:
     class: Drupal\loft_dev\TwigExtension\FileHeader
     tags:
       - { name: twig.extension }
-
-  init_subscriber:
-    class: Drupal\loft_dev\EventSubscriber\InitSubscriber
-    tags:
-      - name: event_subscriber
-  exit_subscriber:
-    class: Drupal\loft_dev\EventSubscriber\ExitSubscriber
-    tags:
-      - name: event_subscriber
-  exit_subscriber:
-    class: Drupal\loft_dev\EventSubscriber\ExitSubscriber
+  loft_event_handlers:
+    class: Drupal\loft_dev\EventSubscriber\EventHandlers
     tags:
       - name: event_subscriber
   loft_dev.exception.final:

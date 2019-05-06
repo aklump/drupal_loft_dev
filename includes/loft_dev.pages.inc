@@ -4,86 +4,37 @@
  * Pages for loft_dev
  */
 
+use AKlump\LoftLib\Bash\Bash;
 use Drupal\loft_dev\ButtonCatalog;
 
 /**
- * Apply ld export via shell.
+ * Execute loft_deploy export via shell.
  *
- * @param  string $filename The arg to pass to ld export.
+ * @param string $basename
+ *   The arg to pass to ld export.
  *
- * @return bool           Success result.
+ * @return bool
+ *   True if the backup succeeded.  False otherwise.
  */
-function loft_dev_loft_deploy_export($filename) {
-  if (!($cmd = \Drupal::config('loft_dev.settings')->get('loft_dev_which_ld'))) {
-    \Drupal::logger('loft_dev')->debug('Empty variable %name. See README for setup instructions.', array('%name' => 'loft_dev_which_ld'));
-
+function loft_dev_loft_deploy_export($basename) {
+  $web_root = \Drupal::root();
+  $which_loft_deploy = \Drupal::config('loft_dev.settings')
+    ->get('which_loft_deploy');
+  $save_as = $basename . '_' . date_create('now')->format('Y-m-d_Hi');
+  try {
+    Bash::exec([
+      "cd $web_root &&",
+      $which_loft_deploy,
+      "export $save_as -fy",
+      // This causes to run in background.
+      "> /dev/null 2>&1 &",
+    ]);
+  }
+  catch (\Exception $exception) {
     return FALSE;
   }
 
-  $web_root = \Drupal::root();
-  $cmd = "cd {$web_root}; {$cmd} export {$filename} -f";
-
-  // Check the mtime of the last one
-  $old_mtime = 0;
-  if (($path = \Drupal::config('loft_dev.settings')->get('loft_dev_loft_deploy_export_path'))) {
-    $old_mtime = @filemtime($path);
-
-    $date = new \DateTime();
-    $date
-      ->setTimestamp($old_mtime)
-      ->setTimezone(new \DateTimeZone('America/Los_Angeles'));
-    $prefix = date_format($date, 'Y-m-d_Hi');
-
-    // Archive the previous file
-    $archive = dirname($path) . '/loft_dev_auto/';
-    file_prepare_directory($archive, FILE_CREATE_DIRECTORY);
-    $to = $archive . "/{$prefix}_" . basename($path);
-    file_exists($path) && file_unmanaged_copy($path, $to);
-  }
-
-  // Can't get this to work it just hangs on exec
-  // if ($path && variable_get('loft_dev_loft_deploy_async', FALSE)) {
-  //   // This will fire off and let it do it's own thing
-  //   exec("$cmd > /dev/null 2 > /dev/null &");
-  //   variable_set('loft_dev_loft_deploy_export_path', time());
-  // }
-  // else {
-  // This will wait for feedback from ld export.
-  // This slows down site builders for large dbs.
-  $handle = popen("$cmd 2>&1 &", 'r');
-  $output = stream_get_contents($handle);
-  pclose($handle);
-
-  if (preg_match('/ database as (.*)\.\.\./', $output, $matches)
-    && isset($matches[1])
-    && file_exists($matches[1])
-  ) {
-    \Drupal::configFactory()->getEditable('loft_dev.settings')->set('loft_dev_loft_deploy_export_path', $matches[1])->save();
-    if (!$old_mtime
-      || ($old_mtime && $old_mtime < filemtime($matches[1]))
-    ) {
-      return TRUE;
-    }
-  }
-
-  $watchdog_message = '';
-  if (preg_match_all("/command not found\s*(\S+?):/", $output, $matches)) {
-    $missing_cmd = $matches[1][0];
-    switch ($missing_cmd) {
-      default;
-        $watchdog_message = "Add the full path to $missing_cmd to .loft_deploy/config e.g. ld_{$missing_cmd}='/Applications/MAMP/Library/bin/{$missing_cmd}'";
-        break;
-    }
-  }
-
-  \Drupal::logger('loft_dev')->debug($output, array());
-  //}
-
-  if ($watchdog_message) {
-    \Drupal::logger('loft_dev')->debug($watchdog_message, array());
-  }
-
-  return FALSE;
+  return TRUE;
 }
 
 function loft_dev_playground_page() {
@@ -186,34 +137,34 @@ function loft_dev_theme_test_page() {
 
   //ordered list
   // @FIXME
-// theme() has been renamed to _theme() and should NEVER be called directly.
-// Calling _theme() directly can alter the expected output and potentially
-// introduce security issues (see https://www.drupal.org/node/2195739). You
-// should use renderable arrays instead.
-// 
-// 
-// @see https://www.drupal.org/node/2195739
-// $output .= theme('item_list', array(
-//       'items' => _loft_dev_dummy_array(5, NULL, 20),
-//       'title' => '&lt;ol> ' . _loft_dev_dummy_string(4),
-//       'type' => 'ol',
-//     )) . "\n";
+  // theme() has been renamed to _theme() and should NEVER be called directly.
+  // Calling _theme() directly can alter the expected output and potentially
+  // introduce security issues (see https://www.drupal.org/node/2195739). You
+  // should use renderable arrays instead.
+  //
+  //
+  // @see https://www.drupal.org/node/2195739
+  // $output .= theme('item_list', array(
+  //       'items' => _loft_dev_dummy_array(5, NULL, 20),
+  //       'title' => '&lt;ol> ' . _loft_dev_dummy_string(4),
+  //       'type' => 'ol',
+  //     )) . "\n";
 
 
   //unordered list
   // @FIXME
-// theme() has been renamed to _theme() and should NEVER be called directly.
-// Calling _theme() directly can alter the expected output and potentially
-// introduce security issues (see https://www.drupal.org/node/2195739). You
-// should use renderable arrays instead.
-// 
-// 
-// @see https://www.drupal.org/node/2195739
-// $output .= theme('item_list', array(
-//       'items' => _loft_dev_dummy_array(5, NULL, 20),
-//       'title' => '&lt;ul> ' . _loft_dev_dummy_string(4),
-//       'type' => 'ul',
-//     )) . "\n";
+  // theme() has been renamed to _theme() and should NEVER be called directly.
+  // Calling _theme() directly can alter the expected output and potentially
+  // introduce security issues (see https://www.drupal.org/node/2195739). You
+  // should use renderable arrays instead.
+  //
+  //
+  // @see https://www.drupal.org/node/2195739
+  // $output .= theme('item_list', array(
+  //       'items' => _loft_dev_dummy_array(5, NULL, 20),
+  //       'title' => '&lt;ul> ' . _loft_dev_dummy_string(4),
+  //       'type' => 'ul',
+  //     )) . "\n";
 
 
   //p tags
@@ -236,18 +187,17 @@ function loft_dev_theme_test_page() {
     $rows[0][$cell_key] = '<a href="#" onclick="return false;">' . $cell . '</a>';
   }
   // @FIXME
-// theme() has been renamed to _theme() and should NEVER be called directly.
-// Calling _theme() directly can alter the expected output and potentially
-// introduce security issues (see https://www.drupal.org/node/2195739). You
-// should use renderable arrays instead.
-// 
-// 
-// @see https://www.drupal.org/node/2195739
-// $output .= theme('table', array(
-//       'header' => _loft_dev_dummy_array(10),
-//       'rows' => $rows,
-//     )) . "\n";
-
+  // theme() has been renamed to _theme() and should NEVER be called directly.
+  // Calling _theme() directly can alter the expected output and potentially
+  // introduce security issues (see https://www.drupal.org/node/2195739). You
+  // should use renderable arrays instead.
+  //
+  //
+  // @see https://www.drupal.org/node/2195739
+  // $output .= theme('table', array(
+  //       'header' => _loft_dev_dummy_array(10),
+  //       'rows' => $rows,
+  //     )) . "\n";
 
 
   // Throbber
@@ -517,14 +467,14 @@ function test_form_form_submit($form, &$form_state) {
  */
 function drupal_not_found_page() {
   // @FIXME
-// The active trail system has been removed in Drupal 8 because the routing and
-// linking systems have been completely rewritten. You will need to rewrite this
-// code to use the menu.active_trail service, or override the service if you need
-// to alter the active trail.
-// 
-// 
-// @see https://www.drupal.org/node/2240003
-// menu_set_active_item('page/not/found');
+  // The active trail system has been removed in Drupal 8 because the routing and
+  // linking systems have been completely rewritten. You will need to rewrite this
+  // code to use the menu.active_trail service, or override the service if you need
+  // to alter the active trail.
+  //
+  //
+  // @see https://www.drupal.org/node/2240003
+  // menu_set_active_item('page/not/found');
 
 
   return drupal_not_found();
@@ -536,12 +486,12 @@ function drupal_not_found_page() {
 function loft_dev_teasers_page() {
   $build = array();
   // @FIXME
-// drupal_set_title() has been removed. There are now a few ways to set the title
-// dynamically, depending on the situation.
-// 
-// 
-// @see https://www.drupal.org/node/2067859
-// drupal_set_title(t('All Node Teasers Test Page'));
+  // drupal_set_title() has been removed. There are now a few ways to set the title
+  // dynamically, depending on the situation.
+  //
+  //
+  // @see https://www.drupal.org/node/2067859
+  // drupal_set_title(t('All Node Teasers Test Page'));
 
   foreach (loft_dev_node_suite() as $type => $nid) {
     $node = \Drupal::entityManager()->getStorage('node')->load($nid);
@@ -568,12 +518,12 @@ function loft_dev_list_libraries_page() {
     foreach ($libraries as $key => $data) {
       $title = empty($data['title']) ? $key : $data['title'];
       // @FIXME
-// l() expects a Url object, created from a route name or external URI.
-// $link = empty($data['website']) ? $title : l($title, $data['website'], array(
-//         'attributes' => array(
-//           'onclick' => 'window.open(this.href); return false;',
-//         ),
-//       ));
+      // l() expects a Url object, created from a route name or external URI.
+      // $link = empty($data['website']) ? $title : l($title, $data['website'], array(
+      //         'attributes' => array(
+      //           'onclick' => 'window.open(this.href); return false;',
+      //         ),
+      //       ));
 
       $rows[$key] = array(
         $link,
@@ -597,7 +547,8 @@ function loft_dev_list_libraries_page() {
  * Genereate the libraries list page
  */
 function loft_dev_list_fapi_elements_page() {
-  $info_hook_modules = \Drupal::moduleHandler()->getImplementations('element_info', TRUE);
+  $info_hook_modules = \Drupal::moduleHandler()
+    ->getImplementations('element_info', TRUE);
   $elements = array();
   foreach ($info_hook_modules as $module) {
     $elements += \Drupal::moduleHandler()->invoke($module, 'element_info');
@@ -673,14 +624,17 @@ function loft_dev_server_vars_page() {
 
   // Capture last 10 user agents
   // @FIXME
-// Could not extract the default value because it is either indeterminate, or
-// not scalar. You'll need to provide a default value in
-// config/install/loft_dev.settings.yml and config/schema/loft_dev.schema.yml.
-$agents = \Drupal::config('loft_dev.settings')->get('loft_dev_user_agents');
+  // Could not extract the default value because it is either indeterminate, or
+  // not scalar. You'll need to provide a default value in
+  // config/install/loft_dev.settings.yml and config/schema/loft_dev.schema.yml.
+  $agents = \Drupal::config('loft_dev.settings')->get('loft_dev_user_agents');
   if (!in_array($_SERVER['HTTP_USER_AGENT'], $agents)) {
     array_unshift($agents, $_SERVER['HTTP_USER_AGENT']);
     $agents = array_slice($agents, 0, 10);
-    \Drupal::configFactory()->getEditable('loft_dev.settings')->set('loft_dev_user_agents', $agents)->save();
+    \Drupal::configFactory()
+      ->getEditable('loft_dev.settings')
+      ->set('loft_dev_user_agents', $agents)
+      ->save();
   }
   $build['session_title'] = array('#markup' => '<h2>Recent Agents</h2>');
   $build['session'] = array(
@@ -876,8 +830,8 @@ function loft_dev_zebra_stripes_reset() {
 function loft_dev_fpo_image_page() {
   $output = '';
   // @FIXME
-// url() expects a route name or an external URI.
-// $path = url(drupal_get_path('module', 'loft_dev') . '/images/fpo-bg.png');
+  // url() expects a route name or an external URI.
+  // $path = url(drupal_get_path('module', 'loft_dev') . '/images/fpo-bg.png');
 
   $output .= '<body style="width: 100%; height: 100%; background: url(' . $path . ') repeat"></body>' . "\n";
   print $output;
@@ -919,28 +873,28 @@ function loft_dev_list_functions_page($op) {
   }
 
   // @FIXME
-// /**
-//    * Auto load all .inc files for all active modules
-//    */
-//   $result = db_select('system', 's')
-//     ->fields('s', array('filename'))
-//     ->condition('status', '1')
-//     //@todo figure out why these cause trouble; has to do with classes
-//     ->condition('name', array(
-//       'backup_migrate',
-//       'date',
-//       'metatag',
-//       'print',
-//       'prod_check',
-//       'email',
-//       'fb_social',
-//       'imageapi',
-//       'mailchimp',
-//       'comment_notify',
-//       'link',
-//       'commerce_product',
-//     ), 'NOT IN')
-//     ->execute()->fetchCol();
+  // /**
+  //    * Auto load all .inc files for all active modules
+  //    */
+  //   $result = db_select('system', 's')
+  //     ->fields('s', array('filename'))
+  //     ->condition('status', '1')
+  //     //@todo figure out why these cause trouble; has to do with classes
+  //     ->condition('name', array(
+  //       'backup_migrate',
+  //       'date',
+  //       'metatag',
+  //       'print',
+  //       'prod_check',
+  //       'email',
+  //       'fb_social',
+  //       'imageapi',
+  //       'mailchimp',
+  //       'comment_notify',
+  //       'link',
+  //       'commerce_product',
+  //     ), 'NOT IN')
+  //     ->execute()->fetchCol();
 
 
   $skipped_files = array(
@@ -1099,7 +1053,8 @@ function loft_dev_parse_time_form($form, &$form_state) {
   $form['append_to_line'] = array(
     '#type' => 'checkbox',
     '#title' => t('Append to the end of the line'),
-    '#default_value' => \Drupal::config('loft_dev.settings')->get('loft_dev_parse_time:append_to_line'),
+    '#default_value' => \Drupal::config('loft_dev.settings')
+      ->get('loft_dev_parse_time:append_to_line'),
   );
 
   //http://api.drupal.org/api/drupal/includes%21common.inc/function/drupal_process_states/7
@@ -1117,7 +1072,8 @@ function loft_dev_parse_time_form($form, &$form_state) {
     '#type' => 'textfield',
     '#description' => t('When appending the output time, place this string between the line and the output.'),
     '#title' => t('Append Prefix'),
-    '#default_value' => \Drupal::config('loft_dev.settings')->get('loft_dev_parse_time:append_prefix'),
+    '#default_value' => \Drupal::config('loft_dev.settings')
+      ->get('loft_dev_parse_time:append_prefix'),
     '#size' => 10,
   );
 
@@ -1159,8 +1115,14 @@ function loft_dev_parse_time_form_submit($form, &$form_state) {
   $form_state['rebuild'] = TRUE;
   $form_state['storage']['output'] = implode($eol, $output);
 
-  \Drupal::configFactory()->getEditable('loft_dev.settings')->set('loft_dev_parse_time:append_prefix', $form_state['values']['append_prefix'])->save();
-  \Drupal::configFactory()->getEditable('loft_dev.settings')->set('loft_dev_parse_time:append_to_line', $form_state['values']['append_to_line'])->save();
+  \Drupal::configFactory()
+    ->getEditable('loft_dev.settings')
+    ->set('loft_dev_parse_time:append_prefix', $form_state['values']['append_prefix'])
+    ->save();
+  \Drupal::configFactory()
+    ->getEditable('loft_dev.settings')
+    ->set('loft_dev_parse_time:append_to_line', $form_state['values']['append_to_line'])
+    ->save();
 }
 
 function _loft_dev_pull_time_string($string) {
@@ -1175,23 +1137,26 @@ function loft_dev_migration_page() {
   $build = array();
 
   // @FIXME
-// Could not extract the default value because it is either indeterminate, or
-// not scalar. You'll need to provide a default value in
-// config/install/loft_dev.settings.yml and config/schema/loft_dev.schema.yml.
-$default = \Drupal::config('loft_dev.settings')->get('loft_dev_migration_urls');
+  // Could not extract the default value because it is either indeterminate, or
+  // not scalar. You'll need to provide a default value in
+  // config/install/loft_dev.settings.yml and config/schema/loft_dev.schema.yml.
+  $default = \Drupal::config('loft_dev.settings')
+    ->get('loft_dev_migration_urls');
   if ($default) {
     // @FIXME
-// Could not extract the default value because it is either indeterminate, or
-// not scalar. You'll need to provide a default value in
-// config/install/loft_dev.settings.yml and config/schema/loft_dev.schema.yml.
-$build['current_status'] = array(
+    // Could not extract the default value because it is either indeterminate, or
+    // not scalar. You'll need to provide a default value in
+    // config/install/loft_dev.settings.yml and config/schema/loft_dev.schema.yml.
+    $build['current_status'] = array(
       '#theme' => 'loft_dev_migration',
       '#urls' => $default,
-      '#results' => \Drupal::config('loft_dev.settings')->get('loft_dev_migration_urls_results'),
+      '#results' => \Drupal::config('loft_dev.settings')
+        ->get('loft_dev_migration_urls_results'),
     );
   }
 
-  $build['form'] = \Drupal::formBuilder()->getForm('loft_dev_migration_urls_form', $default);
+  $build['form'] = \Drupal::formBuilder()
+    ->getForm('loft_dev_migration_urls_form', $default);
 
   return $build;
 }
@@ -1213,7 +1178,8 @@ function loft_dev_migration_urls_form($form, &$form_state, $default) {
     '#type' => 'textfield',
     '#description' => t('Enter the base url of the current production site.'),
     '#title' => t('Canonical URL'),
-    '#default_value' => \Drupal::config('loft_dev.settings')->get('loft_dev_migration_canonical'),
+    '#default_value' => \Drupal::config('loft_dev.settings')
+      ->get('loft_dev_migration_canonical'),
     '#required' => TRUE,
   );
 
@@ -1242,8 +1208,13 @@ function loft_dev_migration_urls_form($form, &$form_state, $default) {
  */
 function loft_dev_migration_urls_form_submit($form, &$form_state) {
 
-  \Drupal::configFactory()->getEditable('loft_dev.settings')->set('loft_dev_migration_canonical', trim($form_state['values']['loft_dev_migration_canonical'], '/'))->save();
-  \Drupal::config('loft_dev.settings')->clear('loft_dev_migration_urls_results')->save();
+  \Drupal::configFactory()
+    ->getEditable('loft_dev.settings')
+    ->set('loft_dev_migration_canonical', trim($form_state['values']['loft_dev_migration_canonical'], '/'))
+    ->save();
+  \Drupal::config('loft_dev.settings')
+    ->clear('loft_dev_migration_urls_results')
+    ->save();
 
   if ($urls = trim($form_state['values']['loft_dev_migration_urls'])) {
     $urls = explode(PHP_EOL, $urls);
@@ -1252,7 +1223,10 @@ function loft_dev_migration_urls_form_submit($form, &$form_state) {
     foreach ($urls as $key => $value) {
       $urls[$key] = trim($value);
     }
-    \Drupal::configFactory()->getEditable('loft_dev.settings')->set('loft_dev_migration_urls', $urls)->save();
+    \Drupal::configFactory()
+      ->getEditable('loft_dev.settings')
+      ->set('loft_dev_migration_urls', $urls)
+      ->save();
   }
 }
 
@@ -1270,15 +1244,17 @@ function loft_dev_migration_urls_form_submit($form, &$form_state) {
  */
 function loft_dev_css_aggregation_form($form, &$form_state) {
   // @FIXME
-// Could not extract the default value because it is either indeterminate, or
-// not scalar. You'll need to provide a default value in
-// config/install/loft_dev.settings.yml and config/schema/loft_dev.schema.yml.
-$default_value = \Drupal::config('loft_dev.settings')->get('loft_dev_css_files_omit');
+  // Could not extract the default value because it is either indeterminate, or
+  // not scalar. You'll need to provide a default value in
+  // config/install/loft_dev.settings.yml and config/schema/loft_dev.schema.yml.
+  $default_value = \Drupal::config('loft_dev.settings')
+    ->get('loft_dev_css_files_omit');
   // @FIXME
-// Could not extract the default value because it is either indeterminate, or
-// not scalar. You'll need to provide a default value in
-// config/install/loft_dev.settings.yml and config/schema/loft_dev.schema.yml.
-$options = \Drupal::config('loft_dev.settings')->get('loft_dev_css_files_options');
+  // Could not extract the default value because it is either indeterminate, or
+  // not scalar. You'll need to provide a default value in
+  // config/install/loft_dev.settings.yml and config/schema/loft_dev.schema.yml.
+  $options = \Drupal::config('loft_dev.settings')
+    ->get('loft_dev_css_files_options');
   $form['loft_dev_css_files_omit'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Omit these files from aggregation'),
@@ -1327,7 +1303,8 @@ function loft_dev_button_catalog_page($theme = NULL) {
     $data = \Drupal::service("renderer")->render($data);
 
     if ($caching) {
-      \Drupal::cache('cache')->set('loft_dev:button_catalog', $data, CACHE_TEMPORARY);
+      \Drupal::cache('cache')
+        ->set('loft_dev:button_catalog', $data, CACHE_TEMPORARY);
     }
   }
 

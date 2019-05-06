@@ -2,10 +2,14 @@ loft_dev.settings:
   type: mapping
   label: Settings
   mapping:
-    loft_dev_which_ld:
+    which_loft_deploy:
       type: string
-    loft_dev_loft_deploy_export_path:
+    loft_deploy_export_path:
       type: string
+    loft_deploy_export_period_mins:
+      type: integer
+    loft_deploy_purge_after_days:
+      type: integer
     'loft_dev_parse_time:append_to_line':
       type: boolean
     'loft_dev_parse_time:append_prefix':
@@ -18,7 +22,5 @@ loft_dev.settings:
       type: boolean
     loft_dev_playground_load_data:
       type: boolean
-    loft_dev_loft_deploy_export_last:
-      type: integer
     loft_dev_mail_capture:
       type: boolean

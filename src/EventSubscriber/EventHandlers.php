@@ -12,7 +12,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Yaml\Yaml;
 
-class InitSubscriber implements EventSubscriberInterface {
+class EventHandlers implements EventSubscriberInterface {
 
   use StringTranslationTrait;
 
@@ -23,6 +23,7 @@ class InitSubscriber implements EventSubscriberInterface {
     return [
       KernelEvents::REQUEST => [
         ['onInit', 0],
+        ['onRequest', 0],
       ],
       KernelEvents::VIEW => [
         ['handleSandbox', 100],
@@ -120,4 +121,67 @@ class InitSubscriber implements EventSubscriberInterface {
 
   }
 
+  public function onRequest() {
+
+    // Do an export if needed using loft_deploy shell script.
+    if (_loft_dev_access() && ($period = \Drupal::config('loft_dev.settings')
+        ->get('loft_deploy_export_period_mins'))) {
+      $rollback = \Drupal::state()
+        ->get('loft_dev.loft_deploy_export_last');
+      $rollback += $period * 60;
+      if (($now = time()) >= $rollback) {
+        loft_dev_include('pages');
+
+        // Important to set the state with an assumption it will not fail, so
+        // that we don't have multiple backups running if it takes a long time.
+        // If it fails, we'll delete the state below.
+        \Drupal::state()->set('loft_dev.loft_deploy_export_last', $now);
+        if (!loft_dev_loft_deploy_export('auto')) {
+          \Drupal::state()->delete('loft_dev.loft_deploy_export_last');
+          $message = 'Automatic database snapshot failed; please check loft_dev and/or loft_deploy.';
+          \Drupal::messenger()->addError($message);
+          \Drupal::logger('loft_dev')->error($message);
+        }
+      }
+    }
+
+    return;
+
+    // Return the mail system to normal.
+    global $_loft_dev_mail_system_stashed_, $_loft_dev_mail_filename_;
+    if (!empty($_loft_dev_mail_system_stashed_)) {
+
+      // Pop off our collected email.
+      // @FIXME
+      // // @FIXME
+      // // This looks like another module's variable. You'll need to rewrite this call
+      // // to ensure that it uses the correct configuration object.
+      // $captured_emails = variable_get('drupal_test_email_collector');
+
+      $message = array_pop($captured_emails);
+      // @FIXME
+      // // @FIXME
+      // // This looks like another module's variable. You'll need to rewrite this call
+      // // to ensure that it uses the correct configuration object.
+      // variable_set('drupal_test_email_collector', $captured_emails);
+
+
+      // Saves a copy of the message in the private files
+      $url = $_loft_dev_mail_filename_ . '.exit.txt';
+      file_unmanaged_save_data(var_export($message, TRUE), $url);
+      // @FIXME
+      // // @FIXME
+      // // This looks like another module's variable. You'll need to rewrite this call
+      // // to ensure that it uses the correct configuration object.
+      // variable_set('mail_system', $_loft_dev_mail_system_stashed_);
+
+
+      // Save a php version of this for export testing.
+      if (($code = _loft_dev_compose_php_mail($message))) {
+        $url = $_loft_dev_mail_filename_ . '.php';
+        file_unmanaged_save_data($code, $url);
+      }
+    }
+
+  }
 }

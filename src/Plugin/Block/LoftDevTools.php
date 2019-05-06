@@ -179,9 +179,9 @@ class LoftDevTools extends BlockBase {
     }
 
     if (($path = \Drupal::config('loft_dev.settings')
-        ->get('loft_dev_loft_deploy_export_path'))
+        ->get('loft_deploy_export_path'))
       && ($last = \Drupal::config('loft_dev.settings')
-        ->get('loft_dev_loft_deploy_export_last'))
+        ->get('loft_deploy_export_last'))
     ) {
       $date = new \DateTime();
       $date
