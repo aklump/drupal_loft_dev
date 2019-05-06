@@ -6,11 +6,20 @@ Summary
 
    Provides a suite of development tools for Drupal.
 
+Features
+
+     * Alerts you when the [2]reroute email module is not properly
+       configured.
+     * Adds the ability to sandbox code using sandbox.inc and ?sb
+     * Adds new Twig function file_header() to generate template headers.
+     * Adds demo page for Page Not Found
+     * Adds demo page for Access Denied
+
 Requirements
 
 Installation
 
-    1. Install as usual, see [2]http://drupal.org/node/70151 for further
+    1. Install as usual, see [3]http://drupal.org/node/70151 for further
        information.
 
 Configuration
@@ -91,10 +100,11 @@ Contact
      * aim: theloft101
      * skype: intheloftstudios
      * d.o: aklump
-     * [3]http://www.InTheLoftStudios.com
+     * [4]http://www.InTheLoftStudios.com
 
 References
 
    1. mailto:sourcecode@intheloftstudios.com
-   2. http://drupal.org/node/70151
-   3. http://www.InTheLoftStudios.com/
+   2. file:///Users/aklump/Code/Packages/d8/loft_dev/documentation/core/cache/build/README.html
+   3. http://drupal.org/node/70151
+   4. http://www.InTheLoftStudios.com/
