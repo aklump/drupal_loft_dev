@@ -1,7 +1,8 @@
 <?php
+
 /**
  * @file
- * Pages for loft_dev
+ * Provide pages for loft_dev.
  */
 
 use AKlump\LoftLib\Bash\Bash;
@@ -18,17 +19,32 @@ use Drupal\loft_dev\ButtonCatalog;
  */
 function loft_dev_loft_deploy_export($basename) {
   $web_root = \Drupal::root();
+  $purge_days = \Drupal::config('loft_dev.settings')
+    ->get('loft_deploy_purge_after_days');
   $which_loft_deploy = \Drupal::config('loft_dev.settings')
     ->get('which_loft_deploy');
   $save_as = $basename . '_' . date_create('now')->format('Y-m-d_Hi');
   try {
+    $home = Bash::exec('echo ~');
     Bash::exec([
+      "export HOME=$home;",
       "cd $web_root &&",
       $which_loft_deploy,
       "export $save_as -fy",
       // This causes to run in background.
       "> /dev/null 2>&1 &",
     ]);
+
+    if ($purge_days) {
+      Bash::exec([
+        "export HOME=$home;",
+        "cd $web_root &&",
+        $which_loft_deploy,
+        "export-purge $purge_days -y",
+        // This causes to run in background.
+        "> /dev/null 2>&1 &",
+      ]);
+    }
   }
   catch (\Exception $exception) {
     return FALSE;
