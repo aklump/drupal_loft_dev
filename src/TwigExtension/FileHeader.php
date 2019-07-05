@@ -4,6 +4,11 @@ namespace Drupal\loft_dev\TwigExtension;
 
 use Drupal\Core\Render\Markup;
 
+/**
+ * This will not work if your template starts uses {% extends "block.html.twig"
+ * %}, int that case try commenting out the extends line and run this to
+ * generate the header, then uncomment.
+ */
 class FileHeader extends \Twig_Extension {
 
   /**
@@ -19,6 +24,7 @@ class FileHeader extends \Twig_Extension {
     debug: true
     auto_reload: true
     cache: false</code></pre>"));
+
           return;
         }
         $path_to_template_file = $env->getLoader()
