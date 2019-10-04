@@ -111,7 +111,7 @@ To suppress this message you must disable Loft Dev module.', [
         ],
       ],
     ];
-    $build['#attached']['library'][] = ['loft_dev', 'loft_dev'];
+    $build['#attached']['library'][] = 'loft_dev/loft_dev';
     \Drupal::service("renderer")->render($build);
 
     // Suppress admin menu if admin stuff hidden.
