@@ -203,7 +203,6 @@ function HOOK_loft_dev_button_catalog() {
       'parent',
       'pill',
       'pill-blue',
-      'pinterest',
       'plus',
       'primary',
       'primary-red',
