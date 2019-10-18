@@ -4,7 +4,6 @@
  * Base module file for loft_dev
  */
 
-use AKlump\LoftLib\Code\Grammar;
 use Drupal\loft_dev\ButtonCatalog;
 
 /**
@@ -17,7 +16,7 @@ define('LOFT_DEV_LOFT_DEPLOY_EXPORT_PERIOD_MIN', 0);
 /**
  * Tests for a GET var
  *
- * @param  string $key The $_GET var key.
+ * @param string $key The $_GET var key.
  * @param bool $default The default when the $GET var is not present
  *
  * @return bool
@@ -522,10 +521,10 @@ function loft_dev_preprocess_page(&$vars) {
  *
  * The end result is $vars['some']['string']['of']['keys'] = 'final value';
  *
- * @param  array &$array The base array.
- * @param  array &$keys An array of keys, each successive a child of the
+ * @param array &$array The base array.
+ * @param array &$keys An array of keys, each successive a child of the
  *                       former.
- * @param  mixed $value The final value to set on the last child key.
+ * @param mixed $value The final value to set on the last child key.
  */
 function loft_dev_array_set_nested_element(&$array, &$keys, $value) {
   if (!($key = array_shift($keys))) {
@@ -544,8 +543,8 @@ function loft_dev_array_set_nested_element(&$array, &$keys, $value) {
 /**
  * Loads data from flatfiles for a given scope, e.g., html, page.
  *
- * @param  string $scope Expecting html, page, etc.
- * @param  array &$vars The vars for that scope.
+ * @param string $scope Expecting html, page, etc.
+ * @param array &$vars The vars for that scope.
  */
 function _loft_dev_playground_data($scope, &$vars) {
   global $_loft_dev_ignored_url;
@@ -616,7 +615,7 @@ function loft_dev_loft_dev_playground_info() {
  */
 function loft_dev_block_view_alter(&$data, $block) {
 
-  return ;
+  return;
   loft_dev_include('drupal_deploy');
   if (($disk = loft_dev_drupal_deploy_get_block($block->module, $block->delta))) {
     $data = $disk;
@@ -634,8 +633,8 @@ function loft_dev_block_view_alter(&$data, $block) {
  * directory; by doing this we avoid nuking this when we pull from prod.  In
  * essence its a supersceding storage mechanism.
  *
- * @param  string $group A key to group related data.
- * @param  array $data Keyed by filename, the values will become the file
+ * @param string $group A key to group related data.
+ * @param array $data Keyed by filename, the values will become the file
  *                       contents.
  *
  * @return array  The currently stored values.
@@ -699,7 +698,7 @@ function loft_dev_mail_alter($message) {
 /**
  * Converts a drupal mail array into a snippet of php code.
  *
- * @param  array $message
+ * @param array $message
  *
  * @return string
  *
@@ -986,7 +985,7 @@ function loft_dev_update_rewind_form_submit($form, &$form_state) {
  * @param string $delta
  * @param string $new_region
  *                     Set to empty() or -1 to disable block
- * @param        array or string $themes
+ * @param array or string $themes
  *                     If empty block will be moved for all themes.
  *                     If one theme you may pass a string.
  * @param int $new_weight
@@ -1092,7 +1091,7 @@ function loft_dev_update_block($delta, $block, $module = 'block') {
  *                            - each key is a theme_name
  *                            - each value is an array of regions for that
  *                            theme
- * @param        string       title
+ * @param string       title
  *
  * @return int
  *   The delta
@@ -1206,7 +1205,7 @@ function loft_dev_new_block($overwrite, $body, $description, $placement = [], $t
  * Update a node
  *
  * @param int $nid
- * @param     string or object
+ * @param string or object
  *                   If object this will be passed directly to node_save
  *                   If a string it will be passed as the body of the node
  *
@@ -1453,9 +1452,9 @@ function loft_dev_services_authentication_info() {
 /**
  * Authenticate a services call using the settings user.
  *
- * @param  array $settings
- * @param  string $method
- * @param  array $args
+ * @param array $settings
+ * @param string $method
+ * @param array $args
  *
  * @return NULL||string
  */
@@ -1559,7 +1558,7 @@ function loft_dev_css_cache_alter(&$css) {
 /**
  * Tries to return the page title of a path.
  *
- * @param  string &$path
+ * @param string &$path
  *   $path may be modified as the normal path.
  *
  * @return string  If title can't be determined, $path is returned.
@@ -1679,8 +1678,6 @@ function loft_dev_file_header($template_file, array $vars) {
   }
 }
 
-
-
 function _loft_dev_file_header_handle_vars($options, $vars, &$comments, &$level = 0) {
   $vars_as_array = json_decode(json_encode($vars), TRUE);
   $func = __FUNCTION__;
@@ -1692,7 +1689,13 @@ function _loft_dev_file_header_handle_vars($options, $vars, &$comments, &$level 
     }
     $var_prefix = isset($options['var_prefix'][$level]) ? $options['var_prefix'][$level] : $options['var_prefix'][0];
     $var_suffix = isset($options['var_suffix'][$level]) ? $options['var_suffix'][$level] : $options['var_suffix'][0];
-    $comments[] = $prefix . $var_prefix . $varname . $var_suffix . ' ' . gettype($vars[$varname]);
+
+    $type = gettype($vars[$varname]);
+    if ($type === 'object') {
+      $type = '\\' . get_class($vars[$varname]);
+    }
+
+    $comments[] = $prefix . $var_prefix . $varname . $var_suffix . ' ' . $type;
     if ($level < $options['max_depth'] && (is_array($var))) {
       $func($options, $var, $comments, $level);
     }
@@ -1710,7 +1713,7 @@ function _loft_dev_file_header($parent, $template_file, array $vars, $prepend_do
   $filename = preg_replace('/\.(html|tpl)$/', '', pathinfo($template_file, PATHINFO_FILENAME));
 
   // TODO Add this back when we have access to this class.
-//  $filename = Grammar::titleCase(str_replace('--', ', ', $filename));
+  //  $filename = Grammar::titleCase(str_replace('--', ', ', $filename));
   if (preg_match('/(twig|tpl\.php)$/', $template_file, $matches)) {
     $extension = $matches[1];
   }
