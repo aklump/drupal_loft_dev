@@ -1,0 +1,5 @@
+{
+    "require": {
+        "aklump/loft-lib": "^1.0"
+    }
+}

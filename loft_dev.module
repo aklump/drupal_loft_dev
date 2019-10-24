@@ -4,6 +4,7 @@
  * Base module file for loft_dev
  */
 
+use AKlump\LoftLib\Bash\Bash;
 use Drupal\loft_dev\ButtonCatalog;
 
 /**
@@ -1819,4 +1820,21 @@ function loft_dev_js_alter(&$js) {
 
     return isset($switches['file.' . $filetype]) ? $switches['file.' . $filetype] : TRUE;
   });
+}
+
+/**
+ * Implements hook_usage_cron().
+ */
+function loft_dev_usage_cron() {
+  try {
+    Bash::exec([
+      'cd /app && ./bin/website_backup backup -d --local=/app/private/default/db/purgeable',
+    ]);
+    \Drupal::messenger()
+      ->addMessage("Usage cron has successfully performed a local database-only backup.");
+  }
+  catch (\Exception $exception) {
+    \Drupal::messenger()
+      ->addError("Usage cron failed to perform a local website backup.");
+  }
 }
