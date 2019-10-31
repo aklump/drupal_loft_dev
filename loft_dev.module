@@ -1828,7 +1828,7 @@ function loft_dev_js_alter(&$js) {
 function loft_dev_usage_cron() {
   try {
     Bash::exec([
-      'cd /app && ./bin/website_backup backup -d --local=/app/private/default/db/purgeable',
+      'cd /app && ./bin/website_backup backup -d --local=/app/private/default/db/purgeable --latest',
     ]);
     \Drupal::messenger()
       ->addMessage("Usage cron has successfully performed a local database-only backup.");
