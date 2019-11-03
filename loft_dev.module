@@ -1835,6 +1835,6 @@ function loft_dev_usage_cron() {
   }
   catch (\Exception $exception) {
     \Drupal::messenger()
-      ->addError("Usage cron failed to perform a local website backup.");
+      ->addError(sprintf("Usage cron failed to perform a local website backup. %s", $exception->getMessage()));
   }
 }
