@@ -26,9 +26,8 @@ use Drupal\migrate\Row;
  * @code
  * process:
  *   'field_subtitle/0/value':
- *     - plugin: get
- *       source: 'field_xml_metadata/0/xml'
  *     - plugin: loft_xml_extract
+ *       source: 'field_xml_metadata/0/xml'
  *       expression: '/page/header'
  *     - plugin: skip_on_empty
  *       method: row
@@ -47,7 +46,6 @@ class LoftXmlExtract extends ProcessPluginBase {
    */
   public function transform($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property) {
     $new_value = [];
-
     // Require strings, but also allow NULL so that an incoming empty from the
     // get plugin does not indicate that this plugin has failed.
     if (!is_null($value) && !is_string($value)) {
@@ -64,7 +62,8 @@ class LoftXmlExtract extends ProcessPluginBase {
       }
     }
 
-    return $new_value;
+    // We return an array of [0 => null] so that the extract plugin won't fail.
+    return $new_value ?: [NULL];
   }
 
 }
