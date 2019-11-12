@@ -1827,13 +1827,35 @@ function loft_dev_js_alter(&$js) {
  */
 function loft_dev_usage_cron() {
   try {
-    Bash::exec([
+
+    // Look at the result of the last backup for the presence of the word
+    // "failed" in the output.  It's not possible yet to capture the exit status
+    // of the async command, so we have to check for the word "failed" in the
+    // output instead.
+    $previous = \Drupal::state()->get('loft_dev_usage_cron_result');
+    \Drupal::state()->delete('loft_dev_usage_cron_result');
+    if ($previous) {
+      if (($output = $previous->getOutput()) && stristr($output, 'failed') !== FALSE) {
+        \Drupal::messenger()
+          ->addError(sprintf("Previous usage cron failed to perform a local website backup. %s", $output));
+      }
+      $previous->flush();
+    }
+
+    // Send off an async request to backup the DB.  The status will be checked
+    // on the next usage cron and if it has failed it will be reported as a
+    // message.
+    $result = Bash::exec([
       'cd /app && ./bin/website_backup backup -d --local=/app/private/default/db/purgeable --latest',
-    ]);
+    ], [], TRUE);
+    \Drupal::state()->set('loft_dev_usage_cron_result', $result);
     \Drupal::messenger()
       ->addMessage("Usage cron has successfully performed a local database-only backup.");
   }
-  catch (\Exception $exception) {
+
+  catch
+  (\Exception $exception) {
+    \Drupal::state()->delete('loft_dev_usage_cron_result');
     \Drupal::messenger()
       ->addError(sprintf("Usage cron failed to perform a local website backup. %s", $exception->getMessage()));
   }
