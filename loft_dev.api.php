@@ -139,7 +139,7 @@ function hook_loft_dev_sandbox() {
  */
 function HOOK_loft_dev_button_catalog() {
   return [
-    'sass_dir' => drupal_get_path('theme', 'gop5_theme') . '/sass/drupal/',
+    'sass_dir' => drupal_get_path('theme', 'gop_theme') . '/sass/drupal/',
     'sass_file' => '_button--catalog.scss',
 
     // A function that generates the build array for each button.
