@@ -32,6 +32,7 @@ use Drupal\migrate\Row;
  *     - plugin: skip_on_empty
  *       method: row
  *     - plugin: extract
+ *       default: 'foo'
  *       index: [0]
  * @endcode
  *
@@ -62,8 +63,7 @@ class LoftXmlExtract extends ProcessPluginBase {
       }
     }
 
-    // We return an array of [0 => null] so that the extract plugin won't fail.
-    return $new_value ?: [NULL];
+    return $new_value;
   }
 
 }
