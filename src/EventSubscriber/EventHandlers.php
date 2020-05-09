@@ -38,6 +38,11 @@ class EventHandlers implements EventSubscriberInterface {
     if (!$sandbox_is_enabled) {
       return;
     }
+    if (($theme = $event->getRequest()->get('theme'))) {
+      \Drupal::theme()->setActiveTheme(\Drupal::service('theme.initialization')
+        ->initTheme($theme));
+    }
+
     global $_loft_dev_ignored_url;
     if ($_loft_dev_ignored_url) {
       return;
