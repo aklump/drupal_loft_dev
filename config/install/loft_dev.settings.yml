@@ -9,3 +9,4 @@ loft_dev_drupal_deploy_path: null
 loft_dev_free_access: false
 loft_dev_playground_load_data: false
 loft_dev_mail_capture: false
+usage_cron_backups: false

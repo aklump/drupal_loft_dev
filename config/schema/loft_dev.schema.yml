@@ -24,3 +24,5 @@ loft_dev.settings:
       type: boolean
     loft_dev_mail_capture:
       type: boolean
+    usage_cron_backups:
+      type: boolean

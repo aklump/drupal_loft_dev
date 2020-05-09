@@ -5,5 +5,3 @@ package: Development
 core: 8.x
 version: 8.x-2.2-rc12
 type: module
-dependencies:
-  - 'usage_cron:usage_cron'

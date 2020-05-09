@@ -1,4 +1,14 @@
-# Automatic Backups Using Loft Deploy
+# Automatic Backups
+
+Enable backups by doing the following:
+
+1. Enable the [Usage Cron module](https://github.com/aklump/drupal_usage_cron).
+1. Add the following to _settings.local.php_ to turn on backups.
+
+        $config['loft_dev.settings']['usage_cron_backups'] = TRUE;
+
+@todo Update the rest of this, I think it doesn't apply to d8 anymore.
+
 
 Loft Dev Module can automatically call `loft_deploy export` on regular intervals of use.  [Loft Deploy](https://github.com/aklump/loft_deploy) must already be installed and configured for your project.  This has the effect of automatically backing up the database to the normal _Loft Deploy_ output path, for every N minutes of **active** use.
 
