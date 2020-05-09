@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>Automatic Backups Using Loft Deploy</title>
+  <title>Automatic Backups</title>
   <link href="search/tipuesearch.css" rel="stylesheet">
   <link href="style.css" rel="stylesheet">
 </head>
@@ -21,9 +21,21 @@
   </section>
 
 
-<h1>Automatic Backups Using Loft Deploy</h1>
+<h1>Automatic Backups</h1>
 
 <section>
+
+<p>Enable backups by doing the following:</p>
+
+<ol>
+<li>Enable the <a href="https://github.com/aklump/drupal_usage_cron">Usage Cron module</a>.</li>
+<li><p>Add the following to <em>settings.local.php</em> to turn on backups.</p>
+
+<pre><code>$config['loft_dev.settings']['usage_cron_backups'] = TRUE;
+</code></pre></li>
+</ol>
+
+<p>@todo Update the rest of this, I think it doesn't apply to d8 anymore.</p>
 
 <p>Loft Dev Module can automatically call <code>loft_deploy export</code> on regular intervals of use.  <a href="https://github.com/aklump/loft_deploy">Loft Deploy</a> must already be installed and configured for your project.  This has the effect of automatically backing up the database to the normal <em>Loft Deploy</em> output path, for every N minutes of <strong>active</strong> use.</p>
 
@@ -54,7 +66,7 @@ $config['loft_dev.settings']['loft_deploy_purge_after_days'] = 3;
 <footer>
   <div class="pager"><a href="index.html" class="prev index">&laquo;Index</a><a href="index.html" class="index pager__book-title"></a><a href="CHANGELOG.html" class="next changelog">Changelog&raquo;</a></div>  
   <div id="footer-legaleeze">
-    <p class="legaleeze center">Version: 1.0 &bull; Last Updated: Fri, 20 Dec 2019 11:27:31 -0800</p>
+    <p class="legaleeze center">Version: 1.0 &bull; Last Updated: Fri, 08 May 2020 17:59:27 -0700</p>
   </div>
 </footer>
 
