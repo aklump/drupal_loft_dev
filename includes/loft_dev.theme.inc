@@ -31,8 +31,8 @@ function loft_dev_check_path($path) {
   // @FIXME
 // menu_get_item() has been removed. To retrieve route information, use the
 // RouteMatch object, which you can retrieve by calling \Drupal::routeMatch().
-// 
-// 
+//
+//
 // @see https://www.drupal.org/node/2203305
 // if ($item = menu_get_item($uri)) {
 //     $status = !empty($item['path']);
@@ -52,8 +52,8 @@ function loft_dev_check_path($path) {
     // @FIXME
 // drupal_http_request() has been replaced by the Guzzle HTTP client, which is bundled
 // with Drupal core.
-// 
-// 
+//
+//
 // @see https://www.drupal.org/node/1862446
 // @see http://docs.guzzlephp.org/en/latest
 // $item = drupal_http_request($url, array(
@@ -164,7 +164,7 @@ function theme_loft_dev_css_circle($vars) {
   ), $vars['attributes']);
 
   $build[] = array(
-    '#theme' => 'html_tag',
+    '#type' => 'html_tag',
     '#tag' => $vars['tag'],
     '#attributes' => $attributes,
     '#value' => '',
