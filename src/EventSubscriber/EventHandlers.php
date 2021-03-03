@@ -66,7 +66,7 @@ class EventHandlers implements EventSubscriberInterface {
     foreach ($sandboxes as $sandbox) {
       if (_loft_dev_check_get_var($sandbox['query'])) {
         $function = $sandbox['callback'];
-        call_user_func_array($function, $sandbox['callback arguments']);
+        call_user_func_array($function, $sandbox['callback arguments'] ?? []);
         exit(0);
       }
     }
