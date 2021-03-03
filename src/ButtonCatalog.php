@@ -2,13 +2,9 @@
 
 namespace Drupal\loft_dev;
 
-use AKlump\Data\DataInterface;
 use AKlump\LoftLib\Storage\FilePath;
-use Drupal\data_api\DataTrait;
 
 class ButtonCatalog {
-
-  use DataTrait;
 
   protected $themes, $states, $layouts, $config, $theme;
 
@@ -17,13 +13,12 @@ class ButtonCatalog {
   /**
    * ButtonCatalog constructor.
    */
-  public function __construct(array $config, DataInterface $data) {
+  public function __construct(array $config) {
     $this->config = $config;
-    $this->setDataApiData($data);
-    $this->themes = $this->g->get($config, 'themes', []);
-    $this->modules = $this->g->get($config, 'modules', []);
-    $this->states = $this->g->get($config, 'states', []);
-    $this->layouts = $this->g->get($config, 'layouts', []);
+    $this->themes = $config['themes'] ?? [];
+    $this->modules = $config['modules'] ?? [];
+    $this->states = $config['states'] ?? [];
+    $this->layouts = $config['layouts'] ?? [];
   }
 
   /**
@@ -149,7 +144,8 @@ class ButtonCatalog {
       '#prefix' => '<div class="' . $cl('components') . '">',
       '#suffix' => '</div>',
     );
-    $build[] = \Drupal::formBuilder()->getForm('loft_dev_button_catalog_form', $this) + [
+    $build[] = \Drupal::formBuilder()
+        ->getForm('loft_dev_button_catalog_form', $this) + [
         '#prefix' => '<div class="' . $cl('form') . '">',
         '#suffix' => '</div>',
       ];
@@ -161,12 +157,12 @@ class ButtonCatalog {
       $wrapper_class[] = $cl('single', '-');
       $build[] = ['#markup' => '<h2>' . $theme . '</h2>'];
       // @FIXME
-// url() expects a route name or an external URI.
-// $build[] = [
-//         '#markup' => t('<a href="!url">&#8592; Return to all buttons</a>', [
-//           '!url' => url(implode('/', $parent)),
-//         ]),
-//       ];
+      // url() expects a route name or an external URI.
+      // $build[] = [
+      //         '#markup' => t('<a href="!url">&#8592; Return to all buttons</a>', [
+      //           '!url' => url(implode('/', $parent)),
+      //         ]),
+      //       ];
 
       $layouts = [NULL => ''] + $this->layouts;
       foreach ($this->states as $state) {
@@ -188,8 +184,8 @@ class ButtonCatalog {
       $title = $this->getTitle();
       foreach ($this->themes as $theme) {
         // @FIXME
-// url() expects a route name or an external URI.
-// $href = url($path . "/$theme");
+        // url() expects a route name or an external URI.
+        // $href = url($path . "/$theme");
 
         $build['buttons'][] = $this->config['button_callback']($title, $href, $theme, NULL, NULL);
       }

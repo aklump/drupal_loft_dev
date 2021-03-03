@@ -1310,7 +1310,7 @@ function loft_dev_button_catalog_page($theme = NULL) {
 
       // Calculate the value of $data now...
       $config = \Drupal::moduleHandler()->invokeAll('loft_dev_button_catalog');
-      $obj = new ButtonCatalog($config, data_api());
+      $obj = new ButtonCatalog($config);
       $data = $obj->setTheme($theme)->writeSass()->build();
     }
     catch (\Exception $exception) {

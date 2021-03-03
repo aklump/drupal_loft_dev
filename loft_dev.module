@@ -554,7 +554,6 @@ function _loft_dev_playground_data($scope, &$vars) {
     return;
   }
 
-  $g = data_api();
   $default = \Drupal::config('loft_dev.settings')
     ->get('loft_dev_playground_load_data');
   if (!_loft_dev_check_get_var('ldp_data', $default)) {
@@ -576,7 +575,7 @@ function _loft_dev_playground_data($scope, &$vars) {
       file_scan_directory($info['data_path'], $regex, [
         'callback' => function ($uri) use ($scope, $regex, &$vars, $config, $g) {
 
-          if (in_array(pathinfo($uri, PATHINFO_BASENAME), $g->get($config, 'ignore', []))) {
+          if (in_array(pathinfo($uri, PATHINFO_BASENAME), $config['ignore'] ?? [])) {
             return;
           }
 
