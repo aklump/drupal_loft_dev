@@ -5,6 +5,7 @@
  */
 
 use AKlump\LoftLib\Bash\Bash;
+use Drupal\Core\File\FileSystemInterface;
 use Drupal\loft_dev\ButtonCatalog;
 
 /**
@@ -643,10 +644,10 @@ function loft_dev_block_view_alter(&$data, $block) {
 function loft_dev_private_storage($group, $data = NULL) {
   $dir = 'private://loft_dev/' . $group;
   try {
-    file_prepare_directory($dir, FILE_CREATE_DIRECTORY);
+    file_prepare_directory($dir, FileSystemInterface::CREATE_DIRECTORY);
     if (isset($data)) {
       foreach ($data as $filename => $value) {
-        file_unmanaged_save_data($value, $dir . '/' . $filename, FILE_EXISTS_REPLACE);
+        file_unmanaged_save_data($value, $dir . '/' . $filename, FileSystemInterface::EXISTS_REPLACE);
       }
     }
     $data = file_scan_directory($dir, '/.+/', ['key' => 'filename']);
@@ -685,7 +686,7 @@ function loft_dev_mail_alter($message) {
     // Saves a copy of the message in the private files
     $_loft_dev_mail_filename_ = 'private://loft-dev/mail/' . time();
     $url = $_loft_dev_mail_filename_ . '.mail_alter.txt';
-    file_prepare_directory(dirname($url), FILE_CREATE_DIRECTORY);
+    file_prepare_directory(dirname($url), FileSystemInterface::CREATE_DIRECTORY);
     file_unmanaged_save_data(var_export($message, TRUE), $url);
     // @FIXME
     // // @FIXME
