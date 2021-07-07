@@ -145,7 +145,7 @@ function HOOK_loft_dev_button_catalog() {
     // A function that generates the build array for each button.
     'button_callback' => function ($title, $href, $theme, $state, $layout) {
       return array(
-        '#theme' => 'g5_button',
+        '#theme' => 'button',
         '#title' => $title,
         '#href' => $href,
         '#button_type' => 'link',
