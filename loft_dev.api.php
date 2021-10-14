@@ -62,34 +62,6 @@ function hook_loft_dev_menu() {
 }
 
 /**
- * Implements hook_loft_dev_function_includes().
- *
- * If you need to manually add files to the function lookup pages use this.
- *
- * @return array
- * - An array of arrays each with:
- *   - file path: the path to the file or files
- *   - file: string/array
- *     If you need to load more than one file, include an array of files all
- *     within file path
- *     If you want to use a regex mask and scan teh file_path then use: #mask
- * @code
- *       array('#mask' => '/*\.inc$/')
- * @endcode
- */
-
-function hook_loft_dev_function_includes() {
-  return array(
-    array(
-      'file path' => drupal_get_path('module', 'koiros') . '/includes',
-      'file' => array(
-        '#mask' => '/\.inc$/',
-      ),
-    ),
-  );
-}
-
-/**
  * Implements hook_loft_dev_module_dependencies().
  *
  * Make sure all dependent modules get turned on when loft_dev is turned on. Use
@@ -102,15 +74,6 @@ function hook_loft_dev_function_includes() {
 function hook_loft_dev_module_dependencies() {
   return array(
     'ova_dev',
-  );
-}
-
-/**
- * Implements hook_loft_dev_playground_info().
- */
-function hook_loft_dev_playground_info(&$info) {
-  return array(
-    'data_path' => drupal_get_path('theme', 'my_theme') . '/loft_dev_playground',
   );
 }
 

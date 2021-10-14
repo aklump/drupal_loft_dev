@@ -169,75 +169,9 @@ function loft_dev_menu() {
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => -10,
   ];
-  $items['admin/loft-dev/zebra'] = [
-    'title' => 'Zebra Striping',
-    'page callback' => 'loft_dev_zebra_striping_page',
-    'access callback' => '_loft_dev_access',
-    'type' => MENU_LOCAL_TASK,
-    'file' => loft_dev_include('pages', 2),
-  ];
-  $items['admin/loft-dev/fpo-image'] = [
-    'title' => 'FPO Image',
-    'page callback' => 'loft_dev_fpo_image_page',
-    'access callback' => '_loft_dev_access',
-    'type' => MENU_LOCAL_TASK,
-    'file' => loft_dev_include('pages', 2),
-  ];
   $items['admin/loft-dev/rem'] = [
     'title' => 'REM Font Sizing',
     'page callback' => 'loft_dev_rem_page',
-    'access callback' => '_loft_dev_access',
-    'type' => MENU_LOCAL_TASK,
-    'file' => loft_dev_include('pages', 2),
-  ];
-  $items['admin/loft-dev/server'] = [
-    'title' => 'Server Vars',
-    'page callback' => 'loft_dev_server_vars_page',
-    'access callback' => TRUE,
-    'access callback' => '_loft_dev_access',
-    'type' => MENU_LOCAL_TASK,
-    'file' => loft_dev_include('pages', 2),
-  ];
-
-  $items['admin/loft-dev/list'] = [
-    'title' => 'Functions Lists',
-    'page callback' => 'loft_dev_list_functions_page',
-    'page arguments' => ['functions'],
-    'access callback' => '_loft_dev_access',
-    'type' => MENU_NORMAL_ITEM,
-    'file' => loft_dev_include('pages', 2),
-  ];
-  $items['admin/loft-dev/list/functions'] = [
-    'title' => 'PHP Functions',
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => -10,
-  ];
-  $items['admin/loft-dev/list/constants'] = [
-    'title' => 'PHP Constants',
-    'page callback' => 'loft_dev_list_functions_page',
-    'page arguments' => [3],
-    'access callback' => '_loft_dev_access',
-    'type' => MENU_LOCAL_TASK,
-    'file' => loft_dev_include('pages', 2),
-  ];
-  $items['admin/loft-dev/list/classes'] = [
-    'title' => 'PHP Classes',
-    'page callback' => 'loft_dev_list_functions_page',
-    'page arguments' => [3],
-    'access callback' => '_loft_dev_access',
-    'type' => MENU_LOCAL_TASK,
-    'file' => loft_dev_include('pages', 2),
-  ];
-  $items['admin/loft-dev/list/libraries'] = [
-    'title' => 'Drupal Libraries',
-    'page callback' => 'loft_dev_list_libraries_page',
-    'access callback' => '_loft_dev_access',
-    'type' => MENU_LOCAL_TASK,
-    'file' => loft_dev_include('pages', 2),
-  ];
-  $items['admin/loft-dev/list/fapi'] = [
-    'title' => 'FAPI Elements',
-    'page callback' => 'loft_dev_list_fapi_elements_page',
     'access callback' => '_loft_dev_access',
     'type' => MENU_LOCAL_TASK,
     'file' => loft_dev_include('pages', 2),
@@ -246,14 +180,6 @@ function loft_dev_menu() {
     'title' => 'Default Theme Tester',
     'page callback' => 'drupal_goto',
     'page arguments' => ['loft-dev/theme'],
-    'access callback' => '_loft_dev_access',
-    'type' => MENU_LOCAL_TASK,
-    'file' => loft_dev_include('pages', 2),
-  ];
-  $items['admin/loft-dev/theme/admin'] = [
-    'title' => 'Admin theme test page',
-    'page callback' => 'loft_dev_theme_test_page',
-    'page arguments' => [3],
     'access callback' => '_loft_dev_access',
     'type' => MENU_LOCAL_TASK,
     'file' => loft_dev_include('pages', 2),
@@ -280,34 +206,6 @@ function loft_dev_menu() {
     'type' => MENU_LOCAL_TASK,
   ];
 
-  $items['loft-dev/theme'] = [
-    'title' => 'Default theme test page',
-    'page callback' => 'loft_dev_theme_test_page',
-    'access callback' => '_loft_dev_access',
-    'type' => MENU_CALLBACK,
-    'file' => loft_dev_include('pages', 2),
-  ];
-  $items['loft-dev/theme/action1'] = [
-    'title' => 'Action Link #1',
-    'description' => 'Some description is helpful for UX',
-    'page callback' => 'drupal_goto',
-    'access callback' => '_loft_dev_access',
-    'type' => MENU_LOCAL_ACTION,
-  ];
-  $items['loft-dev/theme/action2'] = [
-    'title' => 'Action Link #2',
-    'description' => 'Some description is helpful for UX',
-    'page callback' => 'drupal_goto',
-    'access callback' => '_loft_dev_access',
-    'type' => MENU_LOCAL_ACTION,
-  ];
-  $items['loft-dev/theme/action3'] = [
-    'title' => 'Action Link #3',
-    'description' => 'Some description is helpful for UX',
-    'page callback' => 'drupal_goto',
-    'access callback' => '_loft_dev_access',
-    'type' => MENU_LOCAL_ACTION,
-  ];
   $items['loft-dev/theme/403'] = [
     'title' => '403 page',
     'page callback' => 'drupal_access_denied',
@@ -446,34 +344,12 @@ function _loft_dev_access() {
 /**
  * Implements hook_preprocess_html().
  */
-function loft_dev_preprocess_block(&$vars) {
-  if (!_loft_dev_access()) {
-    return;
-  }
-  _loft_dev_playground_data('block', $vars);
-
-  global $_loft_dev_playground;
-  if ($_loft_dev_playground === TRUE) {
-    $vars['theme_hook_suggestion'] = 'block__loft_dev_playground';
-  }
-}
-
-/**
- * Implements hook_preprocess_html().
- */
 function loft_dev_preprocess_html(&$vars) {
   return;
   global $_design_guide;
 
   if (!_loft_dev_access()) {
     return;
-  }
-
-  _loft_dev_playground_data('html', $vars);
-
-  global $_loft_dev_playground;
-  if ($_loft_dev_playground === TRUE) {
-    $vars['theme_hook_suggestion'] = 'html__loft_dev_playground';
   }
 
   // Append the loft dev tools to page_bottom
@@ -487,26 +363,6 @@ function loft_dev_preprocess_html(&$vars) {
   if ($_design_guide) {
     // Supporess loft_dev_block on design page.
     $vars['page']['page_bottom']['loft_dev_block']['#access'] = FALSE;
-  }
-}
-
-/**
- * Implements hook_preprocess_page().
- */
-function loft_dev_preprocess_page(&$vars) {
-  global $_loft_dev_ignored_url;
-  if ($_loft_dev_ignored_url) {
-    return;
-  }
-  if (!_loft_dev_access()) {
-    return;
-  }
-
-  _loft_dev_playground_data('page', $vars);
-
-  global $_loft_dev_playground;
-  if ($_loft_dev_playground === TRUE) {
-    $vars['theme_hook_suggestion'] = 'page__loft_dev_playground';
   }
 }
 
@@ -543,75 +399,6 @@ function loft_dev_array_set_nested_element(&$array, &$keys, $value) {
 }
 
 /**
- * Loads data from flatfiles for a given scope, e.g., html, page.
- *
- * @param string $scope Expecting html, page, etc.
- * @param array &$vars The vars for that scope.
- */
-function _loft_dev_playground_data($scope, &$vars) {
-  global $_loft_dev_ignored_url;
-  if ($_loft_dev_ignored_url) {
-    return;
-  }
-
-  $default = \Drupal::config('loft_dev.settings')
-    ->get('loft_dev_playground_load_data');
-  if (!_loft_dev_check_get_var('ldp_data', $default)) {
-    return;
-  }
-  $info = \Drupal::moduleHandler()->invokeAll('loft_dev_playground_info');
-  $data = [];
-  foreach (\Drupal::moduleHandler()
-             ->getImplementations('loft_dev_playground_info') as $module) {
-    if (($info = \Drupal::moduleHandler()
-        ->invoke($module, 'loft_dev_playground_info'))
-      && file_exists($info['data_path'])
-    ) {
-      $regex = '/' . preg_quote($scope) . "\.(.+)\.php$/";
-
-      $config_file = $info['data_path'] . '/config.json';
-      $config = is_readable($config_file) && ($config = json_decode(file_get_contents($config_file), TRUE)) ? $config : [];
-
-      file_scan_directory($info['data_path'], $regex, [
-        'callback' => function ($uri) use ($scope, $regex, &$vars, $config, $g) {
-
-          if (in_array(pathinfo($uri, PATHINFO_BASENAME), $config['ignore'] ?? [])) {
-            return;
-          }
-
-          preg_match($regex, $uri, $matches);
-          ob_start();
-          require_once \Drupal::root() . '/' . $uri;
-          $content = ob_get_contents();
-          ob_end_clean();
-
-          if (trim($content)) {
-            $content = ['#markup' => $content];
-            $tree = explode('.', $matches[1]);
-            array_unshift($tree, $scope);
-            loft_dev_array_set_nested_element($vars, $tree, $content);
-          }
-        },
-      ], $depth = 0);
-    }
-  }
-}
-
-
-/**
- * Implements hook_loft_dev_playground_info().
- *
- * Registers the active theme
- */
-function loft_dev_loft_dev_playground_info() {
-  return [
-    'data_path' => \Drupal::theme()
-        ->getActiveTheme()
-        ->getPath() . '/loft_dev_playground',
-  ];
-}
-
-/**
  * Implements hook_block_view_alter().
  */
 function loft_dev_block_view_alter(&$data, $block) {
@@ -624,75 +411,6 @@ function loft_dev_block_view_alter(&$data, $block) {
   global $_design_guide;
   if ($_design_guide && $block->module == 'loft_dev') {
     $data = NULL;
-  }
-}
-
-/**
- * Getter/setter for private storage of data
- *
- * This is used so that we bypass the database and store this in the private
- * directory; by doing this we avoid nuking this when we pull from prod.  In
- * essence its a supersceding storage mechanism.
- *
- * @param string $group A key to group related data.
- * @param array $data Keyed by filename, the values will become the file
- *                       contents.
- *
- * @return array  The currently stored values.
- */
-function loft_dev_private_storage($group, $data = NULL) {
-  $dir = 'private://loft_dev/' . $group;
-  try {
-    file_prepare_directory($dir, FileSystemInterface::CREATE_DIRECTORY);
-    if (isset($data)) {
-      foreach ($data as $filename => $value) {
-        file_unmanaged_save_data($value, $dir . '/' . $filename, FileSystemInterface::EXISTS_REPLACE);
-      }
-    }
-    $data = file_scan_directory($dir, '/.+/', ['key' => 'filename']);
-    foreach (array_keys($data) as $filename) {
-      $data[$filename] = file_get_contents($dir . '/' . $filename);
-    }
-  }
-  catch (Exception $e) {
-    watchdog_exception('loft_dev', $e);
-  }
-
-  return $data;
-}
-
-/**
- * Implementation of hook_mail
- */
-function loft_dev_mail_alter($message) {
-  global $_loft_dev_mail_system_stashed_, $_loft_dev_mail_filename_;
-  if (\Drupal::config('loft_dev.settings')->get('loft_dev_mail_capture')) {
-
-    // Stashes and sets to the testing mail system.
-    // @FIXME
-    // // @FIXME
-    // // This looks like another module's variable. You'll need to rewrite this call
-    // // to ensure that it uses the correct configuration object.
-    // $_loft_dev_mail_system_stashed_ = variable_get('mail_system');
-
-    // @FIXME
-    // // @FIXME
-    // // This looks like another module's variable. You'll need to rewrite this call
-    // // to ensure that it uses the correct configuration object.
-    // variable_set('mail_system', ['default-system' => 'TestingMailSystem']);
-
-
-    // Saves a copy of the message in the private files
-    $_loft_dev_mail_filename_ = 'private://loft-dev/mail/' . time();
-    $url = $_loft_dev_mail_filename_ . '.mail_alter.txt';
-    file_prepare_directory(dirname($url), FileSystemInterface::CREATE_DIRECTORY);
-    file_unmanaged_save_data(var_export($message, TRUE), $url);
-    // @FIXME
-    // // @FIXME
-    // // This looks like another module's variable. You'll need to rewrite this call
-    // // to ensure that it uses the correct configuration object.
-    // variable_set('mail_system', ['default-system' => 'TestingMailSystem']);
-
   }
 }
 
@@ -853,6 +571,7 @@ function loft_dev_node_suite() {
   }
   if (empty($suite)) {
 
+    $types = array_keys(\Drupal\node\Entity\NodeType::loadMultiple());
     $types = array_keys(node_type_get_types());
     foreach ($types as $type) {
       $query = db_select('node', 'n');
@@ -1862,4 +1581,11 @@ function loft_dev_usage_cron() {
     \Drupal::messenger()
       ->addError(sprintf("Usage cron failed to perform a local website backup. %s", $exception->getMessage()));
   }
+}
+
+/**
+ * Implements hook_phpstan_config().
+ */
+function loft_dev_phpstan_config_alter(array &$config) {
+  return;
 }

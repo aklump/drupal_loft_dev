@@ -70,13 +70,6 @@ admin/structure/types/manage/video/display/teaser?reset&label=hidden
    rollback to:
 drush vset loft_dev:update_rollback_{module name} {schema version, e.g. 7004}
 
-Integration with drupal_deploy
-
-   Add the somthing like the following to your settings file so the
-   current deploy folder can be located:
-$conf['loft_dev_drupal_deploy_path'] = realpath(DRUPAL_ROOT . '/../drupal_deploy
-/user/deploy_2.0');
-
 Theme Playground Templates (on ?pg or off ?pg=0)
 
    For rapid development, a feature exists called the theme playground
