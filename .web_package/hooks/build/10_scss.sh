@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
-bump_sass=$(type sass >/dev/null &2>&1 && which sass)
+# https://www.npmjs.com/package/node-sass-chokidar
+sass=./node_modules/.bin/node-sass-chokidar
 
-[[ -d "dist/" ]] || mkdir "dist/"
-$bump_sass  --style=compressed --no-cache --update "$7/scss/loft_dev.scss:$7/dist/loft_dev.css"
+# config
+style=compressed
+# endconfig
+
+test -e "$7/dist" && rm -r "$7/dist"
+$sass --output-style=${style} "$7/scss/loft_dev.scss" -o "$7/dist"
