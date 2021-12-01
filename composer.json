@@ -1,5 +1,8 @@
 {
     "require": {
         "aklump/loft-lib": "^1.1"
+    },
+    "require-dev": {
+        "twig/twig": "^2"
     }
 }

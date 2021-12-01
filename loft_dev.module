@@ -1432,8 +1432,6 @@ function _loft_dev_file_header_handle_vars($options, $vars, &$comments, &$level 
 function _loft_dev_file_header($parent, $template_file, array $vars, $prepend_dollar_sign = TRUE) {
   $filename = preg_replace('/\.(html|tpl)$/', '', pathinfo($template_file, PATHINFO_FILENAME));
 
-  // TODO Add this back when we have access to this class.
-  //  $filename = Grammar::titleCase(str_replace('--', ', ', $filename));
   if (preg_match('/(twig|tpl\.php)$/', $template_file, $matches)) {
     $extension = $matches[1];
   }
@@ -1470,12 +1468,13 @@ function _loft_dev_file_header($parent, $template_file, array $vars, $prepend_do
     $phpcs = PHP_EOL . ' *' . PHP_EOL . ' * phpcs:disable Generic.PHP.DisallowShortOpenTag';
   }
 
+  $implementation_title = ucwords(preg_replace('/[-_]/', ' ', $filename));
   $stub = <<<EOD
 <?php
 
 /**
  * @file
- * {$implementation} for {$filename}.
+ * {$implementation} for {$implementation_title}.
  *
  * Available variables:
 {$list}.{$phpcs}

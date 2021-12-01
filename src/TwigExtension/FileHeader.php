@@ -3,42 +3,60 @@
 namespace Drupal\loft_dev\TwigExtension;
 
 use Drupal\Core\Render\Markup;
+use \Drupal\Core\Template\TwigEnvironment;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
 /**
  * This will not work if your template starts uses {% extends "block.html.twig"
  * %}, int that case try commenting out the extends line and run this to
  * generate the header, then uncomment.
+ *
+ * @see \Drupal\loft_dev\Template\TwigEnvironment.
  */
-class FileHeader extends \Twig_Extension {
+class FileHeader extends AbstractExtension {
 
   /**
-   * {@inheritdoc}
+   * Prevents processing the same file more than once by tracking an index.
+   *
+   * @var array
    */
-  public function getFunctions() {
-    return [
-      new \Twig_SimpleFunction('file_header', function (\Twig_Environment $env, $context) {
-        if (!($name_of_template_file = $env->getCompiler()->getFilename())) {
-          \Drupal::messenger()
-            ->addWarning(Markup::create("The <code>file_header()</code> function is not available when twig caching is enabled.  Disable the twig cache using <em>development.services.yml</em> and reload your twig file to write the file header. Add the following and rebuild cache: <pre><code>parameters:
-  twig.config:
-    debug: true
-    auto_reload: true
-    cache: false</code></pre>"));
-
-          return;
-        }
-        $path_to_template_file = $env->getLoader()
-          ->getCacheKey($name_of_template_file);
-        static::getFileHeader($path_to_template_file, $context);
-      }, ['needs_context' => TRUE, 'needs_environment' => TRUE]),
-    ];
-  }
+  private $processed = [];
 
   /**
    * {@inheritdoc}
    */
   public function getName() {
     return 'file_header.twig_extension';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getFunctions() {
+    return [
+      new TwigFunction('file_header', function (TwigEnvironment $env, $context) {
+
+        $path_to_template_file = $env->getTemplateFilepath();
+        if (!$path_to_template_file) {
+          \Drupal::messenger()
+            ->addWarning(Markup::create("The <code>file_header()</code> function is not available when twig caching is enabled.  Disable the twig cache using <em>development.services.yml</em> and reload your twig file to write the file header. Add the following and rebuild cache: <pre><code>parameters:
+  twig.config:
+    debug: true
+    auto_reload: true
+    cache: false</code></pre>"));
+        }
+
+        // Prevent processing more than once.
+        elseif (!in_array($path_to_template_file, $this->processed)) {
+          static::getFileHeader($path_to_template_file, $context);
+          $this->processed[] = $path_to_template_file;
+        }
+      }, [
+        'needs_context' => TRUE,
+        'needs_environment' => TRUE,
+      ]),
+    ];
   }
 
   /**
