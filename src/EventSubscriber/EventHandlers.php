@@ -79,17 +79,20 @@ class EventHandlers implements EventSubscriberInterface {
       return;
     }
 
-    $loft_dev = \Drupal::service('loft_dev');
+    // Do not worry about emails when running in Lando.
+    if (!isset($_ENV["LANDO_HOST_IP"])) {
+      $loft_dev = \Drupal::service('loft_dev');
 
-    // Check our email configuration is correct.
-    if (!$loft_dev->getProperlyConfiguredRerouteEmailAddress()) {
-      $this->messenger()->addError($this->t('Reroute email is not properly enabled/configured. You should add something like the following to <em>settings.local.php</em>
+      // Check our email configuration is correct.
+      if (!$loft_dev->getProperlyConfiguredRerouteEmailAddress()) {
+        $this->messenger()->addError($this->t('Reroute email is not properly enabled/configured. You should add something like the following to <em>settings.local.php</em>
 <pre><code>
   $config[\'reroute_email.settings\'][\'enable\'] = TRUE;
   $config[\'reroute_email.settings\'][\'address\'] = \'aklump@imac-aaron.local\';
 </code></pre>
 To suppress this message you must disable Loft Dev module.', [
-      ]), FALSE);
+        ]), FALSE);
+      }
     }
   }
 
