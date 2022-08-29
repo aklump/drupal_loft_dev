@@ -1516,24 +1516,26 @@ function loft_dev_js_alter(&$js) {
   ], TRUE);
   \Drupal::moduleHandler()->alter('loft_dev_js', $switches);
   $js = array_filter($js, function ($item) use ($switches) {
-    if ($item['type'] !== 'file') {
+    if (isset($item['type']) && $item['type'] !== 'file') {
       return $switches[$item['type']];
     }
 
     $filetype = NULL;
-    if (strpos($item['data'], 'theme') !== FALSE) {
-      $filetype = 'theme';
-    }
-    elseif (strpos($item['data'], '/modules') !== FALSE) {
-      if (strpos($item['data'], '/custom') !== FALSE) {
-        $filetype = 'custom';
+    if (isset($item['data'])) {
+      if (strpos($item['data'], 'theme') !== FALSE) {
+        $filetype = 'theme';
       }
-      else {
-        $filetype = 'contrib';
+      elseif (strpos($item['data'], '/modules') !== FALSE) {
+        if (strpos($item['data'], '/custom') !== FALSE) {
+          $filetype = 'custom';
+        }
+        else {
+          $filetype = 'contrib';
+        }
       }
-    }
-    elseif (strpos($item['data'], 'misc/') !== FALSE) {
-      $filetype = 'core';
+      elseif (strpos($item['data'], 'misc/') !== FALSE) {
+        $filetype = 'core';
+      }
     }
 
     return isset($switches['file.' . $filetype]) ? $switches['file.' . $filetype] : TRUE;
