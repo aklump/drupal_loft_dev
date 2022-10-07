@@ -32,10 +32,10 @@ class FinalExceptionSubscriber implements EventSubscriberInterface {
     if ($status >= 500 && $type === 'text/plain') {
 
       $content = $response->getContent();
-      list($top, $backtrace) = explode('<pre class="backtrace">', $content);
-
+      $content = explode('<pre class="backtrace">', $content);
+      $top = $content[0] ?? NULL;
       $top = str_replace('The website encountered an unexpected error. Please try again later.</br></br>', '', $top);
-
+      $backtrace = $content[0] ?? NULL;
       $backtrace = trim(preg_replace('/<\/pre>$/', '', $backtrace));
       $backtrace = explode(PHP_EOL, $backtrace);
       $starting_count = count($backtrace) + 1;
@@ -62,7 +62,7 @@ class FinalExceptionSubscriber implements EventSubscriberInterface {
         list-style: none;
         counter-reset: reverse {$starting_count};
       }
-    
+      
       .backtrace ol> li:before {
         content: counter(reverse) '.';
         display: block;
@@ -71,7 +71,7 @@ class FinalExceptionSubscriber implements EventSubscriberInterface {
         text-align: right;
         width: 20px;
       }
-    
+      
       .backtrace ol>li {
         counter-increment: reverse -1;
         position: relative;
