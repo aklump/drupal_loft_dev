@@ -19,5 +19,9 @@ Provides tools for use in a Drupal developement environment.
 1. Require this package:
    
     ```
-    composer require --dev aklump_drupal/loft_dev:@dev
+    composer require --dev aklump_drupal/loft_dev:^2.3
     ```
+
+## Outdated
+
+The rest of the documentation is severaly outdated and probably inaccurate.  At this point, trust only this page, and use the rest as a loose guide.
