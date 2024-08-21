@@ -8,9 +8,13 @@ body.page-loft-dev-theme-playground {
 }
 
 .block-loft-dev {
-
-  // Typography
   font-size: 14px !important;
+  background-color: #000;
+  margin-top: 100px;
+  position: relative;
+  text-align: left;
+  color: $green;
+  font-family: "Panic Sans", monospace !important;
   h2, h3, legend {
     font-size: 18px !important
   }
@@ -20,13 +24,6 @@ body.page-loft-dev-theme-playground {
   h2:first-child {
     margin-top: 0;
   }
-
-  background-color: #000;
-  margin-top: 100px;
-  position: relative;
-  text-align: left;
-  color: $green;
-  font-family: "Panic Sans", monospace !important;
   .loft-dev-closure {
     padding: 20px;
   }
@@ -41,7 +38,7 @@ body.page-loft-dev-theme-playground {
     width: 100% !important;
   }
   .form-text {
-    display: auto !important;
+    display: initial !important;
     width: 100% !important;
   }
   tr.odd {

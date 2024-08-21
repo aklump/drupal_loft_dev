@@ -6,17 +6,15 @@
  * @{
  */
 
-(function($) {
+(function ($) {
   Drupal.loftDev = Drupal.loftDev || {};
 
   /**
    * A function to quickly clean up the view for layout checks.
    */
-  Drupal.loftDev.hideAdminStuff = function() {
+  Drupal.loftDev.hideAdminStuff = function () {
     // List of classes that are "admin stuff"--to hide.
-    $(drupalSettings.loftDev.adminStuff)
-      .addClass('hidden-by-loft-dev')
-      .hide();
+    $(drupalSettings.loftDev.adminStuff).addClass('hidden-by-loft-dev').hide();
     $('html').addClass('loft-dev--admin-is-hidden');
     $('body.toolbar').css('padding-top', 0);
   };
@@ -26,7 +24,7 @@
    *
    * @return {[type]} [description]
    */
-  Drupal.loftDev.showAdminStuff = function() {
+  Drupal.loftDev.showAdminStuff = function () {
     $(drupalSettings.loftDev.adminStuff)
       .removeClass('hidden-by-loft-dev')
       .show();
@@ -37,7 +35,7 @@
    * Core behavior for loft_dev.
    */
   Drupal.behaviors.loftDev = Drupal.behaviors.loftDev || {};
-  Drupal.behaviors.loftDev.attach = function(context, settings) {
+  Drupal.behaviors.loftDev.attach = function (context, settings) {
     if ($.cookie('loft_dev_admin_stuff') === 'hidden') {
       Drupal.loftDev.hideAdminStuff();
       $('body')
@@ -56,7 +54,7 @@
 
     $('.loft-dev-hide-admin-trigger')
       .once('loft-dev')
-      .click(function(e) {
+      .click(function (e) {
         Drupal.loftDev.hideAdminStuff();
 
         // Was the meta key held down? Set cookie?
@@ -92,16 +90,13 @@
       );
     }
 
-    $('li .element-name a').click(function() {
-      $(this)
-        .parents('li')
-        .find('.element-details')
-        .slideToggle();
+    $('li .element-name a').click(function () {
+      $(this).parents('li').find('.element-details').slideToggle();
       return false;
     });
 
     // button catalog
-    $('.button-catalog').once('button-catalog', function() {
+    $('.button-catalog').once('button-catalog', function () {
       var $form = $(this).find('form'),
         $states = $form.find('.form-item-state select'),
         $layout = $form.find('.form-item-layout select'),
@@ -112,7 +107,7 @@
         current = {};
 
       function applyClasses() {
-        $buttons.each(function() {
+        $buttons.each(function () {
           applyClass($(this));
         });
       }
@@ -131,10 +126,10 @@
         }
       }
 
-      $buttons.each(function() {
+      $buttons.each(function () {
         var $button = $(this);
         $button.data('class', $button.attr('class'));
-        $button.click(function() {
+        $button.click(function () {
           $button.show();
           state = state === 'all' ? 'one' : 'all';
           if (state === 'one') {
@@ -145,20 +140,20 @@
           return false;
         });
       });
-      $form.submit(function() {
+      $form.submit(function () {
         return false;
       });
-      $class.keyup(function() {
+      $class.keyup(function () {
         applyClasses();
       });
-      $title.keyup(function() {
+      $title.keyup(function () {
         $buttons.find('.button__text').text($title.val());
       });
-      $states.change(function() {
+      $states.change(function () {
         current.state = state = $(this).val();
         applyClasses();
       });
-      $layout.change(function() {
+      $layout.change(function () {
         current.layout = $(this).val();
         applyClasses();
       });
@@ -196,8 +191,8 @@
  * @see http://www.intheloftstudios.com
  * @see http://gist.github.com/4278992
  */
-(function($) {
-  $.fn.listSearchFilter = function($input, options) {
+(function ($) {
+  $.fn.listSearchFilter = function ($input, options) {
     var $list = $(this);
     var settings = $.extend(
       {
@@ -210,16 +205,12 @@
     /**
      * Filter the list with a needle
      */
-    var filter = function(needle) {
+    var filter = function (needle) {
       var $items = $list.find('li');
       $items
         .hide()
-        .filter(function() {
-          return (
-            $(this)
-              .text()
-              .indexOf(needle) !== -1
-          );
+        .filter(function () {
+          return $(this).text().indexOf(needle) !== -1;
         })
         .show();
     };
@@ -227,7 +218,7 @@
     /**
      * Handler of the input
      */
-    $input.keypress(function(e) {
+    $input.keypress(function (e) {
       var code = e.keyCode ? e.keyCode : e.which;
       var needle = $(this).val();
       if (
