@@ -2,6 +2,8 @@
 
 namespace Drupal\loft_dev\Template;
 
+use Twig\Template;
+
 class TwigEnvironment extends \Drupal\Core\Template\TwigEnvironment {
 
   /**
@@ -20,12 +22,12 @@ class TwigEnvironment extends \Drupal\Core\Template\TwigEnvironment {
    * @return mixed|\Twig_TemplateInterface
    * @throws \Twig\Error\RuntimeError
    */
-  public function loadTemplate($name, $index = NULL) {
+  public function loadTemplate(string $cls, string $name, int $index = NULL): Template {
     if (file_exists($name)) {
       $this->templateFilepath = file_exists($name) ? $name : NULL;
     }
 
-    return parent::loadTemplate($name, $index);
+    return parent::loadTemplate($cls, $name, $index);
   }
 
   /**

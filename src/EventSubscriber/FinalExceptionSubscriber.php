@@ -25,7 +25,7 @@ class FinalExceptionSubscriber implements EventSubscriberInterface {
    *
    * @param \Symfony\Component\HttpKernel\Event\FilterResponseEvent $event
    */
-  public function prettifyExceptions(FilterResponseEvent $event) {
+  public function prettifyExceptions(\Symfony\Component\HttpKernel\Event\ResponseEvent $event) {
     $response = $event->getResponse();
     $status = $response->getStatusCode();
     $type = $response->headers->get('Content-Type');
@@ -57,12 +57,12 @@ class FinalExceptionSubscriber implements EventSubscriberInterface {
         line-height: 3;
         margin-left: 10px;
         color: #0000cc;
-      }      
+      }
       .backtrace ol{
         list-style: none;
         counter-reset: reverse {$starting_count};
       }
-      
+
       .backtrace ol> li:before {
         content: counter(reverse) '.';
         display: block;
@@ -71,7 +71,7 @@ class FinalExceptionSubscriber implements EventSubscriberInterface {
         text-align: right;
         width: 20px;
       }
-      
+
       .backtrace ol>li {
         counter-increment: reverse -1;
         position: relative;
