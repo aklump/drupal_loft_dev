@@ -78,26 +78,6 @@ function hook_loft_dev_module_dependencies() {
 }
 
 /**
- * Implements hook_loft_dev_api().
- */
-function hook_loft_dev_sandbox() {
-  return array(
-    // You may have more than one trigger...
-    array(
-      // Appending ?sb to the url will cause callback to be executed with
-      // callback arguments.
-      'query' => 'sb',
-      'callback' => 'module_load_include',
-      'callback arguments' => array(
-        'inc',
-        'my_module',
-        'includes/my_module.sandbox',
-      ),
-    ),
-  );
-}
-
-/**
  * Implements hook_loft_dev_button_catalog().
  */
 function HOOK_loft_dev_button_catalog() {

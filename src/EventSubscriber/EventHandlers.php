@@ -27,51 +27,7 @@ class EventHandlers implements EventSubscriberInterface {
         ['onInit', 0],
         ['onRequest', 0],
       ],
-      KernelEvents::VIEW => [
-        ['handleSandbox', 100],
-      ],
     ];
-  }
-
-  public function handleSandbox(GetResponseForControllerResultEvent $event) {
-    // TODO 'sb' is supposed to be configurable.
-    // TODO This doesn't work to just pass 'sb', have to pass 'sb=1'; the former should work, so fix.
-    $sandbox_is_enabled = $event->getRequest()->get('sb');
-    if (!$sandbox_is_enabled) {
-      return;
-    }
-    if (($theme = $event->getRequest()->get('theme'))) {
-      \Drupal::theme()->setActiveTheme(\Drupal::service('theme.initialization')
-        ->initTheme($theme));
-    }
-
-    global $_loft_dev_ignored_url;
-    if ($_loft_dev_ignored_url) {
-      return;
-    }
-    $sandboxes = \Drupal::moduleHandler()->invokeAll('loft_dev_sandbox');
-
-    // Frontmatter to help developer know where he is.
-    if ($sandboxes) {
-      $frontmatter = [
-        'activeTheme' => \Drupal::service('theme.manager')
-          ->getActiveTheme()
-          ->getName(),
-      ];
-      $header = [];
-      $header[] = '---';
-      $header[] = trim(Yaml::dump($frontmatter));
-      $header[] = '---';
-      print '<pre><code>' . implode(PHP_EOL, $header) . '</code></pre>';
-    }
-
-    foreach ($sandboxes as $sandbox) {
-      if (_loft_dev_check_get_var($sandbox['query'])) {
-        $function = $sandbox['callback'];
-        call_user_func_array($function, $sandbox['callback arguments'] ?? []);
-        exit(0);
-      }
-    }
   }
 
   public function onInit() {
