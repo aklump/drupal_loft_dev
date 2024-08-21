@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
-# https://www.npmjs.com/package/node-sass-chokidar
-sass=./node_modules/.bin/node-sass-chokidar
+sass=./node_modules/.bin/sass
 
-# config
-style=compressed
-# endconfig
-
-test -e "$7/dist" && rm -r "$7/dist"
-$sass --output-style=${style} "$7/scss/loft_dev.scss" -o "$7/dist"
+test -e "dist" && rm -r "dist"
+$sass --style=compressed "scss/loft_dev.scss" "dist/loft_dev.css"
