@@ -1,4 +1,5 @@
 {
+    "name": "aklump_drupal/loft_dev",
     "require": {
         "aklump/loft-lib": "^1.1"
     },

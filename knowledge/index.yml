@@ -1,0 +1,9 @@
+page_order:
+  general:
+    - readme
+    - changelog
+    - backups
+    - image_styles
+    - twiggy
+    - variables
+    - legacy_readme
