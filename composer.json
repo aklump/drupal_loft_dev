@@ -4,6 +4,6 @@
         "aklump/loft-lib": "^1.1 || ^2"
     },
     "require-dev": {
-        "twig/twig": "^2"
+        "twig/twig": "^3"
     }
 }
